@@ -16,10 +16,12 @@
         (function(){
             var s = document.createElement('script');
             var body = document.querySelector('head') || document.body;
-            s.src = 'index.js';
+            s.src = 'https://raw.githubusercontent.com/irwing-moura/acessibrasil/main/index.js';
             s.async = true;
             s.onload = function () {
-                acessiBrasil.init();
+                if (window.acessiBrasil && typeof window.acessiBrasil.init === 'function') {
+                    window.acessiBrasil.init();
+                }
             }
             body.appendChild(s);
         })();
