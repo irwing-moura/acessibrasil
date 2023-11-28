@@ -119,3 +119,5 @@ function toggleExpandWindow() {
   var expandWindow = document.getElementById('expand-window');
   expandWindow.style.display = (expandWindow.style.display === 'none' || expandWindow.style.display === '') ? 'block' : 'none';
 }
+
+window.init = init;
