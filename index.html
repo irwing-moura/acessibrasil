@@ -16,11 +16,11 @@
         (function(){
             var s = document.createElement('script');
             var body = document.querySelector('head') || document.body;
-            s.src = 'https://raw.githubusercontent.com/irwing-moura/acessibrasil/main/index.js';
+            s.src = 'index.js';
             s.async = true;
-            // s.onload = function () {
-            //     acessiBrasil.init();
-            // }
+            s.onload = function () {
+                acessiBrasil.init();
+            }
             body.appendChild(s);
         })();
     </script>

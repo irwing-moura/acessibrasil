@@ -7,8 +7,9 @@ txtTags.forEach(function(txtTag) {
     txtTag.setAttribute('data-initial-size-' + txtTag.tagName, parseInt(window.getComputedStyle(txtTag).fontSize));
 });
 
+window.acessiBrasil = window.acessiBrasil || {};
 
-window.acessiBrasil = function init() {
+window.acessiBrasil.init = function init() {
 
   createIcon();
 
@@ -140,7 +141,3 @@ function toggleExpandWindow() {
 //   
 
 // }
-
-function exposeAPI() {
-  window.acessiBrasil = window.acessiBr || window.access;
-}
