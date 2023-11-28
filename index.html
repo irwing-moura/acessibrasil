@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Widget</title>
+
+</head>
+<body>
+    <!-- Conteúdo da Página -->
+
+    <h1>teste</h1>
+    <span>span</span>
+
+    <script>
+        (function(){
+            var s = document.createElement('script');
+            var body = document.querySelector('head') || document.body;
+            s.src = 'https://raw.githubusercontent.com/irwing-moura/acessibrasil/main/index.js';
+            s.async = true;
+            s.onload = function () {
+                init();
+            }
+            body.appendChild(s);
+        })();
+    </script>
+</body>
+</html>
