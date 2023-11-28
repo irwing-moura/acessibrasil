@@ -1,4 +1,3 @@
-console.log('Script externo está sendo executado.');
 
 window.acessiBrasil = window.acessiBrasil || {};
 
@@ -13,8 +12,6 @@ txtTags.forEach(function(txtTag) {
 
 
 window.acessiBrasil.init = function init() {
-
-  console.log('Entrou no init');
 
   createIcon();
 
@@ -119,8 +116,6 @@ function createIcon() {
   document.body.appendChild(expandWindow);
 
 }
-
-
 
 function toggleExpandWindow() {
   var expandWindow = document.getElementById('expand-window');
