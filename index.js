@@ -1,4 +1,3 @@
-window.acessiBrasil = window.acessiBrasil || {};
 
 var txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, span');
 
@@ -120,4 +119,28 @@ function createIcon() {
 function toggleExpandWindow() {
   var expandWindow = document.getElementById('expand-window');
   expandWindow.style.display = (expandWindow.style.display === 'none' || expandWindow.style.display === '') ? 'block' : 'none';
+}
+
+// function exposeAPI() {
+  
+
+//   window.acessiBrasil = window.acessiBrasil || Object.assign({
+//       initialized: !1,
+//       init: e=>{
+//           i.default.start(i.default.sanitize(e)),
+//           window.acsbJS.initialized = !0
+//       }
+//   }, {
+//       restart: o.restart,
+//       destroy: o.destroy,
+//       map: o.map,
+//       enable: o.enable,
+//       disable: o.disable
+//   }),
+//   
+
+// }
+
+function exposeAPI() {
+  window.acessiBrasil = window.acessiBr || window.access;
 }
