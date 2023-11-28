@@ -1,3 +1,5 @@
+window.acessiBrasil = window.acessiBrasil || {};
+
 var txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, span');
 
 // No início do seu script ou onde você inicializa suas variáveis
@@ -7,7 +9,7 @@ txtTags.forEach(function(txtTag) {
 });
 
 
-function init() {
+window.acessiBrasil = function init() {
 
   createIcon();
 
@@ -119,5 +121,3 @@ function toggleExpandWindow() {
   var expandWindow = document.getElementById('expand-window');
   expandWindow.style.display = (expandWindow.style.display === 'none' || expandWindow.style.display === '') ? 'block' : 'none';
 }
-
-window.init = init;
