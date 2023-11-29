@@ -1,10 +1,11 @@
 
 window.acessiBrasil = window.acessiBrasil || {};
 
-var txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, span');
+var elementNames = [];
 
-// No início do seu script ou onde você inicializa suas variáveis
-txtTags.forEach(function(txtTag) {
+returnAllElementsWithText();
+
+elementNames.forEach(function(txtTag) {
     // Armazenar o tamanho inicial como um atributo de dados
     txtTag.setAttribute('data-initial-size-' + txtTag.tagName, parseInt(window.getComputedStyle(txtTag).fontSize));
 });
@@ -16,9 +17,7 @@ window.acessiBrasil.init = function init() {
   createIcon();
 
   // Recuperar valores do armazenamento local e aplicar as alterações
-  
-
-  txtTags.forEach(function(txtTag) {
+  elementNames.forEach(function(txtTag) {
 
     var savedSize = sessionStorage.getItem(txtTag.tagName);
 
@@ -34,7 +33,7 @@ window.acessiBrasil.init = function init() {
 function changeSize(value) {
 
 
-  txtTags.forEach(function(txtTag) {
+  elementNames.forEach(function(txtTag) {
 
 
     var attName = txtTag.getAttribute('data-initial-size-' + txtTag.tagName);
@@ -45,7 +44,8 @@ function changeSize(value) {
 
 
     // Salvar o valor no armazenamento local
-    sessionStorage.setItem(txtTag.tagName, newSize);   
+    sessionStorage.setItem(txtTag.tagName, newSize);
+    sessionStorage.setItem("range__size", value);
 
 
   });
@@ -56,9 +56,8 @@ function changeSize(value) {
 function changeColor() {
 
     // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
-    txtTags.forEach(function(txtTags) {
-      txtTags.style.color = 'red';
-        
+    elementNames.forEach(function(txtTag) {
+      txtTag.style.color = 'red';
     });
   
   }
@@ -91,7 +90,7 @@ function createIcon() {
   expandWindow.id = 'expand-window';
   expandWindow.innerHTML = `
         <label>
-            Size: <input type="range" min="50" max="500" step="1" value="100" oninput="changeSize(this.value)">
+            Size: <input id="range__size" type="range" min="50" max="500" step="1" value="100" oninput="changeSize(this.value)">
         </label>
     `;
 
@@ -115,9 +114,46 @@ function createIcon() {
   expandWindow.style.borderRadius = '5px';
   document.body.appendChild(expandWindow);
 
+
+  // Define o valor do input range
+  var rangeInput = document.getElementById("range__size");
+  var valueInputRangeSaved = sessionStorage.getItem('range__size');
+  rangeInput.value = valueInputRangeSaved != null ? valueInputRangeSaved :  100;
+
+
 }
 
 function toggleExpandWindow() {
   var expandWindow = document.getElementById('expand-window');
   expandWindow.style.display = (expandWindow.style.display === 'none' || expandWindow.style.display === '') ? 'block' : 'none';
+}
+
+
+function returnAllElementsWithText() {
+  // Obtém todos os elementos do DOM
+
+    var allElements = document.getElementsByTagName('*');
+
+    // Itera sobre cada elemento
+      for (var i = 0; i < allElements.length; i++) {
+        var element = allElements[i];
+    
+        // Verifica se o elemento tem texto
+        if (element.tagName == 'BODY') {
+
+          for (var j = 0; j < element.children.length; j++) {
+
+            var tagInsideBody = element.children[j];
+
+            //verifica se possui conteudo e se é diferente das tags do Widget
+            if(tagInsideBody.textContent.trim().length > 0 && tagInsideBody.id != 'expand-window' && tagInsideBody.id != 'expand-icon') {
+              elementNames.push(tagInsideBody);
+              console.log(elementNames);
+            }
+
+          }
+
+        }
+    }  
+ 
 }
