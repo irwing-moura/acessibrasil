@@ -2,6 +2,8 @@
 window.acessiBrasil = window.acessiBrasil || {};
 
 var elementNames = [];
+//var sizeSaved = localStorage.getItem("txt-value");
+var sizeSaved = getItemFromLocalStorageWithExpiry("txt-value");
 
 returnAllElementsWithText();
 
@@ -11,44 +13,32 @@ elementNames.forEach(function(txtTag) {
 });
 
 
-
 window.acessiBrasil.init = function init() {
 
   createIcon();
-
-  // Recuperar valores do armazenamento local e aplicar as alterações
-  elementNames.forEach(function(txtTag) {
-
-    var savedSize = sessionStorage.getItem(txtTag.tagName);
-
-    if (savedSize !== null) {
-        txtTag.style.fontSize = savedSize + 'px';
-    }
-
-
-});
+  changeSize(sizeSaved);
 
 }
 
 function changeSize(value) {
 
-
-  elementNames.forEach(function(txtTag) {
-
-
-    var attName = txtTag.getAttribute('data-initial-size-' + txtTag.tagName);
-    var initialSize = parseInt(attName); 
-
-    var newSize = initialSize * value /100;
-    txtTag.style.fontSize = newSize + 'px';
+  if(value != null) {
+    
+    elementNames.forEach(function(txtTag) {
 
 
-    // Salvar o valor no armazenamento local
-    sessionStorage.setItem(txtTag.tagName, newSize);
-    sessionStorage.setItem("range__size", value);
+      var attName = txtTag.getAttribute('data-initial-size-' + txtTag.tagName);
+      var initialSize = parseInt(attName); 
 
+      var newSize = initialSize * value /100;
+      txtTag.style.fontSize = newSize + 'px';
 
-  });
+    });
+
+    //localStorage.setItem("txt-value", value);
+    setItemToLocalStorageWithExpiry("txt-value", value, 2);
+
+  }
 
 }
 
@@ -117,8 +107,7 @@ function createIcon() {
 
   // Define o valor do input range
   var rangeInput = document.getElementById("range__size");
-  var valueInputRangeSaved = sessionStorage.getItem('range__size');
-  rangeInput.value = valueInputRangeSaved != null ? valueInputRangeSaved :  100;
+  rangeInput.value = sizeSaved != null ? sizeSaved :  100;
 
 
 }
@@ -148,7 +137,6 @@ function returnAllElementsWithText() {
             //verifica se possui conteudo e se é diferente das tags do Widget
             if(tagInsideBody.textContent.trim().length > 0 && tagInsideBody.id != 'expand-window' && tagInsideBody.id != 'expand-icon') {
               elementNames.push(tagInsideBody);
-              console.log(elementNames);
             }
 
           }
@@ -156,4 +144,40 @@ function returnAllElementsWithText() {
         }
     }  
  
+}
+
+function addDays(date, days) {
+  date.setDate(date.getDate() + days);
+  return date;
+}
+
+// SETA UM ITEM NO LOCAL STORAGE COM TEMPO DE EXPIRAÇÃO
+function setItemToLocalStorageWithExpiry(key, value, days) {
+
+  const newDate = addDays(new Date(), days);
+
+	const item = {
+		value: value,
+		expiry: newDate.getTime(),
+	}
+	localStorage.setItem(key, JSON.stringify(item))
+}
+
+// RETORNA UM ITEM DO LOCAL STORAGE PELA CHAVE
+function getItemFromLocalStorageWithExpiry(key) {
+	const itemStr = localStorage.getItem(key)
+	// if the item doesn't exist, return null
+	if (!itemStr) {
+		return null
+	}
+	const item = JSON.parse(itemStr)
+	const now = new Date()
+	// compare the expiry time of the item with the current time
+	if (now.getTime() > item.expiry) {
+		// If the item is expired, delete the item from storage
+		// and return null
+		localStorage.removeItem(key)
+		return null
+	}
+	return item.value
 }
