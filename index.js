@@ -126,7 +126,7 @@ function createIcon() {
   <div class="container-expand"> 
 
   <div class="container" style="flex-direction:column; gap:5px;">
-    <span>Font Size</span> 
+    <span>Font Size</span>
     <div class="container">
       <button class="button" onclick="changePercentage(-5)">-</button>
       <div class="percentage" id="percentage">0%</div>
