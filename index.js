@@ -1,56 +1,68 @@
 
 window.acessiBrasil = window.acessiBrasil || {};
 
-var elementNames = [];
-//var sizeSaved = localStorage.getItem("txt-value");
-var sizeSaved = getItemFromLocalStorageWithExpiry("txt-value");
 
-returnAllElementsWithText();
+let elementNames = document.querySelectorAll('h1, h2, h3, h4, h5, p, span, a, label, strong, b, em, u, s, blockquote, abbr, cite, code, pre, sub, sup, li');
+let sizeSaved = getItemFromLocalStorageWithExpiry("font-size");
+let elementValues = []; 
 
-elementNames.forEach(function(txtTag) {
+  elementNames.forEach(function(txtTag) {
     // Armazenar o tamanho inicial como um atributo de dados
-    txtTag.setAttribute('data-initial-size-' + txtTag.tagName, parseInt(window.getComputedStyle(txtTag).fontSize));
-});
+    if(!elementValues.some(objeto => objeto.key === txtTag.tagName)) {
+
+      elementValues.push({
+        key: txtTag.tagName,
+        value: parseInt(window.getComputedStyle(txtTag).fontSize)
+      })
+
+    }
+  });
 
 
 window.acessiBrasil.init = function init() {
 
   createIcon();
-  changeSize(sizeSaved);
-
-}
-
-function changeSize(value) {
-
-  if(value != null) {
-    
-    elementNames.forEach(function(txtTag) {
-
-
-      var attName = txtTag.getAttribute('data-initial-size-' + txtTag.tagName);
-      var initialSize = parseInt(attName); 
-
-      var newSize = initialSize * value /100;
-      txtTag.style.fontSize = newSize + 'px';
-
-    });
-
-    //localStorage.setItem("txt-value", value);
-    setItemToLocalStorageWithExpiry("txt-value", value, 2);
-
-  }
+  changePercentage(sizeSaved);
 
 }
 
 
-function changeColor() {
+  let currentPercentage = 0;
 
-    // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
-    elementNames.forEach(function(txtTag) {
-      txtTag.style.color = 'red';
-    });
+
+  function changePercentage(amount) {
+
+    if(amount != null) {
+
+      currentPercentage += amount;
+
+      if (currentPercentage < -50) {
+        currentPercentage = -50;
+      } else if (currentPercentage > 500) {
+        currentPercentage = 500;
+      }
+
+
+      const percentageElement = document.getElementById('percentage');
+      percentageElement.textContent = currentPercentage + '%';
+
+        elementNames.forEach(function(txtTag) {
   
+          const attName = elementValues.find(objeto => objeto.key === txtTag.tagName);
+          var initialSize = parseInt(attName.value); 
+    
+          var newSize = initialSize + (initialSize * currentPercentage /100);
+          txtTag.style.fontSize = newSize + 'px';
+    
+        });
+    
+        setItemToLocalStorageWithExpiry("font-size", currentPercentage, 2);
+  
+    }
+    
   }
+
+
 
 function createIcon() {
 
@@ -75,24 +87,55 @@ function createIcon() {
   document.body.appendChild(expandIcon);
 
 
+
   // Criar a janela expansível dinamicamente
   var expandWindow = document.createElement('div');
   expandWindow.id = 'expand-window';
   expandWindow.innerHTML = `
-        <label>
-            Size: <input id="range__size" type="range" min="50" max="500" step="1" value="100" oninput="changeSize(this.value)">
-        </label>
-    `;
 
-//     expandWindow.innerHTML = `
-//     <label>
-//         Size: <input type="range" min="50" max="500" step="1" value="100" oninput="changeSize(this.value)">
-//     </label>
-//     <br>
-//     <label>
-//         Color: <input type="range" min="0" max="100" step="1" value="50" oninput="changeColor()">
-//     </label>
-// `;
+  <style>
+  .container {
+    display: flex;
+    align-items: center;
+  }
+
+  .button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .percentage {
+    font-size: 24px;
+    margin: 0 10px;
+  }
+
+  .container-expand {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  </style>
+
+  <div class="container-expand"> 
+
+  <div class="container">
+    <button class="button" onclick="changePercentage(-5)">-</button>
+    <div class="percentage" id="percentage">0%</div>
+    <button class="button" onclick="changePercentage(5)">+</button>
+  </div>
+
+  <button class="button" onclick="clearLocalStorage()">RESET</button>
+
+  </div>
+
+    `;
 
   expandWindow.style.display = 'none';
   expandWindow.style.position = 'fixed';
@@ -105,11 +148,6 @@ function createIcon() {
   document.body.appendChild(expandWindow);
 
 
-  // Define o valor do input range
-  var rangeInput = document.getElementById("range__size");
-  rangeInput.value = sizeSaved != null ? sizeSaved :  100;
-
-
 }
 
 function toggleExpandWindow() {
@@ -118,38 +156,13 @@ function toggleExpandWindow() {
 }
 
 
-function returnAllElementsWithText() {
-  // Obtém todos os elementos do DOM
-
-    var allElements = document.getElementsByTagName('*');
-
-    // Itera sobre cada elemento
-      for (var i = 0; i < allElements.length; i++) {
-        var element = allElements[i];
-    
-        // Verifica se o elemento tem texto
-        if (element.tagName == 'BODY') {
-
-          for (var j = 0; j < element.children.length; j++) {
-
-            var tagInsideBody = element.children[j];
-
-            //verifica se possui conteudo e se é diferente das tags do Widget
-            if(tagInsideBody.textContent.trim().length > 0 && tagInsideBody.id != 'expand-window' && tagInsideBody.id != 'expand-icon') {
-              elementNames.push(tagInsideBody);
-            }
-
-          }
-
-        }
-    }  
- 
-}
+// ******************** LOCAL STORAGE ********************//
 
 function addDays(date, days) {
   date.setDate(date.getDate() + days);
   return date;
 }
+
 
 // SETA UM ITEM NO LOCAL STORAGE COM TEMPO DE EXPIRAÇÃO
 function setItemToLocalStorageWithExpiry(key, value, days) {
@@ -181,3 +194,10 @@ function getItemFromLocalStorageWithExpiry(key) {
 	}
 	return item.value
 }
+
+function clearLocalStorage() {
+  localStorage.clear();
+  location.reload(true);
+}
+
+
