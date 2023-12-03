@@ -176,7 +176,8 @@ function getLastLeafElementsWithText() {
     // Função para verificar se o elemento é uma tag de imagem
     function shouldBeRemoved(element) {
         return element.tagName.toLowerCase() === 'img' || element.tagName.toLowerCase() === 'svg' ||
-            element.tagName.toLowerCase() === 'style';
+            element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
+            || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link';
     }
 
     // Inicia a travessia a partir do corpo (body)
