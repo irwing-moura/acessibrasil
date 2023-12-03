@@ -19,11 +19,11 @@ function changePercentage(amount) {
 
         const lastLeafElementsWithText = getLastLeafElementsWithText();
 
-        elementNames.forEach(function(txtTag) {
+        lastLeafElementsWithText.forEach(function(txtTag) {
 
             let attName = txtTag.getAttribute('original-size-' + txtTag.tagName);
             if(attName == null) {
-                txtTag.setAttribute('data-initial-size-' + txtTag.tagName, parseInt(window.getComputedStyle(txtTag).fontSize));
+                txtTag.setAttribute('original-size-' + txtTag.tagName, parseInt(window.getComputedStyle(txtTag).fontSize));
             }
 
         });
@@ -182,7 +182,7 @@ function getLastLeafElementsWithText() {
     // Função recursiva para percorrer os elementos filhos
     function traverse(element) {
         // Verifica se o elemento é uma folha e tem texto
-        if (element.children.length === 0 && element.textContent.trim() !== "" && !elementIsImage(element)) {
+        if (element.children.length === 0 && element.textContent.trim() !== "" && !shouldBeRemoved(element)) {
             elementsWithText.push(element);
         } else {
             // Chama recursivamente a função para os elementos filhos
@@ -193,8 +193,9 @@ function getLastLeafElementsWithText() {
     }
 
     // Função para verificar se o elemento é uma tag de imagem
-    function elementIsImage(element) {
-        return element.tagName.toLowerCase() === 'img' || element.tagName.toLowerCase() === 'svg';
+    function shouldBeRemoved(element) {
+        return element.tagName.toLowerCase() === 'img' || element.tagName.toLowerCase() === 'svg' ||
+            element.tagName.toLowerCase() === 'style';
     }
 
     // Inicia a travessia a partir do corpo (body)
