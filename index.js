@@ -1,22 +1,6 @@
 window.acessiBrasil = window.acessiBrasil || {};
 
-
-let elementNames = document.querySelectorAll('h1, h2, h3, h4, h5, p, span, a, label, strong, b, em, u, s, blockquote, abbr, cite, code, pre, sub, sup, li');
 let sizeSaved = getItemFromLocalStorageWithExpiry("font-size");
-let elementValues = [];
-
-elementNames.forEach(function (txtTag) {
-    // Armazenar o tamanho inicial como um atributo de dados
-    if (!elementValues.some(objeto => objeto.key === txtTag.tagName)) {
-
-        elementValues.push({
-            key: txtTag.tagName,
-            value: parseInt(window.getComputedStyle(txtTag).fontSize)
-        })
-
-    }
-});
-
 
 window.acessiBrasil.init = function init() {
 
@@ -33,24 +17,36 @@ function changePercentage(amount) {
 
     if (amount != null) {
 
+        const lastLeafElementsWithText = getLastLeafElementsWithText();
+
+        elementNames.forEach(function(txtTag) {
+
+            let attName = txtTag.getAttribute('original-size-' + txtTag.tagName);
+            if(attName == null) {
+                txtTag.setAttribute('data-initial-size-' + txtTag.tagName, parseInt(window.getComputedStyle(txtTag).fontSize));
+            }
+
+        });
+
         currentPercentage += amount;
 
         if (currentPercentage < -50) {
             currentPercentage = -50;
-        } else if (currentPercentage > 500) {
-            currentPercentage = 500;
+        } else if (currentPercentage > 300) {
+            currentPercentage = 300;
         }
 
 
         const percentageElement = document.getElementById('percentage');
         percentageElement.textContent = currentPercentage + '%';
 
-        elementNames.forEach(function (txtTag) {
+        lastLeafElementsWithText.forEach(function (txtTag) {
 
-            const attName = elementValues.find(objeto => objeto.key === txtTag.tagName);
-            var initialSize = parseInt(attName.value);
+            let attName = txtTag.getAttribute('original-size-' + txtTag.tagName);
+            let initialSize = parseInt(attName);
 
-            var newSize = initialSize + (initialSize * currentPercentage / 100);
+
+            let newSize = initialSize + (initialSize * currentPercentage / 100);
             txtTag.style.fontSize = newSize + 'px';
 
         });
@@ -148,6 +144,63 @@ function createIcon() {
     document.body.appendChild(expandWindow);
 
 
+}
+
+//
+// function returnAllElementsWithText() {
+//     // Obtém todos os elementos do DOM
+//
+//     var allElements = document.getElementsByTagName('*');
+//
+//     // Itera sobre cada elemento
+//     for (var i = 0; i < allElements.length; i++) {
+//         var element = allElements[i];
+//
+//         // Verifica se o elemento tem texto
+//         if (element.tagName == 'BODY') {
+//
+//             for (var j = 0; j < element.children.length; j++) {
+//
+//                 var tagInsideBody = element.children[j];
+//
+//                 //verifica se possui conteudo e se é diferente das tags do Widget
+//                 if(tagInsideBody.textContent.trim().length > 0 && tagInsideBody.id != 'expand-window' && tagInsideBody.id != 'expand-icon') {
+//                     elementNames.push(tagInsideBody);
+//                 }
+//
+//             }
+//
+//         }
+//     }
+//
+// }
+
+function getLastLeafElementsWithText() {
+    const body = document.body;
+    const elementsWithText = [];
+
+    // Função recursiva para percorrer os elementos filhos
+    function traverse(element) {
+        // Verifica se o elemento é uma folha e tem texto
+        if (element.children.length === 0 && element.textContent.trim() !== "" && !elementIsImage(element)) {
+            elementsWithText.push(element);
+        } else {
+            // Chama recursivamente a função para os elementos filhos
+            for (let child of element.children) {
+                traverse(child);
+            }
+        }
+    }
+
+    // Função para verificar se o elemento é uma tag de imagem
+    function elementIsImage(element) {
+        return element.tagName.toLowerCase() === 'img' || element.tagName.toLowerCase() === 'svg';
+    }
+
+    // Inicia a travessia a partir do corpo (body)
+    traverse(body);
+
+    return elementsWithText;
 }
 
 function toggleExpandWindow() {
