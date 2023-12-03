@@ -19,11 +19,16 @@ function changePercentage(amount) {
 
         const lastLeafElementsWithText = getLastLeafElementsWithText();
 
+
         lastLeafElementsWithText.forEach(function(txtTag) {
 
-            let attName = txtTag.getAttribute('original-size-' + txtTag.tagName);
+            if(txtTag.tagName === 'footer') {
+                console.log("teste");
+            }
+
+            let attName = txtTag.getAttribute('original-size');
             if(attName == null) {
-                txtTag.setAttribute('original-size-' + txtTag.tagName, parseInt(window.getComputedStyle(txtTag).fontSize));
+                txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
             }
 
         });
@@ -42,7 +47,11 @@ function changePercentage(amount) {
 
         lastLeafElementsWithText.forEach(function (txtTag) {
 
-            let attName = txtTag.getAttribute('original-size-' + txtTag.tagName);
+            if(txtTag.tagName === 'footer') {
+                console.log("teste");
+            }
+
+            let attName = txtTag.getAttribute('original-size');
             let initialSize = parseInt(attName);
 
 
@@ -146,34 +155,6 @@ function createIcon() {
 
 }
 
-//
-// function returnAllElementsWithText() {
-//     // Obtém todos os elementos do DOM
-//
-//     var allElements = document.getElementsByTagName('*');
-//
-//     // Itera sobre cada elemento
-//     for (var i = 0; i < allElements.length; i++) {
-//         var element = allElements[i];
-//
-//         // Verifica se o elemento tem texto
-//         if (element.tagName == 'BODY') {
-//
-//             for (var j = 0; j < element.children.length; j++) {
-//
-//                 var tagInsideBody = element.children[j];
-//
-//                 //verifica se possui conteudo e se é diferente das tags do Widget
-//                 if(tagInsideBody.textContent.trim().length > 0 && tagInsideBody.id != 'expand-window' && tagInsideBody.id != 'expand-icon') {
-//                     elementNames.push(tagInsideBody);
-//                 }
-//
-//             }
-//
-//         }
-//     }
-//
-// }
 
 function getLastLeafElementsWithText() {
     const body = document.body;
