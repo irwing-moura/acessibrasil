@@ -162,14 +162,20 @@ function getLastLeafElementsWithText() {
     const body = document.body;
     const elementsWithText = [];
 
-    // Função recursiva para percorrer os elementos filhos
     function traverse(element) {
         // Verifica se o elemento é uma folha e tem texto
-        if ((element.children.length === 0 || areAllChildrenBrTags(element))
-            && element.textContent.trim() !== "" && !shouldBeRemoved(element)) {
+        // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
+        if ((element.children.length === 0 && element.textContent.trim() !== "" && !shouldBeRemoved(element))
+            || (element.tagName === 'INPUT' || element.tagName === 'LABEL')) {
             elementsWithText.push(element);
-        } else {
-            // Chama recursivamente a função para os elementos filhos
+        }
+        //QUANDO POSSUIR FILHOS
+        else {
+            //POSSUI CONTEUDO
+            if (element.textContent.trim() !== "") {
+                elementsWithText.push(element);
+            }
+
             for (let child of element.children) {
                 traverse(child);
             }
