@@ -85,6 +85,7 @@ function createIcon() {
     expandIcon.style.alignItems = 'center';
     expandIcon.style.justifyContent = 'center';
     expandIcon.style.cursor = 'pointer';
+    expandIcon.style.zIndex = 99999;
     expandIcon.onclick = toggleExpandWindow;
 
     document.body.appendChild(expandIcon);
@@ -150,6 +151,7 @@ function createIcon() {
     expandWindow.style.backgroundColor = '#fff';
     expandWindow.style.border = '1px solid #ccc';
     expandWindow.style.borderRadius = '5px';
+    expandWindow.style.zIndex = 99999;
     document.body.appendChild(expandWindow);
 
 
