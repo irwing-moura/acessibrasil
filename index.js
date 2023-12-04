@@ -163,7 +163,8 @@ function getLastLeafElementsWithText() {
     // Função recursiva para percorrer os elementos filhos
     function traverse(element) {
         // Verifica se o elemento é uma folha e tem texto
-        if (element.children.length === 0 && element.textContent.trim() !== "" && !shouldBeRemoved(element)) {
+        if ((element.children.length === 0 || (element.children.length === 1 && element.children[0].tagName.toLowerCase() === 'br'))
+            && element.textContent.trim() !== "" && !shouldBeRemoved(element)) {
             elementsWithText.push(element);
         } else {
             // Chama recursivamente a função para os elementos filhos
