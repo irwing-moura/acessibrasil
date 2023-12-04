@@ -163,7 +163,7 @@ function getLastLeafElementsWithText() {
     // Função recursiva para percorrer os elementos filhos
     function traverse(element) {
         // Verifica se o elemento é uma folha e tem texto
-        if ((element.children.length === 0 || (element.children.length === 1 && element.children[0].tagName.toLowerCase() === 'br'))
+        if ((element.children.length === 0 || areAllChildrenBrTags(element))
             && element.textContent.trim() !== "" && !shouldBeRemoved(element)) {
             elementsWithText.push(element);
         } else {
@@ -178,7 +178,13 @@ function getLastLeafElementsWithText() {
     function shouldBeRemoved(element) {
         return element.tagName.toLowerCase() === 'img' || element.tagName.toLowerCase() === 'svg' ||
             element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
-            || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link';
+            || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
+            || element.tagName.toLowerCase() === 'br';
+    }
+
+    // Função para verificar se todos os filhos são tags <br>
+    function areAllChildrenBrTags(element) {
+        return Array.from(element.children).every(child => child.tagName.toLowerCase() === 'br');
     }
 
     // Inicia a travessia a partir do corpo (body)
