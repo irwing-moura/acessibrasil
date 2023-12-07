@@ -1,17 +1,20 @@
 window.acessiBrasil = window.acessiBrasil || {};
 
 let sizeSaved = getItemFromLocalStorageWithExpiry("font-size");
+let zoomSaved = getItemFromLocalStorageWithExpiry("zoom");
+
 
 window.acessiBrasil.init = function init() {
 
     createIcon();
     changePercentage(sizeSaved);
+    updateZoom(zoomSaved);
 
 }
 
 
-let currentPercentage = 0;
-
+let currentPercentageFontSize = 0;
+let currentPercentageZoomSize = 0;
 
 function changePercentage(amount) {
 
@@ -22,10 +25,6 @@ function changePercentage(amount) {
 
         lastLeafElementsWithText.forEach(function(txtTag) {
 
-            if(txtTag.tagName === 'footer') {
-                console.log("teste");
-            }
-
             let attName = txtTag.getAttribute('original-size');
             if(attName == null) {
                 txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
@@ -33,17 +32,17 @@ function changePercentage(amount) {
 
         });
 
-        currentPercentage += amount;
+        currentPercentageFontSize += amount;
 
-        if (currentPercentage < -50) {
-            currentPercentage = -50;
-        } else if (currentPercentage > 300) {
-            currentPercentage = 300;
+        if (currentPercentageFontSize < -50) {
+            currentPercentageFontSize = -50;
+        } else if (currentPercentageFontSize > 300) {
+            currentPercentageFontSize = 300;
         }
 
 
         const percentageElement = document.getElementById('percentage');
-        percentageElement.textContent = currentPercentage + '%';
+        percentageElement.textContent = currentPercentageFontSize + '%';
 
         lastLeafElementsWithText.forEach(function (txtTag) {
 
@@ -55,12 +54,12 @@ function changePercentage(amount) {
             let initialSize = parseInt(attName);
 
 
-            let newSize = initialSize + (initialSize * currentPercentage / 100);
+            let newSize = initialSize + (initialSize * currentPercentageFontSize / 100);
             txtTag.style.fontSize = newSize + 'px';
 
         });
 
-        setItemToLocalStorageWithExpiry("font-size", currentPercentage, 2);
+        setItemToLocalStorageWithExpiry("font-size", currentPercentageFontSize, 2);
 
     }
 
@@ -134,6 +133,12 @@ function createIcon() {
       <button class="button" onclick="changePercentage(-5)">-</button>
       <div class="percentage" id="percentage">0%</div>
       <button class="button" onclick="changePercentage(5)">+</button>
+    </div>
+    <span>Content Scaling</span>
+    <div class="container">
+      <button class="button" onclick="updateZoom(-0.0016)">-</button>
+      <div class="percentage" id="percentageZoom">0%</div>
+      <button class="button" onclick="updateZoom(0.0016)">+</button>
     </div>
   </div>
 
@@ -251,4 +256,48 @@ function clearLocalStorage() {
     location.reload(true);
 }
 
+
+
+// *********** IMPLEMENTAÇÃO DA FUNCIONALIDADE DE ZOOM ********** //
+
+function updateZoom(zoom) {
+
+    if(zoom != null) {
+
+        currentPercentageZoomSize += zoom;
+
+        if(currentPercentageZoomSize > 0 && currentPercentageZoomSize < 1) {
+            currentPercentageZoomSize += 1;
+        }
+
+        let body = document.body;
+
+        // Obtém os filhos diretos do body
+        let tagsDoPrimeiroNivel = Array.from(body.children);
+
+        for (let i = 0; i < tagsDoPrimeiroNivel.length; i++) {
+            tagsDoPrimeiroNivel[i].style.zoom = currentPercentageZoomSize;
+        }
+
+        const percentageElement = document.getElementById('percentageZoom');
+        percentageElement.textContent = getPercentageOfZoom(currentPercentageZoomSize);
+
+        setItemToLocalStorageWithExpiry("zoom", currentPercentageZoomSize, 2);
+
+    }
+
+
+}
+
+function getPercentageOfZoom(zoom) {
+    // Verifica se o valor está dentro do range permitido
+    if (zoom < -0.4984 || zoom > 3.0016) {
+        return "Fora do range permitido (-50% a 300%)";
+    }
+
+    // Calcula a porcentagem em números redondos
+    const porcentagem = Math.round((zoom - 1) / 0.0016) * 10;
+
+    return `${porcentagem}%`;
+}
 
