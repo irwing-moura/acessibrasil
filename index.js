@@ -136,9 +136,9 @@ function createIcon() {
     </div>
     <span>Content Scaling</span>
     <div class="container">
-      <button class="button" onclick="updateZoom(-0.0016)">-</button>
+      <button class="button" onclick="updateZoom(-0.016)">-</button>
       <div class="percentage" id="percentageZoom">0%</div>
-      <button class="button" onclick="updateZoom(0.0016)">+</button>
+      <button class="button" onclick="updateZoom(0.016)">+</button>
     </div>
   </div>
 
@@ -296,7 +296,7 @@ function getPercentageOfZoom(zoom) {
     }
 
     // Calcula a porcentagem em números redondos
-    const porcentagem = Math.round((zoom - 1) / 0.0016) * 10;
+    const porcentagem = Math.round((zoom - 1) / 0.016) * 10;
 
     return `${porcentagem}%`;
 }
