@@ -14,7 +14,7 @@ window.acessiBrasil.init = function init() {
 
 
 let currentPercentageFontSize = 0;
-let currentPercentageZoomSize = 0;
+let currentPercentageZoomSize = 1;
 
 function changePercentage(amount) {
 
@@ -266,10 +266,6 @@ function updateZoom(zoom) {
 
         currentPercentageZoomSize += zoom;
 
-        if(currentPercentageZoomSize > 0 && currentPercentageZoomSize < 1) {
-            currentPercentageZoomSize += 1;
-        }
-
         let body = document.body;
 
         // Obtém os filhos diretos do body
@@ -290,13 +286,16 @@ function updateZoom(zoom) {
 }
 
 function getPercentageOfZoom(zoom) {
-    // Verifica se o valor está dentro do range permitido
-    if (zoom < -0.4984 || zoom > 3.0016) {
-        return "Fora do range permitido (-50% a 300%)";
-    }
-
     // Calcula a porcentagem em números redondos
-    const porcentagem = Math.round((zoom - 1) / 0.016) * 10;
+
+    let porcentagem;
+
+    if(zoom < 0) {
+        porcentagem = Math.round((zoom + 1) / 0.016) * 10;
+    }else {
+        porcentagem = Math.round((zoom - 1) / 0.016) * 10;
+
+    }
 
     return `${porcentagem}%`;
 }
