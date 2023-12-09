@@ -2,68 +2,22 @@ window.acessiBrasil = window.acessiBrasil || {};
 
 let sizeSaved = getItemFromLocalStorageWithExpiry("font-size");
 let zoomSaved = getItemFromLocalStorageWithExpiry("zoom");
+let lineHightSaved = getItemFromLocalStorageWithExpiry("line-height");
 
 
 window.acessiBrasil.init = function init() {
 
     createIcon();
     changePercentage(sizeSaved);
-    updateZoom(zoomSaved);
+    updateZoom(zoomSaved, true);
+    updateLineHeight(lineHightSaved);
 
 }
 
 
 let currentPercentageFontSize = 0;
 let currentPercentageZoomSize = 1;
-
-function changePercentage(amount) {
-
-    if (amount != null) {
-
-        const lastLeafElementsWithText = getLastLeafElementsWithText();
-
-
-        lastLeafElementsWithText.forEach(function(txtTag) {
-
-            let attName = txtTag.getAttribute('original-size');
-            if(attName == null) {
-                txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
-            }
-
-        });
-
-        currentPercentageFontSize += amount;
-
-        if (currentPercentageFontSize < -50) {
-            currentPercentageFontSize = -50;
-        } else if (currentPercentageFontSize > 300) {
-            currentPercentageFontSize = 300;
-        }
-
-
-        const percentageElement = document.getElementById('percentage');
-        percentageElement.textContent = currentPercentageFontSize + '%';
-
-        lastLeafElementsWithText.forEach(function (txtTag) {
-
-            if(txtTag.tagName === 'footer') {
-                console.log("teste");
-            }
-
-            let attName = txtTag.getAttribute('original-size');
-            let initialSize = parseInt(attName);
-
-
-            let newSize = initialSize + (initialSize * currentPercentageFontSize / 100);
-            txtTag.style.fontSize = newSize + 'px';
-
-        });
-
-        setItemToLocalStorageWithExpiry("font-size", currentPercentageFontSize, 2);
-
-    }
-
-}
+let currentLineHeight = 0;
 
 
 function createIcon() {
@@ -136,9 +90,15 @@ function createIcon() {
     </div>
     <span>Content Scaling</span>
     <div class="container">
-      <button class="button" onclick="updateZoom(-0.016)">-</button>
+      <button class="button" onclick="updateZoom(-0.016, false)">-</button>
       <div class="percentage" id="percentageZoom">0%</div>
-      <button class="button" onclick="updateZoom(0.016)">+</button>
+      <button class="button" onclick="updateZoom(0.016, false)">+</button>
+    </div>
+    <span>Line Height</span>
+    <div class="container">
+      <button class="button" onclick="updateLineHeight(-4.0)">-</button>
+      <div class="percentage" id="percentageLineHeight">0%</div>
+      <button class="button" onclick="updateLineHeight(4.0)">+</button>
     </div>
   </div>
 
@@ -160,6 +120,92 @@ function createIcon() {
     document.body.appendChild(expandWindow);
 
 
+}
+
+function changePercentage(amount) {
+
+    if (amount != null) {
+
+        const lastLeafElementsWithText = getLastLeafElementsWithText();
+
+
+        lastLeafElementsWithText.forEach(function(txtTag) {
+
+            let attName = txtTag.getAttribute('original-size');
+            if(attName == null) {
+                txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
+            }
+
+        });
+
+        currentPercentageFontSize += amount;
+
+        if (currentPercentageFontSize < -50) {
+            currentPercentageFontSize = -50;
+        } else if (currentPercentageFontSize > 300) {
+            currentPercentageFontSize = 300;
+        }
+
+
+        const percentageElement = document.getElementById('percentage');
+        percentageElement.textContent = currentPercentageFontSize + '%';
+
+        lastLeafElementsWithText.forEach(function (txtTag) {
+
+            let attName = txtTag.getAttribute('original-size');
+            let initialSize = parseInt(attName);
+
+
+            let newSize = initialSize + (initialSize * currentPercentageFontSize / 100);
+            txtTag.style.fontSize = newSize + 'px';
+
+        });
+
+        setItemToLocalStorageWithExpiry("font-size", currentPercentageFontSize, 2);
+
+    }
+
+}
+
+function updateLineHeight(newLineHeight) {
+
+    if (newLineHeight != null) {
+
+        const lastLeafElementsWithText = getLastLeafElementsWithText();
+
+        currentLineHeight += newLineHeight;
+
+        const percentageLineHeightElement = document.getElementById('percentageLineHeight');
+        let percentageLineHeightElementValue = getPercentageOfLineHeight(currentLineHeight);
+
+        lastLeafElementsWithText.forEach(function (txtTag) {
+            let lh = parseInt(txtTag.style.lineHeight);
+            let actualLineHeight = isNaN(lh) ? getLineHeightInPixelsIfText(txtTag) : lh;
+            txtTag.style.lineHeight = actualLineHeight + newLineHeight + 'px';
+        });
+
+        percentageLineHeightElement.textContent = percentageLineHeightElementValue + '%';
+
+        setItemToLocalStorageWithExpiry("line-height", currentLineHeight, 2);
+
+    }
+
+}
+
+function getLineHeightInPixelsIfText(element) {
+
+    let tempElement = document.createElement("div");
+    tempElement.style.fontSize = window.getComputedStyle(element).fontSize;
+    tempElement.style.lineHeight = "normal";
+    tempElement.innerHTML = "&nbsp;";
+
+    document.body.appendChild(tempElement);
+
+    let lineHeight = tempElement.offsetHeight;
+
+    document.body.removeChild(tempElement);
+
+    return lineHeight;
 }
 
 
@@ -260,11 +306,15 @@ function clearLocalStorage() {
 
 // *********** IMPLEMENTAÇÃO DA FUNCIONALIDADE DE ZOOM ********** //
 
-function updateZoom(zoom) {
+function updateZoom(zoom, initial) {
 
     if(zoom != null) {
 
-        currentPercentageZoomSize += zoom;
+        if(initial){
+            currentPercentageZoomSize = zoom;
+        } else {
+            currentPercentageZoomSize += zoom;
+        }
 
         let body = document.body;
 
@@ -298,5 +348,21 @@ function getPercentageOfZoom(zoom) {
     }
 
     return `${porcentagem}%`;
+}
+
+
+function getPercentageOfLineHeight(lineHeight) {
+    // Calcula a porcentagem em números redondos
+
+    let porcentagem;
+
+    if(lineHeight < 0) {
+        porcentagem = Math.round((lineHeight + 1) / 4) * 10;
+    }else {
+        porcentagem = Math.round((lineHeight - 1) / 4) * 10;
+
+    }
+
+    return porcentagem;
 }
 
