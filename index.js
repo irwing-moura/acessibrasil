@@ -4,14 +4,14 @@ let sizeSaved = getItemFromLocalStorageWithExpiry("font-size");
 let zoomSaved = getItemFromLocalStorageWithExpiry("zoom");
 let lineHightSaved = getItemFromLocalStorageWithExpiry("line-height");
 
+let currentLetterSpacing = getItemFromLocalStorageWithExpiryNew("letter-spacing");
 
 window.acessiBrasil.init = function init() {
-
     createIcon();
     changePercentage(sizeSaved);
     updateZoom(zoomSaved, true);
     updateLineHeight(lineHightSaved);
-
+    loadLetterSpacing();
 }
 
 
@@ -99,6 +99,12 @@ function createIcon() {
       <button class="button" onclick="updateLineHeight(-4.0)">-</button>
       <div class="percentage" id="percentageLineHeight">0%</div>
       <button class="button" onclick="updateLineHeight(4.0)">+</button>
+    </div>
+    <span>Letter Spacing</span>
+    <div class="container">
+      <button class="button" onclick="reduceLetterSpacing()">-</button>
+      <div class="percentage" id="percentageLetterSpacing">0%</div>
+      <button class="button" onclick="increaseLetterSpacing()">+</button>
     </div>
   </div>
 
@@ -208,7 +214,6 @@ function getLineHeightInPixelsIfText(element) {
     return lineHeight;
 }
 
-
 function getLastLeafElementsWithText() {
     const body = document.body;
     const elementsWithText = [];
@@ -216,7 +221,7 @@ function getLastLeafElementsWithText() {
     function traverse(element) {
         // Verifica se o elemento é uma folha e tem texto
         // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
-        if ((element.children.length === 0 && element.textContent.trim() !== "" && !shouldBeRemoved(element))
+        if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
             || (element.tagName === 'INPUT' || element.tagName === 'LABEL')) {
             elementsWithText.push(element);
         }
@@ -241,15 +246,11 @@ function getLastLeafElementsWithText() {
             || element.tagName.toLowerCase() === 'br';
     }
 
-    // Função para verificar se todos os filhos são tags <br>
-    function areAllChildrenBrTags(element) {
-        return Array.from(element.children).every(child => child.tagName.toLowerCase() === 'br');
-    }
-
     // Inicia a travessia a partir do corpo (body)
     traverse(body);
 
-    return elementsWithText;
+    // Invertendo a lista para que na aplicação, a tag não herde o estilo da tag pai. Fazendo a aplicação de dentro para fora
+    return elementsWithText.reverse();
 }
 
 function toggleExpandWindow() {
@@ -278,6 +279,20 @@ function setItemToLocalStorageWithExpiry(key, value, days) {
     localStorage.setItem(key, JSON.stringify(item))
 }
 
+// SETA UM ITEM NO LOCAL STORAGE COM TEMPO DE EXPIRAÇÃO
+function setItemToLocalStorageWithExpiryNew(key, value, percentage) {
+
+    const newDate = addDays(new Date(), 2);
+
+    const item = {
+        value: value,
+        percentage: percentage,
+        expiry: newDate.getTime(),
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+}
+
+
 // RETORNA UM ITEM DO LOCAL STORAGE PELA CHAVE
 function getItemFromLocalStorageWithExpiry(key) {
     const itemStr = localStorage.getItem(key)
@@ -295,6 +310,24 @@ function getItemFromLocalStorageWithExpiry(key) {
         return null
     }
     return item.value
+}
+
+function getItemFromLocalStorageWithExpiryNew(key) {
+    const itemStr = localStorage.getItem(key)
+    // if the item doesn't exist, return null
+    if (!itemStr) {
+        return null
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+    // compare the expiry time of the item with the current time
+    if (now.getTime() > item.expiry) {
+        // If the item is expired, delete the item from storage
+        // and return null
+        localStorage.removeItem(key)
+        return null
+    }
+    return item;
 }
 
 function clearLocalStorage() {
@@ -366,3 +399,59 @@ function getPercentageOfLineHeight(lineHeight) {
     return porcentagem;
 }
 
+
+function increaseLetterSpacing() {
+    updateLetterSpacing(0.2, 10)
+}
+
+function reduceLetterSpacing() {
+    updateLetterSpacing(-0.2, -10)
+}
+
+
+function updateLetterSpacing(defaultValue, defaultPercentage) {
+
+    //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 0.2PX A CADA 10%
+
+    const plusDays = addDays(new Date(), 2).getTime();
+    const percentageLetterSpacingElement = document.getElementById('percentageLetterSpacing');
+    percentageLetterSpacingElement.textContent = currentLetterSpacing != null ? currentLetterSpacing.percentage + defaultPercentage + '%' : defaultPercentage + '%';
+
+    const lastLeafElementsWithText = getLastLeafElementsWithText();
+
+    lastLeafElementsWithText.forEach(function (txtTag) {
+        let letterSpacingVal = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
+        let letterSpacingFormated = isNaN(letterSpacingVal) ? 0 : letterSpacingVal;
+        txtTag.style.letterSpacing = letterSpacingFormated + defaultValue + 'px';
+    });
+
+    currentLetterSpacing = {
+        value: currentLetterSpacing == null ? defaultValue : currentLetterSpacing.value += defaultValue,
+        percentage: currentLetterSpacing == null ? defaultPercentage : currentLetterSpacing.percentage += defaultPercentage,
+        expiry: plusDays
+    }
+
+    setItemToLocalStorageWithExpiryNew("letter-spacing",
+        currentLetterSpacing.value,
+        currentLetterSpacing.percentage);
+
+
+}
+
+function loadLetterSpacing() {
+
+    if(currentLetterSpacing !== null) {
+        const percentageLetterSpacingElement = document.getElementById('percentageLetterSpacing');
+        percentageLetterSpacingElement.textContent = currentLetterSpacing.percentage + '%';
+
+        const lastLeafElementsWithText = getLastLeafElementsWithText();
+
+        lastLeafElementsWithText.forEach(function (txtTag) {
+            let lh = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
+            let actualLetterSpacing = isNaN(lh) ? 0 : lh;
+            txtTag.style.letterSpacing = actualLetterSpacing + currentLetterSpacing.value + 'px';
+        });
+    }
+
+
+}
