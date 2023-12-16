@@ -1,29 +1,24 @@
 window.acessiBrasil = window.acessiBrasil || {};
 
-let sizeSaved = getItemFromLocalStorageWithExpiry("font-size");
-let zoomSaved = getItemFromLocalStorageWithExpiry("zoom");
-let lineHightSaved = getItemFromLocalStorageWithExpiry("line-height");
-
-let currentLetterSpacing = getItemFromLocalStorageWithExpiryNew("letter-spacing");
+let currentFontSize = getItemFromLocalStorageWithExpiry("font-size");
+let currentZoom = getItemFromLocalStorageWithExpiry("zoom");
+let currentLineHeight = getItemFromLocalStorageWithExpiry("line-height");
+let currentLetterSpacing = getItemFromLocalStorageWithExpiry("letter-spacing");
 
 window.acessiBrasil.init = function init() {
     createIcon();
-    changePercentage(sizeSaved);
-    updateZoom(zoomSaved, true);
-    updateLineHeight(lineHightSaved);
+    loadFontSize();
+    loadZoom();
+    loadLineHeight();
     loadLetterSpacing();
 }
 
-
-let currentPercentageFontSize = 0;
-let currentPercentageZoomSize = 1;
-let currentLineHeight = 0;
-
+// ******************** CRIAÇÃO DO WIDGET ********************//
 
 function createIcon() {
 
     // Criar o ícone arredondado dinamicamente
-    var expandIcon = document.createElement('div');
+    let expandIcon = document.createElement('div');
     expandIcon.id = 'expand-icon';
     expandIcon.innerHTML = '+';
     expandIcon.style.position = 'fixed';
@@ -45,7 +40,7 @@ function createIcon() {
 
 
     // Criar a janela expansível dinamicamente
-    var expandWindow = document.createElement('div');
+    let expandWindow = document.createElement('div');
     expandWindow.id = 'expand-window';
     expandWindow.innerHTML = `
 
@@ -84,21 +79,21 @@ function createIcon() {
   <div class="container" style="flex-direction:column; gap:5px;">
     <span>Font Size</span>
     <div class="container">
-      <button class="button" onclick="changePercentage(-5)">-</button>
+      <button class="button" onclick="reduceFontSize()">-</button>
       <div class="percentage" id="percentage">0%</div>
-      <button class="button" onclick="changePercentage(5)">+</button>
+      <button class="button" onclick="increaseFontSize()">+</button>
     </div>
     <span>Content Scaling</span>
     <div class="container">
-      <button class="button" onclick="updateZoom(-0.016, false)">-</button>
+      <button class="button" onclick="reduceZoom()">-</button>
       <div class="percentage" id="percentageZoom">0%</div>
-      <button class="button" onclick="updateZoom(0.016, false)">+</button>
+      <button class="button" onclick="increaseZoom()">+</button>
     </div>
     <span>Line Height</span>
     <div class="container">
-      <button class="button" onclick="updateLineHeight(-4.0)">-</button>
+      <button class="button" onclick="reduceLineHeight()">-</button>
       <div class="percentage" id="percentageLineHeight">0%</div>
-      <button class="button" onclick="updateLineHeight(4.0)">+</button>
+      <button class="button" onclick="increaseLineHeight()">+</button>
     </div>
     <span>Letter Spacing</span>
     <div class="container">
@@ -128,77 +123,190 @@ function createIcon() {
 
 }
 
-function changePercentage(amount) {
+function toggleExpandWindow() {
+    let expandWindow = document.getElementById('expand-window');
+    expandWindow.style.display = (expandWindow.style.display === 'none' || expandWindow.style.display === '') ? 'block' : 'none';
+}
 
-    if (amount != null) {
 
-        const lastLeafElementsWithText = getLastLeafElementsWithText();
+// ******************** FONT SIZE ********************//
+
+function increaseFontSize() {
+    updateFontSize( 5)
+}
+
+function reduceFontSize() {
+    updateFontSize(-5)
+}
+
+function updateFontSize(defaultPercentage) {
+
+    const plusDays = addDays(new Date(), 2).getTime();
+
+    const lastLeafElementsWithText = getLastLeafElementsWithText();
+    const percentageElement = document.getElementById('percentage');
+    percentageElement.textContent = currentFontSize != null ? currentFontSize.percentage + defaultPercentage + '%'
+    : defaultPercentage + '%';
+
+    lastLeafElementsWithText.forEach(function (txtTag) {
+
+        let attName = txtTag.getAttribute('original-size');
+        let initialSize = parseInt(attName);
+        let newSize = initialSize + (initialSize * (currentFontSize !== null ? currentFontSize.percentage + defaultPercentage : defaultPercentage) / 100);
+        txtTag.style.fontSize = newSize + 'px';
+
+    });
+
+    currentFontSize = {
+        value: null,
+        percentage: currentFontSize == null ? defaultPercentage : currentFontSize.percentage += defaultPercentage,
+        expiry: plusDays
+    }
+
+    setItemToLocalStorageWithExpiry("font-size",
+        currentFontSize.value,
+        currentFontSize.percentage);
 
 
-        lastLeafElementsWithText.forEach(function(txtTag) {
+}
 
-            let attName = txtTag.getAttribute('original-size');
-            if(attName == null) {
-                txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
-            }
+function loadFontSize() {
 
-        });
+    const lastLeafElementsWithText = getLastLeafElementsWithText();
 
-        currentPercentageFontSize += amount;
+    lastLeafElementsWithText.forEach(function(txtTag) {
 
-        if (currentPercentageFontSize < -50) {
-            currentPercentageFontSize = -50;
-        } else if (currentPercentageFontSize > 300) {
-            currentPercentageFontSize = 300;
+        let attName = txtTag.getAttribute('original-size');
+        if(attName == null) {
+            txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
         }
 
-
-        const percentageElement = document.getElementById('percentage');
-        percentageElement.textContent = currentPercentageFontSize + '%';
-
-        lastLeafElementsWithText.forEach(function (txtTag) {
-
-            let attName = txtTag.getAttribute('original-size');
-            let initialSize = parseInt(attName);
-
-
-            let newSize = initialSize + (initialSize * currentPercentageFontSize / 100);
+        if(currentFontSize != null) {
+            let initialSize = parseInt(txtTag.getAttribute('original-size'));
+            let newSize = initialSize + (initialSize * currentFontSize.percentage / 100);
             txtTag.style.fontSize = newSize + 'px';
 
-        });
+            const percentageElement = document.getElementById('percentage');
+            percentageElement.textContent = currentFontSize.percentage + '%';
+        }
 
-        setItemToLocalStorageWithExpiry("font-size", currentPercentageFontSize, 2);
+    });
 
+}
+
+// *********** ZOOM ********** //
+
+function increaseZoom() {
+    updateZoom(0.016, false, 10)
+}
+
+function reduceZoom() {
+    updateZoom(-0.016, false, 10)
+}
+
+function updateZoom(zoom, initial, defaultPercentage) {
+
+    const plusDays = addDays(new Date(), 2).getTime();
+    const percentageZoomElement = document.getElementById('percentageZoom');
+    percentageZoomElement.textContent = currentZoom != null ? currentZoom.percentage + defaultPercentage + '%' : defaultPercentage + '%';
+
+    let tagsDoPrimeiroNivel = getFirstChildElementsBelowBody();
+
+    for (let i = 0; i < tagsDoPrimeiroNivel.length; i++) {
+        let zoomVal = parseFloat(window.getComputedStyle(tagsDoPrimeiroNivel[i]).zoom);
+        let zoomFormated = isNaN(zoomVal) ? 1 : zoomVal;
+        tagsDoPrimeiroNivel[i].style.zoom = zoomFormated + zoom;
+
+    }
+
+    currentZoom = {
+        value: currentZoom == null ? zoom : currentZoom.value += zoom,
+        percentage: currentZoom == null ? defaultPercentage : currentZoom.percentage += defaultPercentage,
+        expiry: plusDays
+    }
+
+    setItemToLocalStorageWithExpiry("zoom",
+        currentZoom.value,
+        currentZoom.percentage);
+
+
+}
+
+function loadZoom() {
+
+    if(currentZoom !== null) {
+        const percentageZoomElement = document.getElementById('percentageZoom');
+        percentageZoomElement.textContent = currentZoom.percentage + '%';
+
+        let tagsDoPrimeiroNivel = getFirstChildElementsBelowBody();
+
+        for (let i = 0; i < tagsDoPrimeiroNivel.length; i++) {
+            let zoomVal = parseFloat(window.getComputedStyle(tagsDoPrimeiroNivel[i]).zoom);
+            let zoomFormated = isNaN(zoomVal) ? 1 : zoomVal;
+            tagsDoPrimeiroNivel[i].style.zoom = zoomFormated + currentZoom.value;
+        }
     }
 
 }
 
-function updateLineHeight(newLineHeight) {
+// ******************** LINE HEIGHT ********************//
 
-    if (newLineHeight != null) {
+function increaseLineHeight() {
+    updateLineHeight(4.0, 10)
+}
+
+function reduceLineHeight() {
+    updateLineHeight(-4.0, -10)
+}
+
+function updateLineHeight(defaultValue, defaultPercentage) {
+
+    //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 4PX A CADA 10%
+
+    const plusDays = addDays(new Date(), 2).getTime();
+    const percentageLineHeightElement = document.getElementById('percentageLineHeight');
+    percentageLineHeightElement.textContent = currentLineHeight != null ? currentLineHeight.percentage + defaultPercentage + '%' : defaultPercentage + '%';
+
+    const lastLeafElementsWithText = getLastLeafElementsWithText();
+
+    lastLeafElementsWithText.forEach(function (txtTag) {
+        let lineHeightVal = parseFloat(window.getComputedStyle(txtTag).lineHeight);
+        let lineHeightFormated = isNaN(lineHeightVal) ? getLineHeightInPixelsIfText(txtTag) : lineHeightVal;
+        txtTag.style.lineHeight = lineHeightFormated + defaultValue + 'px';
+    });
+
+    currentLineHeight = {
+        value: currentLineHeight == null ? defaultValue : currentLineHeight.value += defaultValue,
+        percentage: currentLineHeight == null ? defaultPercentage : currentLineHeight.percentage += defaultPercentage,
+        expiry: plusDays
+    }
+
+    setItemToLocalStorageWithExpiry("line-height",
+        currentLineHeight.value,
+        currentLineHeight.percentage);
+
+}
+
+function loadLineHeight() {
+
+    if(currentLineHeight !== null) {
+        const percentageLineHeightElement = document.getElementById('percentageLineHeight');
+        percentageLineHeightElement.textContent = currentLineHeight.percentage + '%';
 
         const lastLeafElementsWithText = getLastLeafElementsWithText();
 
-        currentLineHeight += newLineHeight;
-
-        const percentageLineHeightElement = document.getElementById('percentageLineHeight');
-        let percentageLineHeightElementValue = getPercentageOfLineHeight(currentLineHeight);
-
         lastLeafElementsWithText.forEach(function (txtTag) {
-            let lh = parseInt(txtTag.style.lineHeight);
+            let lh = parseFloat(window.getComputedStyle(txtTag).lineHeight);
             let actualLineHeight = isNaN(lh) ? getLineHeightInPixelsIfText(txtTag) : lh;
-            txtTag.style.lineHeight = actualLineHeight + newLineHeight + 'px';
+            txtTag.style.lineHeight = actualLineHeight + currentLineHeight.value + 'px';
         });
-
-        percentageLineHeightElement.textContent = percentageLineHeightElementValue + '%';
-
-        setItemToLocalStorageWithExpiry("line-height", currentLineHeight, 2);
-
     }
 
 }
 
 function getLineHeightInPixelsIfText(element) {
+
+    //RECUPERA O LINE HEIGHT CORRETO DE ELEMENTOS QUE ESTÃO COMO 'NORMAL'
 
     let tempElement = document.createElement("div");
     tempElement.style.fontSize = window.getComputedStyle(element).fontSize;
@@ -214,6 +322,63 @@ function getLineHeightInPixelsIfText(element) {
     return lineHeight;
 }
 
+// *********** LETTER SPACING ********** //
+
+function increaseLetterSpacing() {
+    updateLetterSpacing(0.2, 10)
+}
+
+function reduceLetterSpacing() {
+    updateLetterSpacing(-0.2, -10)
+}
+
+function updateLetterSpacing(defaultValue, defaultPercentage) {
+
+    //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 0.2PX A CADA 10%
+
+    const plusDays = addDays(new Date(), 2).getTime();
+    const percentageLetterSpacingElement = document.getElementById('percentageLetterSpacing');
+    percentageLetterSpacingElement.textContent = currentLetterSpacing != null ? currentLetterSpacing.percentage + defaultPercentage + '%' : defaultPercentage + '%';
+
+    const lastLeafElementsWithText = getLastLeafElementsWithText();
+
+    lastLeafElementsWithText.forEach(function (txtTag) {
+        let letterSpacingVal = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
+        let letterSpacingFormated = isNaN(letterSpacingVal) ? 0 : letterSpacingVal;
+        txtTag.style.letterSpacing = letterSpacingFormated + defaultValue + 'px';
+    });
+
+    currentLetterSpacing = {
+        value: currentLetterSpacing == null ? defaultValue : currentLetterSpacing.value += defaultValue,
+        percentage: currentLetterSpacing == null ? defaultPercentage : currentLetterSpacing.percentage += defaultPercentage,
+        expiry: plusDays
+    }
+
+    setItemToLocalStorageWithExpiry("letter-spacing",
+        currentLetterSpacing.value,
+        currentLetterSpacing.percentage);
+
+
+}
+
+function loadLetterSpacing() {
+
+    if(currentLetterSpacing !== null) {
+        const percentageLetterSpacingElement = document.getElementById('percentageLetterSpacing');
+        percentageLetterSpacingElement.textContent = currentLetterSpacing.percentage + '%';
+
+        const lastLeafElementsWithText = getLastLeafElementsWithText();
+
+        lastLeafElementsWithText.forEach(function (txtTag) {
+            let lh = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
+            let actualLetterSpacing = isNaN(lh) ? 0 : lh;
+            txtTag.style.letterSpacing = actualLetterSpacing + currentLetterSpacing.value + 'px';
+        });
+    }
+
+}
+
+// ******************** RECUPERAR ELEMENTOS ********************//
 function getLastLeafElementsWithText() {
     const body = document.body;
     const elementsWithText = [];
@@ -253,34 +418,15 @@ function getLastLeafElementsWithText() {
     return elementsWithText.reverse();
 }
 
-function toggleExpandWindow() {
-    var expandWindow = document.getElementById('expand-window');
-    expandWindow.style.display = (expandWindow.style.display === 'none' || expandWindow.style.display === '') ? 'block' : 'none';
+function getFirstChildElementsBelowBody() {
+    // Obtém os primeiros filhos diretos do body
+    let body = document.body;
+    return Array.from(body.children);
 }
-
 
 // ******************** LOCAL STORAGE ********************//
 
-function addDays(date, days) {
-    date.setDate(date.getDate() + days);
-    return date;
-}
-
-
-// SETA UM ITEM NO LOCAL STORAGE COM TEMPO DE EXPIRAÇÃO
-function setItemToLocalStorageWithExpiry(key, value, days) {
-
-    const newDate = addDays(new Date(), days);
-
-    const item = {
-        value: value,
-        expiry: newDate.getTime(),
-    }
-    localStorage.setItem(key, JSON.stringify(item))
-}
-
-// SETA UM ITEM NO LOCAL STORAGE COM TEMPO DE EXPIRAÇÃO
-function setItemToLocalStorageWithExpiryNew(key, value, percentage) {
+function setItemToLocalStorageWithExpiry(key, value, percentage) {
 
     const newDate = addDays(new Date(), 2);
 
@@ -292,27 +438,7 @@ function setItemToLocalStorageWithExpiryNew(key, value, percentage) {
     localStorage.setItem(key, JSON.stringify(item))
 }
 
-
-// RETORNA UM ITEM DO LOCAL STORAGE PELA CHAVE
 function getItemFromLocalStorageWithExpiry(key) {
-    const itemStr = localStorage.getItem(key)
-    // if the item doesn't exist, return null
-    if (!itemStr) {
-        return null
-    }
-    const item = JSON.parse(itemStr)
-    const now = new Date()
-    // compare the expiry time of the item with the current time
-    if (now.getTime() > item.expiry) {
-        // If the item is expired, delete the item from storage
-        // and return null
-        localStorage.removeItem(key)
-        return null
-    }
-    return item.value
-}
-
-function getItemFromLocalStorageWithExpiryNew(key) {
     const itemStr = localStorage.getItem(key)
     // if the item doesn't exist, return null
     if (!itemStr) {
@@ -330,128 +456,12 @@ function getItemFromLocalStorageWithExpiryNew(key) {
     return item;
 }
 
+function addDays(date, days) {
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
 function clearLocalStorage() {
     localStorage.clear();
     location.reload(true);
-}
-
-
-
-// *********** IMPLEMENTAÇÃO DA FUNCIONALIDADE DE ZOOM ********** //
-
-function updateZoom(zoom, initial) {
-
-    if(zoom != null) {
-
-        if(initial){
-            currentPercentageZoomSize = zoom;
-        } else {
-            currentPercentageZoomSize += zoom;
-        }
-
-        let body = document.body;
-
-        // Obtém os filhos diretos do body
-        let tagsDoPrimeiroNivel = Array.from(body.children);
-
-        for (let i = 0; i < tagsDoPrimeiroNivel.length; i++) {
-            tagsDoPrimeiroNivel[i].style.zoom = currentPercentageZoomSize;
-        }
-
-        const percentageElement = document.getElementById('percentageZoom');
-        percentageElement.textContent = getPercentageOfZoom(currentPercentageZoomSize);
-
-        setItemToLocalStorageWithExpiry("zoom", currentPercentageZoomSize, 2);
-
-    }
-
-
-}
-
-function getPercentageOfZoom(zoom) {
-    // Calcula a porcentagem em números redondos
-
-    let porcentagem;
-
-    if(zoom < 0) {
-        porcentagem = Math.round((zoom + 1) / 0.016) * 10;
-    }else {
-        porcentagem = Math.round((zoom - 1) / 0.016) * 10;
-
-    }
-
-    return `${porcentagem}%`;
-}
-
-
-function getPercentageOfLineHeight(lineHeight) {
-    // Calcula a porcentagem em números redondos
-
-    let porcentagem;
-
-    if(lineHeight < 0) {
-        porcentagem = Math.round((lineHeight + 1) / 4) * 10;
-    }else {
-        porcentagem = Math.round((lineHeight - 1) / 4) * 10;
-
-    }
-
-    return porcentagem;
-}
-
-
-function increaseLetterSpacing() {
-    updateLetterSpacing(0.2, 10)
-}
-
-function reduceLetterSpacing() {
-    updateLetterSpacing(-0.2, -10)
-}
-
-
-function updateLetterSpacing(defaultValue, defaultPercentage) {
-
-    //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 0.2PX A CADA 10%
-
-    const plusDays = addDays(new Date(), 2).getTime();
-    const percentageLetterSpacingElement = document.getElementById('percentageLetterSpacing');
-    percentageLetterSpacingElement.textContent = currentLetterSpacing != null ? currentLetterSpacing.percentage + defaultPercentage + '%' : defaultPercentage + '%';
-
-    const lastLeafElementsWithText = getLastLeafElementsWithText();
-
-    lastLeafElementsWithText.forEach(function (txtTag) {
-        let letterSpacingVal = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
-        let letterSpacingFormated = isNaN(letterSpacingVal) ? 0 : letterSpacingVal;
-        txtTag.style.letterSpacing = letterSpacingFormated + defaultValue + 'px';
-    });
-
-    currentLetterSpacing = {
-        value: currentLetterSpacing == null ? defaultValue : currentLetterSpacing.value += defaultValue,
-        percentage: currentLetterSpacing == null ? defaultPercentage : currentLetterSpacing.percentage += defaultPercentage,
-        expiry: plusDays
-    }
-
-    setItemToLocalStorageWithExpiryNew("letter-spacing",
-        currentLetterSpacing.value,
-        currentLetterSpacing.percentage);
-
-
-}
-
-function loadLetterSpacing() {
-
-    if(currentLetterSpacing !== null) {
-        const percentageLetterSpacingElement = document.getElementById('percentageLetterSpacing');
-        percentageLetterSpacingElement.textContent = currentLetterSpacing.percentage + '%';
-
-        const lastLeafElementsWithText = getLastLeafElementsWithText();
-
-        lastLeafElementsWithText.forEach(function (txtTag) {
-            let lh = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
-            let actualLetterSpacing = isNaN(lh) ? 0 : lh;
-            txtTag.style.letterSpacing = actualLetterSpacing + currentLetterSpacing.value + 'px';
-        });
-    }
-
-
 }
