@@ -5,6 +5,8 @@ let currentZoom = getItemFromLocalStorageWithExpiry("zoom");
 let currentLineHeight = getItemFromLocalStorageWithExpiry("line-height");
 let currentLetterSpacing = getItemFromLocalStorageWithExpiry("letter-spacing");
 
+let textMagnifier = getItemFromLocalStorageWithExpiry("text-magnifier");
+
 window.acessiBrasil.init = function init() {
     createIcon();
     loadFontSize();
@@ -71,6 +73,12 @@ function createIcon() {
     align-items: center;
     gap: 0.5rem;
   }
+  
+  .balao {
+    display: none;
+    position: absolute;
+    z-index: 1000; /* Valor alto para garantir que fique acima de outros elementos */
+   }
 
   </style>
 
@@ -100,6 +108,9 @@ function createIcon() {
       <button class="button" onclick="reduceLetterSpacing()">-</button>
       <div class="percentage" id="percentageLetterSpacing">0%</div>
       <button class="button" onclick="increaseLetterSpacing()">+</button>
+    </div>
+    <div class="container">
+      <button class="button" onclick="loadTextMagnifier(this)">TEXT MAGNIFIER</button>
     </div>
   </div>
 
@@ -418,6 +429,47 @@ function getLastLeafElementsWithText() {
     return elementsWithText.reverse();
 }
 
+function getElementsWithTextAndImageAlts() {
+    const body = document.body;
+    const elementsWithText = [];
+
+    function traverse(element) {
+        // Verifica se o elemento é uma folha e tem texto
+        // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
+        if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
+            || (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'label')) {
+            elementsWithText.push(element);
+        }
+        //QUANDO POSSUIR FILHOS
+        else {
+            //POSSUI CONTEUDO
+            // if (element.tagName.toLowerCase() !== 'button' && element.textContent.trim() !== "") {
+            //     elementsWithText.push(element);
+            // }
+
+            for (let child of element.children) {
+                traverse(child);
+            }
+        }
+    }
+
+    // Função para verificar se o elemento é uma tag de imagem
+    function shouldBeRemoved(element) {
+        return element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
+            || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
+            || element.tagName.toLowerCase() === 'br' || element.tagName.toLowerCase() === 'i'
+            || element.tagName.toLowerCase() === 'svg' || element.tagName.toLowerCase() === 'img';
+    }
+
+    // Inicia a travessia a partir do corpo (body)
+    traverse(body);
+
+    // Invertendo a lista para que na aplicação, a tag não herde o estilo da tag pai. Fazendo a aplicação de dentro para fora
+    return elementsWithText.reverse().filter(function (item) {
+        return item.tagName.toLowerCase() !== "body";
+    });
+}
+
 function getFirstChildElementsBelowBody() {
     // Obtém os primeiros filhos diretos do body
     let body = document.body;
@@ -465,3 +517,125 @@ function clearLocalStorage() {
     localStorage.clear();
     location.reload(true);
 }
+
+
+// ******************** LUPA ********************//
+
+// Função para criar o balão
+function criarBalao() {
+    let balao = document.createElement("div");
+    balao.className = "balao";
+    document.body.appendChild(balao);
+    return balao;
+}
+
+// Função para estilizar o balão
+function estilizarBalao(balao) {
+    // Estilização do balão
+    balao.style.padding = "10px";
+    balao.style.backgroundColor = "rgba(0, 0, 0, 0.8)"; /* Fundo escurecido */
+    balao.style.color = "white"; /* Texto branco */
+    balao.style.borderRadius = "5px";
+    balao.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.2)";
+    balao.style.fontSize = "40px"; /* Tamanho da fonte aumentado (ajuste conforme necessário) */
+    balao.style.position = "absolute";
+    balao.style.zIndex = 1000;
+}
+
+// Função para atualizar a posição do balão
+function atualizarPosicaoBalao(event, balao) {
+    // Define a posição do balão perto do cursor do mouse
+    balao.style.left = (event.clientX + 10) + "px";
+    balao.style.top = (event.clientY + 10) + "px";
+}
+
+// Função para mostrar o balão com o texto maior
+function mostrarBalao(event) {
+
+    if (!textMagnifier || !textMagnifier.value) {
+        return;
+    }
+
+    // Obtém ou cria o elemento do balão
+    var balao = document.querySelector(".balao") || criarBalao();
+
+    // Estiliza o balão
+    estilizarBalao(balao);
+
+    // Obtém o conteúdo com base no tipo de tag
+    let conteudo;
+    // if (event.target.tagName.toLowerCase() === 'img') {
+    //     // Se for uma imagem, usa o atributo "alt"
+    //     conteudo = event.target.alt;
+    // } else {
+    //     // Para outras tags, usa o conteúdo interno
+    //     conteudo = event.target.innerHTML;
+    // }
+
+    conteudo = event.target.innerHTML;
+
+    // Define o conteúdo no balão
+    balao.innerHTML = conteudo;
+
+    // Atualiza a posição do balão
+    atualizarPosicaoBalao(event, balao);
+
+    // Exibe o balão
+    balao.style.display = "block";
+
+    // Adiciona o evento de movimento do mouse para atualizar a posição do balão
+    document.addEventListener("mousemove", function (event) {
+        atualizarPosicaoBalao(event, balao);
+    });
+}
+
+// Função para esconder o balão ao retirar o mouse
+function esconderBalao() {
+    let balao = document.querySelector(".balao");
+    if (balao) {
+        balao.style.display = "none";
+
+        // Remove o evento de movimento do mouse
+        document.removeEventListener("mousemove", atualizarPosicaoBalao);
+    }
+}
+
+
+function loadTextMagnifier(element) {
+
+    if(textMagnifier == null) {
+        textMagnifier = {
+            value: false,
+            percentage: null
+        }
+    }
+
+    textMagnifier.value = !textMagnifier.value;
+
+    if (!textMagnifier.value) {
+        // Se a funcionalidade for desativada, esconde o balão
+        let balao = document.querySelector(".balao");
+        if (balao) {
+            balao.style.display = "none !important";
+            element.style.backgroundColor = "red";
+        }
+    }else {
+        element.style.backgroundColor = "green";
+    }
+
+    setItemToLocalStorageWithExpiry("text-magnifier",
+        textMagnifier.value,
+        null);
+
+
+}
+
+// Adiciona os eventos a todas as tags
+// var tags = document.querySelectorAll("p, span, h1, img");
+let tags = getElementsWithTextAndImageAlts();
+tags.forEach(function (element) {
+    element.addEventListener("mouseover", mostrarBalao);
+    element.addEventListener("mouseout", esconderBalao);
+});
+
+
