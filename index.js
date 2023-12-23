@@ -503,6 +503,7 @@ function estilizarBalao(balao) {
 }
 
 function atualizarPosicaoBalao(event, balao) {
+
     // Leva em consideração a posição do scroll
     const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     const scrollY = window.pageYOffset || document.documentElement.scrollTop;
@@ -518,6 +519,7 @@ function atualizarPosicaoBalao(event, balao) {
     // Ajusta a posição do balão para garantir que ele caiba completamente na tela
     balao.style.left = Math.min(balaoLeft, screenWidth - balao.offsetWidth - 10) + "px";
     balao.style.top = Math.min(balaoTop, screenHeight - balao.offsetHeight - 10) + "px";
+
 }
 
 
