@@ -539,7 +539,7 @@ function estilizarBalao(balao) {
     balao.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.2)";
     balao.style.fontSize = "40px"; /* Tamanho da fonte aumentado (ajuste conforme necessário) */
     balao.style.position = "absolute";
-    balao.style.zIndex = 1000;
+    balao.style.zIndex = 999999;
 }
 
 // Função para atualizar a posição do balão
