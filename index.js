@@ -502,16 +502,24 @@ function estilizarBalao(balao) {
     balao.style.zIndex = 999999;
 }
 
-// Função para atualizar a posição do balão
 function atualizarPosicaoBalao(event, balao) {
     // Leva em consideração a posição do scroll
     const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     const scrollY = window.pageYOffset || document.documentElement.scrollTop;
 
-    // Define a posição do balão perto do cursor do mouse considerando o scroll
-    balao.style.left = (event.clientX + scrollX + 10) + "px";
-    balao.style.top = (event.clientY + scrollY + 10) + "px";
+    // Obtém as dimensões da tela
+    const screenWidth = window.innerWidth || document.documentElement.clientWidth;
+    const screenHeight = window.innerHeight || document.documentElement.clientHeight;
+
+    // Calcula as coordenadas do balão considerando o scroll
+    const balaoLeft = event.clientX + scrollX + 10;
+    const balaoTop = event.clientY + scrollY + 10;
+
+    // Ajusta a posição do balão para garantir que ele caiba completamente na tela
+    balao.style.left = Math.min(balaoLeft, screenWidth - balao.offsetWidth - 10) + "px";
+    balao.style.top = Math.min(balaoTop, screenHeight - balao.offsetHeight - 10) + "px";
 }
+
 
 // Função para mostrar o balão com o texto maior
 function mostrarBalao(event) {
