@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessibility Widget</title>
 
+    <style>
+        h1 {
+            font-size: 40px;
+        }
+    </style>
     
     <script>
         (function(){
             var s = document.createElement('script');
             var body = document.querySelector('head') || document.body;
-            //s.src = 'index.js'; --dev
-            s.src = 'https://raw.githack.com/irwing-moura/acessibrasil/main/index.js';
+            s.src = 'index.js';
+            // s.src = 'https://raw.githack.com/irwing-moura/acessibrasil/main/index.js';
             s.async = true;
             s.onload = function () {
                 acessiBrasil.init();
@@ -25,9 +30,13 @@
     <!-- Conteúdo da Página -->
 
     <h1>teste</h1>
-    <span>span</span>
+    <span style="font-size: 20px">span</span>
 
-    <img src="https://pa1.aminoapps.com/6471/836dc71f6e4c1845305983b00c56df8c4679e56e_hq.gif" alt="Minha Figura">
+    <img alt="leorio" src="https://pa1.aminoapps.com/6471/836dc71f6e4c1845305983b00c56df8c4679e56e_hq.gif">
+
+    <button class="play-button js-a11y-bound" data-clicker-trigger="popup-hero-media"><span class="sr-only">Play</span><i class="icon icon-play icon-button-play icon-play-bigger" aria-hidden="true" role="presentation"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 27 30.9" style="enable-background:new 0 0 27 30.9;" xml:space="preserve"><path d="M0,2c0-1.6,1.7-2.6,3.1-1.8l23,13.4c1.3,0.8,1.3,2.7,0,3.5l-23,13.4C1.7,31.4,0,30.5,0,28.9V2z"></path></svg></i></button>
+
+    <a class="js-a11y-bound" href="https://shop.foxnews.com/#showacsb" target="_blank" data-a11y-tooltip=" New Window "><img src="https://accessibe.com/media/template/clients/foxnews.png" alt="Fox News"><span class="sr-only"> New Window </span></a>
 
 </body>
 </html>
