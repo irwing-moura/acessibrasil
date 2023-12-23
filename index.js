@@ -13,6 +13,7 @@ window.acessiBrasil.init = function init() {
     loadZoom();
     loadLineHeight();
     loadLetterSpacing();
+    loadTextMagnifier()
 }
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
@@ -110,7 +111,7 @@ function createIcon() {
       <button class="button" onclick="increaseLetterSpacing()">+</button>
     </div>
     <div class="container">
-      <button class="button" onclick="loadTextMagnifier(this)">TEXT MAGNIFIER</button>
+      <button id="btn-text-magnifier" class="button" onclick="updateTextMagnifier()">TEXT MAGNIFIER</button>
     </div>
   </div>
 
@@ -429,47 +430,6 @@ function getLastLeafElementsWithText() {
     return elementsWithText.reverse();
 }
 
-function getElementsWithTextAndImageAlts() {
-    const body = document.body;
-    const elementsWithText = [];
-
-    function traverse(element) {
-        // Verifica se o elemento é uma folha e tem texto
-        // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
-        if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
-            || (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'label')) {
-            elementsWithText.push(element);
-        }
-        //QUANDO POSSUIR FILHOS
-        else {
-            //POSSUI CONTEUDO
-            // if (element.tagName.toLowerCase() !== 'button' && element.textContent.trim() !== "") {
-            //     elementsWithText.push(element);
-            // }
-
-            for (let child of element.children) {
-                traverse(child);
-            }
-        }
-    }
-
-    // Função para verificar se o elemento é uma tag de imagem
-    function shouldBeRemoved(element) {
-        return element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
-            || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
-            || element.tagName.toLowerCase() === 'br' || element.tagName.toLowerCase() === 'i'
-            || element.tagName.toLowerCase() === 'svg' || element.tagName.toLowerCase() === 'img';
-    }
-
-    // Inicia a travessia a partir do corpo (body)
-    traverse(body);
-
-    // Invertendo a lista para que na aplicação, a tag não herde o estilo da tag pai. Fazendo a aplicação de dentro para fora
-    return elementsWithText.reverse().filter(function (item) {
-        return item.tagName.toLowerCase() !== "body";
-    });
-}
-
 function getFirstChildElementsBelowBody() {
     // Obtém os primeiros filhos diretos do body
     let body = document.body;
@@ -544,9 +504,13 @@ function estilizarBalao(balao) {
 
 // Função para atualizar a posição do balão
 function atualizarPosicaoBalao(event, balao) {
-    // Define a posição do balão perto do cursor do mouse
-    balao.style.left = (event.clientX + 10) + "px";
-    balao.style.top = (event.clientY + 10) + "px";
+    // Leva em consideração a posição do scroll
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Define a posição do balão perto do cursor do mouse considerando o scroll
+    balao.style.left = (event.clientX + scrollX + 10) + "px";
+    balao.style.top = (event.clientY + scrollY + 10) + "px";
 }
 
 // Função para mostrar o balão com o texto maior
@@ -557,21 +521,13 @@ function mostrarBalao(event) {
     }
 
     // Obtém ou cria o elemento do balão
-    var balao = document.querySelector(".balao") || criarBalao();
+    let balao = document.querySelector(".balao") || criarBalao();
 
     // Estiliza o balão
     estilizarBalao(balao);
 
     // Obtém o conteúdo com base no tipo de tag
     let conteudo;
-    // if (event.target.tagName.toLowerCase() === 'img') {
-    //     // Se for uma imagem, usa o atributo "alt"
-    //     conteudo = event.target.alt;
-    // } else {
-    //     // Para outras tags, usa o conteúdo interno
-    //     conteudo = event.target.innerHTML;
-    // }
-
     conteudo = event.target.innerHTML;
 
     // Define o conteúdo no balão
@@ -600,42 +556,80 @@ function esconderBalao() {
     }
 }
 
-
-function loadTextMagnifier(element) {
+function updateTextMagnifier() {
 
     if(textMagnifier == null) {
         textMagnifier = {
-            value: false,
+            value: true,
             percentage: null
         }
+    } else {
+        textMagnifier.value = !textMagnifier.value;
     }
 
-    textMagnifier.value = !textMagnifier.value;
+    loadTextMagnifier();
+}
 
-    if (!textMagnifier.value) {
-        // Se a funcionalidade for desativada, esconde o balão
-        let balao = document.querySelector(".balao");
-        if (balao) {
-            balao.style.display = "none !important";
-            element.style.backgroundColor = "red";
+function loadTextMagnifier() {
+
+    if(textMagnifier != null) {
+
+        let element = document.getElementById("btn-text-magnifier");
+
+        if (!textMagnifier.value) {
+            // Se a funcionalidade for desativada, esconde o balão
+            let balao = document.querySelector(".balao");
+            if (balao) {
+                balao.style.display = "none !important";
+                element.style.backgroundColor = "red";
+            }
+        }else {
+            getElementCursorHover();
+            element.style.backgroundColor = "green";
         }
-    }else {
-        element.style.backgroundColor = "green";
+
+        setItemToLocalStorageWithExpiry("text-magnifier",
+            textMagnifier.value,
+            null);
+
     }
-
-    setItemToLocalStorageWithExpiry("text-magnifier",
-        textMagnifier.value,
-        null);
-
 
 }
 
-// Adiciona os eventos a todas as tags
-// var tags = document.querySelectorAll("p, span, h1, img");
-let tags = getElementsWithTextAndImageAlts();
-tags.forEach(function (element) {
-    element.addEventListener("mouseover", mostrarBalao);
-    element.addEventListener("mouseout", esconderBalao);
-});
+function getElementCursorHover() {
+    document.addEventListener('mouseover', function (event) {
+
+        const element = event.target;
+
+        function traverse(element) {
+            // Verifica se o elemento é uma folha e tem texto
+            // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
+            if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
+                || (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'label')) {
+
+                element.addEventListener("mouseover", mostrarBalao);
+                element.addEventListener("mouseout", esconderBalao);
+
+            }
+            //QUANDO POSSUIR FILHOS
+            else {
+                for (let child of element.children) {
+                    traverse(child);
+                }
+            }
+        }
+
+        // Função para verificar se o elemento é uma tag de imagem
+        function shouldBeRemoved(element) {
+            return element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
+                || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
+                || element.tagName.toLowerCase() === 'br' || element.tagName.toLowerCase() === 'i'
+                || element.tagName.toLowerCase() === 'svg' || element.tagName.toLowerCase() === 'img';
+        }
+
+        traverse(element);
+
+    });
+}
 
 
