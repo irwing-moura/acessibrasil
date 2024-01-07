@@ -113,6 +113,9 @@ function createIcon() {
     <div class="container">
       <button id="btn-text-magnifier" class="button" onclick="updateTextMagnifier()">TEXT MAGNIFIER</button>
     </div>
+    <div class="container">
+      <button id="btn-text-magnifier" class="button" onclick="alignCenter()">ALIGN CENTER</button>
+    </div>
   </div>
 
   <button class="button" onclick="clearLocalStorage()">RESET</button>
@@ -416,6 +419,7 @@ function getLastLeafElementsWithText() {
     }
 
     // Função para verificar se o elemento é uma tag de imagem
+    //TODO:: REFAZER ESSE METODO, ONDE IRA RECEBER UMA LISTA COM AS TAGS QUE DEVEM SER EXCLUIDAS
     function shouldBeRemoved(element) {
         return element.tagName.toLowerCase() === 'img' || element.tagName.toLowerCase() === 'svg' ||
             element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
@@ -434,6 +438,91 @@ function getFirstChildElementsBelowBody() {
     // Obtém os primeiros filhos diretos do body
     let body = document.body;
     return Array.from(body.children);
+}
+
+function getElementCursorHover() {
+    document.addEventListener('mouseover', function (event) {
+
+        const element = event.target;
+
+        function traverse(element) {
+            // Verifica se o elemento é uma folha e tem texto
+            // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
+            if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
+                || (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'label')) {
+
+                element.addEventListener("mouseover", mostrarBalao);
+                element.addEventListener("mouseout", esconderBalao);
+
+            }
+            //QUANDO POSSUIR FILHOS
+            else {
+                for (let child of element.children) {
+                    traverse(child);
+                }
+            }
+        }
+
+        // Função para verificar se o elemento é uma tag de imagem
+        function shouldBeRemoved(element) {
+            return element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
+                || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
+                || element.tagName.toLowerCase() === 'br' || element.tagName.toLowerCase() === 'i'
+                || element.tagName.toLowerCase() === 'svg' || element.tagName.toLowerCase() === 'img';
+        }
+
+        traverse(element);
+
+    });
+}
+
+function getElementsWithTextToAlign() {
+    const body = document.body;
+    const elementsWithText = [];
+
+    function traverse(element) {
+        // Verifica se o elemento é uma folha e tem texto
+        // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
+        //TODO:: COLOCAR VERIFICAÇÃO PARA VER SE O ELEMENT PAI É UMA TAG BUTTON, PARA NÃO ALINHAR AS TAGS FILHAS DE BUTTON
+        //TODO:: COLOCAR VERIFICAÇÃO PARA VER SE O ELEMENT PAI É UMA TAG NAV, PARA NÃO ALINHAR AS TAGS FILHAS DE NAV
+        if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
+            || (element.tagName === 'INPUT' || element.tagName === 'LABEL')) {
+            elementsWithText.push(element);
+        }
+        //QUANDO POSSUIR FILHOS
+        else {
+
+            for (let child of element.children) {
+                traverse(child);
+            }
+        }
+    }
+
+    // Função para verificar se o elemento é uma tag de imagem
+    //TODO:: REFAZER ESSE METODO, ONDE IRA RECEBER UMA LISTA COM AS TAGS QUE DEVEM SER EXCLUIDAS
+    function shouldBeRemoved(element) {
+        return element.tagName.toLowerCase() === 'img' || element.tagName.toLowerCase() === 'svg' ||
+            element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
+            || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
+            || element.tagName.toLowerCase() === 'br' || element.tagName.toLowerCase() === 'i'
+            || element.tagName.toLowerCase() === 'button' || element.tagName.toLowerCase() === 'nav'
+            || element.parentNode.tagName.toLowerCase() === 'button' || element.parentNode.tagName.toLowerCase() === 'nav';
+    }
+
+    function fatherElementIsButton(element) {
+
+        let father = element.parentNode;
+
+        return father.tagName.toLowerCase() === 'button' || father.tagName.toLowerCase() === 'nav';
+
+
+    }
+
+    // Inicia a travessia a partir do corpo (body)
+    traverse(body);
+
+    // Invertendo a lista para que na aplicação, a tag não herde o estilo da tag pai. Fazendo a aplicação de dentro para fora
+    return elementsWithText.reverse();
 }
 
 // ******************** LOCAL STORAGE ********************//
@@ -598,40 +687,32 @@ function loadTextMagnifier() {
 
 }
 
-function getElementCursorHover() {
-    document.addEventListener('mouseover', function (event) {
+function alignCenter() {
 
-        const element = event.target;
+    const plusDays = addDays(new Date(), 2).getTime();
 
-        function traverse(element) {
-            // Verifica se o elemento é uma folha e tem texto
-            // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
-            if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
-                || (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'label')) {
+    const lastLeafElementsWithText = getElementsWithTextToAlign();
 
-                element.addEventListener("mouseover", mostrarBalao);
-                element.addEventListener("mouseout", esconderBalao);
+    lastLeafElementsWithText.forEach(function (txtTag) {
 
-            }
-            //QUANDO POSSUIR FILHOS
-            else {
-                for (let child of element.children) {
-                    traverse(child);
-                }
-            }
-        }
-
-        // Função para verificar se o elemento é uma tag de imagem
-        function shouldBeRemoved(element) {
-            return element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
-                || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
-                || element.tagName.toLowerCase() === 'br' || element.tagName.toLowerCase() === 'i'
-                || element.tagName.toLowerCase() === 'svg' || element.tagName.toLowerCase() === 'img';
-        }
-
-        traverse(element);
+        txtTag.style.textAlign = 'center';
 
     });
+
+    // currentFontSize = {
+    //     value: null,
+    //     percentage: currentFontSize == null ? defaultPercentage : currentFontSize.percentage += defaultPercentage,
+    //     expiry: plusDays
+    // }
+    //
+    // setItemToLocalStorageWithExpiry("font-size",
+    //     currentFontSize.value,
+    //     currentFontSize.percentage);
+
+
 }
+
+
+
 
 
