@@ -6,6 +6,7 @@ let currentLineHeight = getItemFromLocalStorageWithExpiry("line-height");
 let currentLetterSpacing = getItemFromLocalStorageWithExpiry("letter-spacing");
 
 let textMagnifier = getItemFromLocalStorageWithExpiry("text-magnifier");
+let textAlign = getItemFromLocalStorageWithExpiry("text-align");
 
 window.acessiBrasil.init = function init() {
     createIcon();
@@ -14,6 +15,7 @@ window.acessiBrasil.init = function init() {
     loadLineHeight();
     loadLetterSpacing();
     loadTextMagnifier()
+    loadTextAlign();
 }
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
@@ -113,14 +115,16 @@ function createIcon() {
     <div class="container">
       <button id="btn-text-magnifier" class="button" onclick="updateTextMagnifier()">TEXT MAGNIFIER</button>
     </div>
-    <div class="container">
-      <button id="btn-text-magnifier" class="button" onclick="alignText('center')">ALIGN CENTER</button>
-    </div>
-    <div class="container">
-      <button id="btn-text-magnifier" class="button" onclick="alignText('right')">ALIGN RIGHT</button>
-    </div>
-    <div class="container">
-      <button id="btn-text-magnifier" class="button" onclick="alignText('left')">ALIGN LEFT</button>
+    <div style="display: flex; gap: 1rem;">
+        <div class="container">
+          <button class="button" onclick="alignText('left')"><img style="max-width: 20px" alt="align left" src="align-left.png"/></button>
+        </div>
+        <div class="container">
+          <button class="button" onclick="alignText('center')"><img style="max-width: 20px" alt="align center" src="align-center.png"/></button>
+        </div>
+        <div class="container">
+          <button class="button" onclick="alignText('right')"><img style="max-width: 20px" alt="align right" src="align-right.png"/></button>
+        </div>
     </div>
   </div>
 
@@ -646,17 +650,29 @@ function loadTextMagnifier() {
 
 function alignText(direction) {
 
-    // Cria um elemento <style>
-    let estiloGlobal = document.createElement('style');
+        // Cria um elemento <style>
+        let estiloGlobal = document.createElement('style');
 
-    let estilo = document.createTextNode('body :not(button):not(nav) { text-align:' + direction + '; }');
+        let estilo = document.createTextNode('body :not(button):not(nav) { text-align:' + direction + '; }');
 
-    // Adiciona o conteúdo ao elemento <style>
-    estiloGlobal.appendChild(estilo);
+        // Adiciona o conteúdo ao elemento <style>
+        estiloGlobal.appendChild(estilo);
 
-    // Adiciona o elemento <style> ao final do <body>
-    document.body.appendChild(estiloGlobal);
+        // Adiciona o elemento <style> ao final do <body>
+        document.body.appendChild(estiloGlobal);
 
+        setItemToLocalStorageWithExpiry("text-align",
+            direction,
+            null);
+
+
+}
+
+function loadTextAlign() {
+
+    if(textAlign != null) {
+        alignText(textAlign.value);
+    }
 
 }
 
