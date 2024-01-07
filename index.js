@@ -114,7 +114,13 @@ function createIcon() {
       <button id="btn-text-magnifier" class="button" onclick="updateTextMagnifier()">TEXT MAGNIFIER</button>
     </div>
     <div class="container">
-      <button id="btn-text-magnifier" class="button" onclick="alignCenter()">ALIGN CENTER</button>
+      <button id="btn-text-magnifier" class="button" onclick="alignText('center')">ALIGN CENTER</button>
+    </div>
+    <div class="container">
+      <button id="btn-text-magnifier" class="button" onclick="alignText('right')">ALIGN RIGHT</button>
+    </div>
+    <div class="container">
+      <button id="btn-text-magnifier" class="button" onclick="alignText('left')">ALIGN LEFT</button>
     </div>
   </div>
 
@@ -638,12 +644,12 @@ function loadTextMagnifier() {
 
 }
 
-function alignCenter() {
+function alignText(direction) {
 
     // Cria um elemento <style>
     let estiloGlobal = document.createElement('style');
 
-    let estilo = document.createTextNode('body :not(button):not(nav) { text-align: center; }');
+    let estilo = document.createTextNode('body :not(button):not(nav) { text-align:' + direction + '; }');
 
     // Adiciona o conteúdo ao elemento <style>
     estiloGlobal.appendChild(estilo);
@@ -653,7 +659,6 @@ function alignCenter() {
 
 
 }
-
 
 
 
