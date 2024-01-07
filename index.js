@@ -476,55 +476,6 @@ function getElementCursorHover() {
     });
 }
 
-function getElementsWithTextToAlign() {
-    const body = document.body;
-    const elementsWithText = [];
-
-    function traverse(element) {
-        // Verifica se o elemento é uma folha e tem texto
-        // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
-        //TODO:: COLOCAR VERIFICAÇÃO PARA VER SE O ELEMENT PAI É UMA TAG BUTTON, PARA NÃO ALINHAR AS TAGS FILHAS DE BUTTON
-        //TODO:: COLOCAR VERIFICAÇÃO PARA VER SE O ELEMENT PAI É UMA TAG NAV, PARA NÃO ALINHAR AS TAGS FILHAS DE NAV
-        if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
-            || (element.tagName === 'INPUT' || element.tagName === 'LABEL')) {
-            elementsWithText.push(element);
-        }
-        //QUANDO POSSUIR FILHOS
-        else {
-
-            for (let child of element.children) {
-                traverse(child);
-            }
-        }
-    }
-
-    // Função para verificar se o elemento é uma tag de imagem
-    //TODO:: REFAZER ESSE METODO, ONDE IRA RECEBER UMA LISTA COM AS TAGS QUE DEVEM SER EXCLUIDAS
-    function shouldBeRemoved(element) {
-        return element.tagName.toLowerCase() === 'img' || element.tagName.toLowerCase() === 'svg' ||
-            element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
-            || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
-            || element.tagName.toLowerCase() === 'br' || element.tagName.toLowerCase() === 'i'
-            || element.tagName.toLowerCase() === 'button' || element.tagName.toLowerCase() === 'nav'
-            || element.parentNode.tagName.toLowerCase() === 'button' || element.parentNode.tagName.toLowerCase() === 'nav';
-    }
-
-    function fatherElementIsButton(element) {
-
-        let father = element.parentNode;
-
-        return father.tagName.toLowerCase() === 'button' || father.tagName.toLowerCase() === 'nav';
-
-
-    }
-
-    // Inicia a travessia a partir do corpo (body)
-    traverse(body);
-
-    // Invertendo a lista para que na aplicação, a tag não herde o estilo da tag pai. Fazendo a aplicação de dentro para fora
-    return elementsWithText.reverse();
-}
-
 // ******************** LOCAL STORAGE ********************//
 
 function setItemToLocalStorageWithExpiry(key, value, percentage) {
@@ -689,25 +640,16 @@ function loadTextMagnifier() {
 
 function alignCenter() {
 
-    const plusDays = addDays(new Date(), 2).getTime();
+    // Cria um elemento <style>
+    let estiloGlobal = document.createElement('style');
 
-    const lastLeafElementsWithText = getElementsWithTextToAlign();
+    let estilo = document.createTextNode('body :not(button):not(nav) { text-align: center; }');
 
-    lastLeafElementsWithText.forEach(function (txtTag) {
+    // Adiciona o conteúdo ao elemento <style>
+    estiloGlobal.appendChild(estilo);
 
-        txtTag.style.textAlign = 'center';
-
-    });
-
-    // currentFontSize = {
-    //     value: null,
-    //     percentage: currentFontSize == null ? defaultPercentage : currentFontSize.percentage += defaultPercentage,
-    //     expiry: plusDays
-    // }
-    //
-    // setItemToLocalStorageWithExpiry("font-size",
-    //     currentFontSize.value,
-    //     currentFontSize.percentage);
+    // Adiciona o elemento <style> ao final do <body>
+    document.body.appendChild(estiloGlobal);
 
 
 }
