@@ -126,6 +126,12 @@ function createIcon() {
           <button class="button" onclick="alignText('right')"><img style="max-width: 20px" alt="align right" src="align-right.png"/></button>
         </div>
     </div>
+    
+    <div class="container">
+          <button class="button" onclick="highlightHeading()">HIGHLIGHT HEADING</button>
+    </div>
+    
+    
   </div>
 
   <button class="button" onclick="clearLocalStorage()">RESET</button>
@@ -676,6 +682,43 @@ function loadTextAlign() {
 
 }
 
+function highlightHeading() {
 
+
+    // a {
+    //     box-shadow: 0 0 0 7px #FDC50D40, 2000px 0 0 0 #FDC50D40 inset !important;
+    //     outline: 3px dashed #FDC50D !important;
+    //     outline-offset: 4px !important;
+    // }
+    //
+    // button, input[type="button"], input[type="submit"], [role="button"] {
+    //     box-shadow: 0 0 0 7px #FDC50D40, 2000px 0 0 0 #FDC50D40 inset !important;
+    //     outline: 3px dashed #FDC50D !important;
+    //     outline-offset: 4px !important;
+    // }
+    //
+
+
+    // Cria um elemento <style>
+    let estiloGlobal = document.createElement('style');
+
+    let estilo = document.createTextNode('h1, h2, h3, h4, h5, h6 ' +
+        '{box-shadow: 0 0 0 7px #FDC50D40, 2000px 0 0 0 #FDC50D40 inset !important;outline: 3px dashed #FDC50D !important;' +
+        'outline-offset: 4px !important;}');
+
+    // Adiciona o conteúdo ao elemento <style>
+    estiloGlobal.appendChild(estilo);
+
+    // Adiciona o elemento <style> ao final do <body>
+    document.body.appendChild(estiloGlobal);
+
+    setItemToLocalStorageWithExpiry("highlight-headings",
+        true,
+        null);
+
+
+
+
+}
 
 
