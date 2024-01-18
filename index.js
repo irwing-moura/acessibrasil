@@ -7,6 +7,9 @@ let currentLetterSpacing = getItemFromLocalStorageWithExpiry("letter-spacing");
 
 let textMagnifier = getItemFromLocalStorageWithExpiry("text-magnifier");
 let textAlign = getItemFromLocalStorageWithExpiry("text-align");
+let hightlightHeadings = getItemFromLocalStorageWithExpiry("highlight-headings");
+let hightlightLinks = getItemFromLocalStorageWithExpiry("highlight-links");
+let hightlightButtons = getItemFromLocalStorageWithExpiry("highlight-buttons");
 
 window.acessiBrasil.init = function init() {
     createIcon();
@@ -16,6 +19,9 @@ window.acessiBrasil.init = function init() {
     loadLetterSpacing();
     loadTextMagnifier()
     loadTextAlign();
+    loadHighlightHeading();
+    loadHighlightLinks();
+    loadHighlightButtons();
 }
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
@@ -129,6 +135,12 @@ function createIcon() {
     
     <div class="container">
           <button class="button" onclick="highlightHeading()">HIGHLIGHT HEADING</button>
+    </div>
+    <div class="container">
+          <button class="button" onclick="highlightLinks()">HIGHLIGHT LINKS</button>
+    </div>
+    <div class="container">
+          <button class="button" onclick="highlightButtons()">HIGHLIGHT BUTTONS</button>
     </div>
     
     
@@ -518,10 +530,14 @@ function getItemFromLocalStorageWithExpiry(key) {
     if (now.getTime() > item.expiry) {
         // If the item is expired, delete the item from storage
         // and return null
-        localStorage.removeItem(key)
+        removeItemFromLocalStorage(key);
         return null
     }
     return item;
+}
+
+function removeItemFromLocalStorage(key) {
+    localStorage.removeItem(key);
 }
 
 function addDays(date, days) {
@@ -684,41 +700,124 @@ function loadTextAlign() {
 
 function highlightHeading() {
 
+    if (!document.getElementById('highlight-headings')) {
+        // Cria um elemento <style>
+        let estiloGlobal = document.createElement('style');
+        estiloGlobal.id = 'highlight-headings';
+        //
+        // let estilo = document.createTextNode('h1, h2, h3, h4, h5, h6 ' +
+        //     '{box-shadow: 0 0 0 7px #FFFF00, 2000px 0 0 0 #FFFF00 inset !important;' +
+        //     'color: black !important;}');
 
-    // a {
-    //     box-shadow: 0 0 0 7px #FDC50D40, 2000px 0 0 0 #FDC50D40 inset !important;
-    //     outline: 3px dashed #FDC50D !important;
-    //     outline-offset: 4px !important;
-    // }
-    //
-    // button, input[type="button"], input[type="submit"], [role="button"] {
-    //     box-shadow: 0 0 0 7px #FDC50D40, 2000px 0 0 0 #FDC50D40 inset !important;
-    //     outline: 3px dashed #FDC50D !important;
-    //     outline-offset: 4px !important;
-    // }
-    //
+        let estilo = document.createTextNode('h1, h2, h3, h4, h5, h6 ' +
+            '{background: #FFFF00 !important;' +
+            'color: black !important;}');
 
+        // Adiciona o conteúdo ao elemento <style>
+        estiloGlobal.appendChild(estilo);
 
-    // Cria um elemento <style>
-    let estiloGlobal = document.createElement('style');
+        // Adiciona o elemento <style> ao final do <body>
+        document.body.appendChild(estiloGlobal);
 
-    let estilo = document.createTextNode('h1, h2, h3, h4, h5, h6 ' +
-        '{box-shadow: 0 0 0 7px #FDC50D40, 2000px 0 0 0 #FDC50D40 inset !important;outline: 3px dashed #FDC50D !important;' +
-        'outline-offset: 4px !important;}');
-
-    // Adiciona o conteúdo ao elemento <style>
-    estiloGlobal.appendChild(estilo);
-
-    // Adiciona o elemento <style> ao final do <body>
-    document.body.appendChild(estiloGlobal);
-
-    setItemToLocalStorageWithExpiry("highlight-headings",
-        true,
-        null);
-
-
-
+        setItemToLocalStorageWithExpiry("highlight-headings",
+            true,
+            null);
+    } else {
+        // Remove o elemento <style> para desfazer o estilo
+        document.getElementById('highlight-headings').remove();
+        removeItemFromLocalStorage('highlight-headings');
+    }
 
 }
 
+function loadHighlightHeading() {
 
+    if(hightlightHeadings != null) {
+        highlightHeading();
+    }
+
+}
+
+function highlightLinks() {
+
+    if (!document.getElementById('highlight-links')) {
+
+        // Cria um elemento <style>
+        let estiloGlobal = document.createElement('style');
+        estiloGlobal.id = 'highlight-links';
+
+        // let estilo = document.createTextNode('a ' +
+        //     '{box-shadow: 0 0 0 7px #FFFF00, 2000px 0 0 0 #FFFF00 inset !important;' +
+        //     'color: black !important;}');
+
+        let estilo = document.createTextNode('a' +
+            '{background: #FFFF00 !important;' +
+            'color: black !important;}');
+
+        // Adiciona o conteúdo ao elemento <style>
+        estiloGlobal.appendChild(estilo);
+
+        // Adiciona o elemento <style> ao final do <body>
+        document.body.appendChild(estiloGlobal);
+
+        setItemToLocalStorageWithExpiry("highlight-links",
+            true,
+            null);
+
+    } else {
+        // Remove o elemento <style> para desfazer o estilo
+        document.getElementById('highlight-links').remove();
+        removeItemFromLocalStorage('highlight-links');
+    }
+
+}
+
+function loadHighlightLinks() {
+
+    if(hightlightLinks != null) {
+        highlightLinks();
+    }
+
+}
+
+function highlightButtons() {
+
+    if (!document.getElementById('highlight-buttons')) {
+
+        // Cria um elemento <style>
+        let estiloGlobal = document.createElement('style');
+        estiloGlobal.id = 'highlight-buttons'
+
+        // let estilo = document.createTextNode('button, input[type="button"], input[type="submit"], [role="button"]' +
+        //     '{box-shadow: 0 0 0 7px #FFFF00, 2000px 0 0 0 #FFFF00 inset !important;' +
+        //     'color: black !important;}');
+
+        let estilo = document.createTextNode('button, input[type="button"], input[type="submit"], [role="button"]' +
+            '{background: #FFFF00 !important;' +
+            'color: black !important;}');
+
+        // Adiciona o conteúdo ao elemento <style>
+        estiloGlobal.appendChild(estilo);
+
+        // Adiciona o elemento <style> ao final do <body>
+        document.body.appendChild(estiloGlobal);
+
+        setItemToLocalStorageWithExpiry("highlight-buttons",
+            true,
+            null);
+
+    } else {
+        // Remove o elemento <style> para desfazer o estilo
+        document.getElementById('highlight-buttons').remove();
+        removeItemFromLocalStorage('highlight-buttons');
+    }
+
+}
+
+function loadHighlightButtons() {
+
+    if(hightlightButtons != null) {
+        highlightButtons();
+    }
+
+}
