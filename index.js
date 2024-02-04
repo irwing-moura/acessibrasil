@@ -873,22 +873,16 @@ function loadTextMagnifier() {
 
 function alignText(direction) {
 
-        // Cria um elemento <style>
-        let estiloGlobal = document.createElement('style');
 
-        let estilo = document.createTextNode('body :not(button):not(nav) { text-align:' + direction + '; }');
+    const lastLeafElementsWithText = getLastLeafElementsWithText();
 
-        // Adiciona o conteúdo ao elemento <style>
-        estiloGlobal.appendChild(estilo);
+    lastLeafElementsWithText.forEach(function (txtTag) {
+        txtTag.style.textAlign = direction;
+    });
 
-        // Adiciona o elemento <style> ao final do <body>
-        document.body.appendChild(estiloGlobal);
-
-        setItemToLocalStorageWithExpiry("text-align",
-            direction,
-            null);
-
-
+    setItemToLocalStorageWithExpiry("text-align",
+        direction,
+        null);
 }
 
 function loadTextAlign() {
@@ -901,25 +895,6 @@ function loadTextAlign() {
 
 
 function highlightHeading() {
-
-    // if (getItemFromLocalStorageWithExpiry('highlight-headings') !== null) {
-        // // Cria um elemento <style>
-        // let estiloGlobal = document.createElement('style');
-        // estiloGlobal.id = 'highlight-headings';
-        // //
-        // // let estilo = document.createTextNode('h1, h2, h3, h4, h5, h6 ' +
-        // //     '{box-shadow: 0 0 0 7px #FFFF00, 2000px 0 0 0 #FFFF00 inset !important;' +
-        // //     'color: black !important;}');
-        //
-        // let estilo = document.createTextNode('h1, h2, h3, h4, h5, h6 ' +
-        //     '{background: #FFFF00 !important;' +
-        //     'color: black !important;}');
-        //
-        // // Adiciona o conteúdo ao elemento <style>
-        // estiloGlobal.appendChild(estilo);
-        //
-        // // Adiciona o elemento <style> ao final do <body>
-        // document.body.appendChild(estiloGlobal);
 
         let txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
 
