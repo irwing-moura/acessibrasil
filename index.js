@@ -10,6 +10,202 @@ let textAlign = getItemFromLocalStorageWithExpiry("text-align");
 let hightlightHeadings = getItemFromLocalStorageWithExpiry("highlight-headings");
 let hightlightLinks = getItemFromLocalStorageWithExpiry("highlight-links");
 let hightlightButtons = getItemFromLocalStorageWithExpiry("highlight-buttons");
+let fontFamily = getItemFromLocalStorageWithExpiry("font-family");
+
+//FONT FAMILY
+let fontes = ['inherit', 'Arial, sans-serif', 'OpenDyslexic'];
+let indexActualFontFamily = fontFamily != null ? fontFamily.value : fontFamily; // Obtém a fonte salva ou usa a primeira opção
+
+
+let yellowColors  = {
+    "cor1": {
+    "valor": "#FFFFE0",
+        "outroAtributo": "green"
+},
+    "cor2": {
+    "valor": "#FFFACD",
+        "outroAtributo": "Valor para a cor 2"
+},
+    "cor3": {
+    "valor": "#FADA5E",
+        "outroAtributo": "Valor para a cor 3"
+},
+    "cor4": {
+    "valor": "#FFC30B",
+        "outroAtributo": "Valor para a cor 4"
+},
+    "cor5": {
+    "valor": "#FFD700",
+        "outroAtributo": "Valor para a cor 5"
+},
+    "cor6": {
+    "valor": "#FFDB58",
+        "outroAtributo": "Valor para a cor 6"
+},
+    "cor7": {
+    "valor": "#E9D66B",
+        "outroAtributo": "Valor para a cor 7"
+},
+    "cor8": {
+    "valor": "#FFEA00",
+        "outroAtributo": "Valor para a cor 8"
+},
+    "cor9": {
+    "valor": "#FFF44F",
+        "outroAtributo": "Valor para a cor 9"
+},
+    "cor10": {
+    "valor": "#FFC40C",
+        "outroAtributo": "Valor para a cor 10"
+},
+    "cor11": {
+    "valor": "#FDDA0D",
+        "outroAtributo": "Valor para a cor 11"
+},
+    "cor12": {
+    "valor": "#FFDA03",
+        "outroAtributo": "Valor para a cor 12"
+},
+    "cor13": {
+    "valor": "#CC7722",
+        "outroAtributo": "Valor para a cor 13"
+},
+    "cor14": {
+    "valor": "#ADFF2F",
+        "outroAtributo": "Valor para a cor 14"
+},
+    "cor15": {
+    "valor": "#FDFD96",
+        "outroAtributo": "Valor para a cor 15"
+},
+    "cor16": {
+    "valor": "#FFBF00",
+        "outroAtributo": "Valor para a cor 15"
+},
+    "cor17": {
+    "valor": "#F0A804",
+        "outroAtributo": "Valor para a cor 15"
+},
+    "cor18": {
+    "valor": "#FFD02E",
+        "outroAtributo": "Valor para a cor 15"
+},
+    "cor19": {
+    "valor": "#CCFF00",
+        "outroAtributo": "Valor para a cor 15"
+},
+    "cor20": {
+    "valor": "#CCEE22",
+        "outroAtributo": "Valor para a cor 15"
+},
+    "cor21": {
+    "valor": "#FFFF33",
+        "outroAtributo": "Valor para a cor 15"
+},
+//     "cor22": {
+//     "valor": "#FFFF00",
+//         "outroAtributo": "Valor para a cor 15"
+// },
+    "cor23": {
+    "valor": "#CCFF66",
+        "outroAtributo": "Valor para a cor 15"
+},
+    "cor24": {
+    "valor": "#CCFF33",
+        "outroAtributo": "Valor para a cor 15"
+},
+    "cor25": {
+    "valor": "#DFFF00",
+        "outroAtributo": "Valor para a cor 15"
+},
+    "cor26": {
+    "valor": "#FFFF99",
+        "outroAtributo": "Valor para a cor 15"
+},
+    "cor27": {
+    "valor": "#FFFF66",
+        "outroAtributo": "Valor para a cor 15"
+}
+
+}
+
+let orangeColors  = {
+    "cor1": {
+        "valor": "#FF4500",
+        "outroAtributo": "Valor para a cor 1"
+    },
+    "cor2": {
+        "valor": "#FF8C00",
+        "outroAtributo": "Valor para a cor 2"
+    },
+    "cor3": {
+        "valor": "#FFA500",
+        "outroAtributo": "Valor para a cor 3"
+    }
+}
+
+let blackColors  = {
+    "cor1": {
+        "valor": "#000000",
+        "outroAtributo": "Valor para a cor 1"
+    },
+    "cor2": {
+        "valor": "#1C1C1C",
+        "outroAtributo": "Valor para a cor 2"
+    },
+    "cor3": {
+        "valor": "#363636",
+        "outroAtributo": "Valor para a cor 3"
+    },
+    "cor4": {
+        "valor": "#4F4F4F",
+        "outroAtributo": "Valor para a cor 4"
+    },
+    "cor5": {
+        "valor": "#696969",
+        "outroAtributo": "Valor para a cor 5"
+    },
+    "cor6": {
+        "valor": "#1C1C1C",
+        "outroAtributo": "Valor para a cor 6"
+    },
+    "cor7": {
+        "valor": "#333333",
+        "outroAtributo": "Valor para a cor 7"
+    },
+    "cor8": {
+        "valor": "#555555",
+        "outroAtributo": "Valor para a cor 8"
+    },
+    "cor9": {
+        "valor": "#666666",
+        "outroAtributo": "Valor para a cor 9"
+    },
+    "cor10": {
+        "valor": "#999999",
+        "outroAtributo": "Valor para a cor 10"
+    },
+    "cor11": {
+        "valor": "#333333",
+        "outroAtributo": "Valor para a cor 11"
+    },
+    "cor12": {
+        "valor": "#595959",
+        "outroAtributo": "Valor para a cor 12"
+    },
+    "cor13": {
+        "valor": "#1A1A1A",
+        "outroAtributo": "Valor para a cor 13"
+    },
+    "cor14": {
+        "valor": "#2C2C2C",
+        "outroAtributo": "Valor para a cor 14"
+    },
+    "cor15": {
+        "valor": "#1E1E1E",
+        "outroAtributo": "Valor para a cor 15"
+    }
+}
 
 window.acessiBrasil.init = function init() {
     createIcon();
@@ -22,6 +218,9 @@ window.acessiBrasil.init = function init() {
     loadHighlightHeading();
     loadHighlightLinks();
     loadHighlightButtons();
+    // loadFontFamily();
+    setFontFamily();
+
 }
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
@@ -142,7 +341,9 @@ function createIcon() {
     <div class="container">
           <button class="button" onclick="highlightButtons()">HIGHLIGHT BUTTONS</button>
     </div>
-    
+    <div class="container">
+          <button class="button" onclick="changeFontFamily()">CHANGE FONT FAMILY</button>
+    </div>
     
   </div>
 
@@ -698,77 +899,146 @@ function loadTextAlign() {
 
 }
 
+
 function highlightHeading() {
 
-    if (!document.getElementById('highlight-headings')) {
-        // Cria um elemento <style>
-        let estiloGlobal = document.createElement('style');
-        estiloGlobal.id = 'highlight-headings';
+    // if (getItemFromLocalStorageWithExpiry('highlight-headings') !== null) {
+        // // Cria um elemento <style>
+        // let estiloGlobal = document.createElement('style');
+        // estiloGlobal.id = 'highlight-headings';
+        // //
+        // // let estilo = document.createTextNode('h1, h2, h3, h4, h5, h6 ' +
+        // //     '{box-shadow: 0 0 0 7px #FFFF00, 2000px 0 0 0 #FFFF00 inset !important;' +
+        // //     'color: black !important;}');
         //
         // let estilo = document.createTextNode('h1, h2, h3, h4, h5, h6 ' +
-        //     '{box-shadow: 0 0 0 7px #FFFF00, 2000px 0 0 0 #FFFF00 inset !important;' +
+        //     '{background: #FFFF00 !important;' +
         //     'color: black !important;}');
+        //
+        // // Adiciona o conteúdo ao elemento <style>
+        // estiloGlobal.appendChild(estilo);
+        //
+        // // Adiciona o elemento <style> ao final do <body>
+        // document.body.appendChild(estiloGlobal);
 
-        let estilo = document.createTextNode('h1, h2, h3, h4, h5, h6 ' +
-            '{background: #FFFF00 !important;' +
-            'color: black !important;}');
+        let txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
 
-        // Adiciona o conteúdo ao elemento <style>
-        estiloGlobal.appendChild(estilo);
+        // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
+        txtTags.forEach(function(txtTag) {
 
-        // Adiciona o elemento <style> ao final do <body>
-        document.body.appendChild(estiloGlobal);
+            let attName = txtTag.getAttribute('data-inclowee-hlh-styled');
 
-        setItemToLocalStorageWithExpiry("highlight-headings",
-            true,
-            null);
-    } else {
-        // Remove o elemento <style> para desfazer o estilo
-        document.getElementById('highlight-headings').remove();
-        removeItemFromLocalStorage('highlight-headings');
-    }
+            if(attName == null) {
+
+                let background = transformToHex(txtTag.style.background).toUpperCase();
+                let color = transformToHex(txtTag.style.color).toUpperCase();
+
+                let buscaYellow = Object.keys(yellowColors).find(chave => yellowColors[chave].valor === background);
+                let buscaBlack = Object.keys(blackColors).find(chave => blackColors[chave].valor === color);
+
+
+                if (buscaYellow) {
+                    txtTag.style.background = yellowColors[buscaYellow].outroAtributo;
+
+                } else {
+                    txtTag.style.background = '#FFFF00';
+                }
+
+                if (buscaBlack) {
+                    txtTag.style.color = blackColors[buscaBlack].outroAtributo;
+                } else {
+                    txtTag.style.color = '#000';
+                }
+
+                txtTag.setAttribute('data-inclowee-hlh-styled', 'true');
+                setItemToLocalStorageWithExpiry("highlight-headings",
+                    true,
+                    null);
+
+            } else {
+                txtTag.style.background = '';
+                txtTag.style.color = '';
+                txtTag.removeAttribute("data-inclowee-hlh-styled");
+                removeItemFromLocalStorage("highlight-headings");
+            }
+
+        });
+
+
 
 }
+
 
 function loadHighlightHeading() {
 
     if(hightlightHeadings != null) {
         highlightHeading();
     }
-
 }
+
+
+function transformToHex(rgb) {
+    // Verifique se a cor está no formato 'rgb(r, g, b)'
+    var match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+
+    if (match) {
+        // Converte os valores para hexadecimal e os concatena
+        return '#' +
+            ('0' + parseInt(match[1], 10).toString(16)).slice(-2) +
+            ('0' + parseInt(match[2], 10).toString(16)).slice(-2) +
+            ('0' + parseInt(match[3], 10).toString(16)).slice(-2);
+    } else {
+        // Se a cor já estiver no formato hexadecimal, retorna ela mesma
+        return rgb;
+    }
+}
+
 
 function highlightLinks() {
 
-    if (!document.getElementById('highlight-links')) {
+    let txtTags = document.querySelectorAll('a');
 
-        // Cria um elemento <style>
-        let estiloGlobal = document.createElement('style');
-        estiloGlobal.id = 'highlight-links';
+    // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
+    txtTags.forEach(function(txtTag) {
 
-        // let estilo = document.createTextNode('a ' +
-        //     '{box-shadow: 0 0 0 7px #FFFF00, 2000px 0 0 0 #FFFF00 inset !important;' +
-        //     'color: black !important;}');
+        let attName = txtTag.getAttribute('data-inclowee-hll-styled');
 
-        let estilo = document.createTextNode('a' +
-            '{background: #FFFF00 !important;' +
-            'color: black !important;}');
+        if(attName == null) {
 
-        // Adiciona o conteúdo ao elemento <style>
-        estiloGlobal.appendChild(estilo);
+            let background = transformToHex(txtTag.style.background).toUpperCase();
+            let color = transformToHex(txtTag.style.color).toUpperCase();
 
-        // Adiciona o elemento <style> ao final do <body>
-        document.body.appendChild(estiloGlobal);
+            let buscaYellow = Object.keys(yellowColors).find(chave => yellowColors[chave].valor === background);
+            let buscaBlack = Object.keys(blackColors).find(chave => blackColors[chave].valor === color);
 
-        setItemToLocalStorageWithExpiry("highlight-links",
-            true,
-            null);
 
-    } else {
-        // Remove o elemento <style> para desfazer o estilo
-        document.getElementById('highlight-links').remove();
-        removeItemFromLocalStorage('highlight-links');
-    }
+            if (buscaYellow) {
+                txtTag.style.background = yellowColors[buscaYellow].outroAtributo;
+
+            } else {
+                txtTag.style.background = '#FFFF00';
+            }
+
+            if (buscaBlack) {
+                txtTag.style.color = blackColors[buscaBlack].outroAtributo;
+            } else {
+                txtTag.style.color = '#000';
+            }
+
+            txtTag.setAttribute('data-inclowee-hll-styled', 'true');
+            setItemToLocalStorageWithExpiry("highlight-links",
+                true,
+                null);
+
+        } else {
+            txtTag.style.background = '';
+            txtTag.style.color = '';
+            txtTag.removeAttribute("data-inclowee-hll-styled");
+            removeItemFromLocalStorage("highlight-links");
+        }
+
+    });
+
 
 }
 
@@ -782,35 +1052,48 @@ function loadHighlightLinks() {
 
 function highlightButtons() {
 
-    if (!document.getElementById('highlight-buttons')) {
+    let txtTags = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"]');
 
-        // Cria um elemento <style>
-        let estiloGlobal = document.createElement('style');
-        estiloGlobal.id = 'highlight-buttons'
+    // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
+    txtTags.forEach(function(txtTag) {
 
-        // let estilo = document.createTextNode('button, input[type="button"], input[type="submit"], [role="button"]' +
-        //     '{box-shadow: 0 0 0 7px #FFFF00, 2000px 0 0 0 #FFFF00 inset !important;' +
-        //     'color: black !important;}');
+        let attName = txtTag.getAttribute('data-inclowee-hlb-styled');
 
-        let estilo = document.createTextNode('button, input[type="button"], input[type="submit"], [role="button"]' +
-            '{background: #FFFF00 !important;' +
-            'color: black !important;}');
+        if(attName == null) {
 
-        // Adiciona o conteúdo ao elemento <style>
-        estiloGlobal.appendChild(estilo);
+            let background = transformToHex(txtTag.style.background).toUpperCase();
+            let color = transformToHex(txtTag.style.color).toUpperCase();
 
-        // Adiciona o elemento <style> ao final do <body>
-        document.body.appendChild(estiloGlobal);
+            let buscaYellow = Object.keys(yellowColors).find(chave => yellowColors[chave].valor === background);
+            let buscaBlack = Object.keys(blackColors).find(chave => blackColors[chave].valor === color);
 
-        setItemToLocalStorageWithExpiry("highlight-buttons",
-            true,
-            null);
 
-    } else {
-        // Remove o elemento <style> para desfazer o estilo
-        document.getElementById('highlight-buttons').remove();
-        removeItemFromLocalStorage('highlight-buttons');
-    }
+            if (buscaYellow) {
+                txtTag.style.background = yellowColors[buscaYellow].outroAtributo;
+
+            } else {
+                txtTag.style.background = '#FFFF00';
+            }
+
+            if (buscaBlack) {
+                txtTag.style.color = blackColors[buscaBlack].outroAtributo;
+            } else {
+                txtTag.style.color = '#000';
+            }
+
+            txtTag.setAttribute('data-inclowee-hlb-styled', 'true');
+            setItemToLocalStorageWithExpiry("highlight-buttons",
+                true,
+                null);
+
+        } else {
+            txtTag.style.background = '';
+            txtTag.style.color = '';
+            txtTag.removeAttribute("data-inclowee-hlb-styled");
+            removeItemFromLocalStorage("highlight-buttons");
+        }
+
+    });
 
 }
 
@@ -820,4 +1103,193 @@ function loadHighlightButtons() {
         highlightButtons();
     }
 
+}
+
+//
+// function setFontFamily(family) {
+//
+//     let txtTags = document.querySelectorAll('li, a, p, h1, h2, h3, h4, h5, h6, body, input[type="button"], button, input[type="submit"]');
+//
+//     // Cria um elemento <style>
+//     let estiloGlobal = document.createElement('style');
+//     estiloGlobal.setAttribute("id", "dyslexic-font")
+//     let estilo = document.createTextNode(' @font-face {\n' +
+//         '            font-family: \'OpenDyslexic\';\n' +
+//         '            src: url("OpenDyslexic-Regular.woff"),\n' +
+//         '            url("OpenDyslexic-Regular.woff");\n' +
+//         '            font-weight: normal;\n' +
+//         '            font-style: normal;\n' +
+//         '        }\n' +
+//         '\n' +
+//         '        @font-face {\n' +
+//         '            font-family: \'OpenDyslexic-Italic\';\n' +
+//         '            src: url("OpenDyslexic-Italic.woff"),\n' +
+//         '            url("OpenDyslexic-Italic.woff");\n' +
+//         '            font-weight: normal;\n' +
+//         '            font-style: italic;\n' +
+//         '        }\n' +
+//         '\n' +
+//         '        @font-face {\n' +
+//         '            font-family: \'OpenDyslexic-Bold\';\n' +
+//         '            src: url("OpenDyslexic-Bold.woff"),\n' +
+//         '            url("OpenDyslexic-Bold.woff");\n' +
+//         '            font-weight: bold;\n' +
+//         '            font-style: normal;\n' +
+//         '        }\n' +
+//         '\n' +
+//         '        @font-face {\n' +
+//         '            font-family: \'OpenDyslexic-Bold-Italic\';\n' +
+//         '            src: url("OpenDyslexic-Bold-Italic.woff"),\n' +
+//         '            url("OpenDyslexic-Bold-Italic.woff");\n' +
+//         '            font-weight: bold;\n' +
+//         '            font-style: italic;\n' +
+//         '        }');
+//
+//     estiloGlobal.appendChild(estilo);
+//     document.body.appendChild(estiloGlobal)
+//
+//     //readable - arial
+//
+//     txtTags.forEach(function (txtTag) {
+//
+//         let readableStyledSetted = txtTag.getAttribute('data-inclowee-rf-styled');
+//         let dyslexicStyledSetted = txtTag.getAttribute('data-inclowee-df-styled');
+//
+//         if (readableStyledSetted == null && dyslexicStyledSetted == null) {
+//
+//             txtTag.style.setProperty('font-family', family === 1 ? 'Arial, Helvetica, sans-serif'
+//                 : 'OpenDyslexic, sans-serif', 'important');
+//
+//             if(family === 1) {
+//                 txtTag.setAttribute('data-inclowee-rf-styled', 'true');
+//                 txtTag.removeAttribute('data-inclowee-df-styled');
+//             }else if (family === 2) {
+//                 txtTag.setAttribute('data-inclowee-df-styled', 'true');
+//                 txtTag.removeAttribute('data-inclowee-rf-styled');
+//             }
+//
+//             setItemToLocalStorageWithExpiry("font-family",
+//                 family,
+//                 null);
+//
+//         }
+//
+//         else if (readableStyledSetted) {
+//
+//         }
+//
+//         //else {
+//         //     txtTag.style.fontFamily = '';
+//         //     txtTag.removeAttribute("data-inclowee-f-styled");
+//         //     removeItemFromLocalStorage("font-family");
+//         //
+//         //     //DELTE DYSLEXIC STYLE FONT
+//         //     let folhaDeEstiloParaDeletar = document.getElementById("dyslexic-font");
+//         //     if (folhaDeEstiloParaDeletar) {
+//         //         // Obtém o pai da folha de estilo e remove a folha de estilo
+//         //         var paiDaFolhaDeEstilo = folhaDeEstiloParaDeletar.parentNode;
+//         //         paiDaFolhaDeEstilo.removeChild(folhaDeEstiloParaDeletar);
+//         //     }
+//         //
+//         // }
+//
+//     });
+//
+// }
+//
+// function loadFontFamily() {
+//
+//     if(fontFamily != null) {
+//         setFontFamily(fontFamily);
+//     }
+//
+// }
+
+function changeFontFamily() {
+    indexActualFontFamily = (indexActualFontFamily + 1) % fontes.length;
+    setFontFamily();
+
+    if(indexActualFontFamily === 0) {
+        removeItemFromLocalStorage("font-family");
+    } else {
+        setItemToLocalStorageWithExpiry("font-family",
+            indexActualFontFamily,
+            null);
+    }
+
+
+
+}
+
+function setFontFamily() {
+
+    if (indexActualFontFamily !== null) {
+
+        let styleDyslexic = document.getElementById("dyslexic-font");
+
+        if ((indexActualFontFamily === 1 || indexActualFontFamily === 2) && styleDyslexic == null) {
+            createStyleFontDyslexic();
+        }
+
+        let selectedFontFamily = fontes[indexActualFontFamily];
+        let elements = document
+            .querySelectorAll('li, a, p, h1, h2, h3, h4, h5, h6, body, input[type="button"], button, input[type="submit"]');
+        for (let i = 0; i < elements.length; i++) {
+
+            elements[i].style.fontFamily = selectedFontFamily;
+
+            if (selectedFontFamily === 'inherit') {
+                removeItemFromLocalStorage("font-family");
+
+                if (styleDyslexic) {
+                    let dadStyleDyslexic = styleDyslexic.parentNode;
+                    dadStyleDyslexic.removeChild(styleDyslexic);
+                }
+
+            }
+
+        }
+    }
+
+}
+
+
+function createStyleFontDyslexic() {
+    // Cria um elemento <style>
+    let estiloGlobal = document.createElement('style');
+    estiloGlobal.setAttribute("id", "dyslexic-font")
+    let estilo = document.createTextNode(' @font-face {\n' +
+        '            font-family: \'OpenDyslexic\';\n' +
+        '            src: url("OpenDyslexic-Regular.woff"),\n' +
+        '            url("OpenDyslexic-Regular.woff");\n' +
+        '            font-weight: normal;\n' +
+        '            font-style: normal;\n' +
+        '        }\n' +
+        '\n' +
+        '        @font-face {\n' +
+        '            font-family: \'OpenDyslexic-Italic\';\n' +
+        '            src: url("OpenDyslexic-Italic.woff"),\n' +
+        '            url("OpenDyslexic-Italic.woff");\n' +
+        '            font-weight: normal;\n' +
+        '            font-style: italic;\n' +
+        '        }\n' +
+        '\n' +
+        '        @font-face {\n' +
+        '            font-family: \'OpenDyslexic-Bold\';\n' +
+        '            src: url("OpenDyslexic-Bold.woff"),\n' +
+        '            url("OpenDyslexic-Bold.woff");\n' +
+        '            font-weight: bold;\n' +
+        '            font-style: normal;\n' +
+        '        }\n' +
+        '\n' +
+        '        @font-face {\n' +
+        '            font-family: \'OpenDyslexic-Bold-Italic\';\n' +
+        '            src: url("OpenDyslexic-Bold-Italic.woff"),\n' +
+        '            url("OpenDyslexic-Bold-Italic.woff");\n' +
+        '            font-weight: bold;\n' +
+        '            font-style: italic;\n' +
+        '        }');
+
+    estiloGlobal.appendChild(estilo);
+    document.body.appendChild(estiloGlobal)
 }
