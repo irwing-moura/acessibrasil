@@ -12,10 +12,27 @@ let hightlightLinks = getItemFromLocalStorageWithExpiry("highlight-links");
 let hightlightButtons = getItemFromLocalStorageWithExpiry("highlight-buttons");
 let fontFamily = getItemFromLocalStorageWithExpiry("font-family");
 
+let closeButton;
+let resetButton;
+let createshortcutsButton;
+let hideButton;
+let textEnlargeButton;
+let hlHeading;
+let highlightLinksButton;
+let highlightButtonsButton;
+let readableFontButton;
+let friendlyDyslexiaButton;
+let alignLeft;
+let alignCenter;
+let alignRight;
+
 //FONT FAMILY
-let fontes = ['inherit', 'Arial, sans-serif', 'OpenDyslexic'];
+let fontes = ['', 'Arial, sans-serif', 'OpenDyslexic'];
 let indexActualFontFamily = fontFamily != null ? fontFamily.value : fontFamily; // Obtém a fonte salva ou usa a primeira opção
 
+//TEXT-ALIGN
+let aligns = ['', 'left', 'center', 'right'];
+let indexActualTextAlign = textAlign != null ? textAlign.value : textAlign;
 
 let yellowColors  = {
     "cor1": {
@@ -209,79 +226,415 @@ let blackColors  = {
 
 window.acessiBrasil.init = function init() {
     createIcon();
+    assignFunctionsToIds();
     loadFontSize();
     loadZoom();
     loadLineHeight();
     loadLetterSpacing();
     loadTextMagnifier()
-    loadTextAlign();
     loadHighlightHeading();
     loadHighlightLinks();
     loadHighlightButtons();
-    // loadFontFamily();
     setFontFamily();
+    setAlignText();
 
 }
+
+function assignFunctionsToIds() {
+
+    //HEADER
+
+    closeButton = document.getElementById("closeButton");
+    closeButton.addEventListener('click', toggleExpandWindow);
+
+    resetButton = document.getElementById("resetButton");
+    resetButton.addEventListener('click', clearLocalStorage);
+
+    createshortcutsButton = document.getElementById("createshortcuts");
+    createshortcutsButton.addEventListener('click', ()=>{
+        alert('Não esta pronto ainda, meu chapinha!');
+    });
+
+    hideButton = document.getElementById("hideButton");
+    hideButton.addEventListener('click', ()=>{
+        alert('Não esta pronto ainda, meu chapinha!');
+    });
+
+    //FUNCIONALIDADES
+
+    textEnlargeButton = document.getElementById("textEnlargeButton");
+    textEnlargeButton.addEventListener('click', updateTextMagnifier);
+
+    hlHeading = document.getElementById("highlightTitlesButton");
+    hlHeading.addEventListener('click', highlightHeading);
+
+    highlightLinksButton = document.getElementById("highlightLinksButton");
+    highlightLinksButton.addEventListener('click', highlightLinks);
+
+    highlightButtonsButton = document.getElementById("highlightButtonsButton");
+    highlightButtonsButton.addEventListener('click', highlightButtons);
+
+    readableFontButton = document.getElementById("readableFontButton");
+    readableFontButton.addEventListener('click', ()=> {
+        changeFontFamily(1);
+    });
+
+    friendlyDyslexiaButton = document.getElementById("friendlyDyslexiaButton");
+    friendlyDyslexiaButton.addEventListener('click', ()=> {
+        changeFontFamily(2);
+    });
+
+    alignLeft = document.getElementById("alignLeft");
+    alignLeft.addEventListener('click', ()=> {
+       changeAlignText(1);
+    });
+
+    alignCenter = document.getElementById("alignCenter");
+    alignCenter.addEventListener('click', ()=> {
+        changeAlignText(2);
+    });
+
+    alignRight = document.getElementById("alignRight");
+    alignRight.addEventListener('click', ()=> {
+        changeAlignText(3);
+    });
+
+
+}
+
+
+function changeStyleButtonSelected(id) {
+
+
+    if(id.style.background === 'rgb(26, 110, 255)') {
+        id.style.background = '#ffffff';
+        id.style.borderColor = '#8e8e8e';
+        id.style.color = '#000';
+    }else {
+        id.style.background = '#1a6eff'; //#ffffff
+        id.style.borderColor = '#1a6eff'; //#8e8e8e
+        id.style.color = '#fff'; //#000
+    }
+
+
+}
+
+function changeStyleButtonSelectedAndDeselectOthers(idActivate, idsDisable) {
+
+
+    if(idActivate !== null) {
+        idActivate.style.setProperty('background', '#1a6eff', 'important');
+        idActivate.style.setProperty('borderColor', '#1a6eff', 'important');
+        idActivate.style.setProperty('color', '#fff', 'important');
+    }
+
+    idsDisable.forEach(function (index) {
+
+        index.style.setProperty('background', '#ffffff', 'important');
+        index.style.setProperty('borderColor', '#8e8e8e', 'important');
+        index.style.setProperty('color', '#000', 'important');
+
+    });
+
+}
+
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
 
 function createIcon() {
 
     // Criar o ícone arredondado dinamicamente
-    let expandIcon = document.createElement('div');
-    expandIcon.id = 'expand-icon';
-    expandIcon.innerHTML = '+';
-    expandIcon.style.position = 'fixed';
-    expandIcon.style.bottom = '20px';
-    expandIcon.style.right = '20px';
-    expandIcon.style.width = '50px';
-    expandIcon.style.height = '50px';
-    expandIcon.style.backgroundColor = '#3498db';
-    expandIcon.style.color = '#fff';
-    expandIcon.style.borderRadius = '50%';
-    expandIcon.style.display = 'flex';
-    expandIcon.style.alignItems = 'center';
-    expandIcon.style.justifyContent = 'center';
-    expandIcon.style.cursor = 'pointer';
-    expandIcon.style.zIndex = 99999;
-    expandIcon.onclick = toggleExpandWindow;
+    let expandIcon = document.createElement('button');
+    expandIcon.id = 'accessibilityButton';
+    expandIcon.className = 'accessibility-button'
+    expandIcon.innerHTML = '<span class="material-icons">accessibility_new</span>';
+    expandIcon.addEventListener('click', toggleExpandWindow);
 
     document.body.appendChild(expandIcon);
 
 
     // Criar a janela expansível dinamicamente
     let expandWindow = document.createElement('div');
-    expandWindow.id = 'expand-window';
+    expandWindow.id = 'appWindow';
     expandWindow.innerHTML = `
 
   <style>
-  .container {
-    display: flex;
-    align-items: center;
-  }
+  /* Estilos para o botão de acessibilidade */
+.accessibility-button {
+  position: fixed;
+  bottom: 20px;
+  right: 40px;
+  width: 75px;
+  height: 75px;
+  background-color: #1A6EFF;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  transition: background-color 0.3s, transform 0.3s;
+}
 
-  .button {
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    font-size: 16px;
-  }
+.accessibility-button:focus,
+.accessibility-button:hover {
+  background-color: #1038bd; /* Altere a cor de fundo quando o botão estiver em foco ou hover, se desejar */
+  transform: scale(1.1); /* Aumenta o botão em 10% ao passar o mouse ou focar */
+  outline: 2px solid #ffffff; /* Contorno branco para indicar foco */
+  outline-offset: 2px;
+}
 
-  .percentage {
-    font-size: 24px;
-    margin: 0 10px;
-  }
+/* Adiciona estilos específicos para o ícone no botão de acessibilidade */
+.accessibility-button .material-icons {
+  font-size: 50px;
+  color: white;
+}
 
-  .container-expand {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
+/* Estilos gerais para a janela do aplicativo */
+.app-window {
+  position: fixed;
+  top: 10px; /* Ajuste conforme necessário para a distância desejada do topo */
+  right: 20px; /* Mantém a posição à esquerda do navegador */
+  height: 740px; /* Ajusta para cobrir toda a altura do navegador */
+  width: 345px;
+  max-width: 100%; /* Garante que a largura não ultrapasse a largura total do navegador */
+  background-color: #f6f6f6;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Aplica uma sombra em torno da janela */
+  overflow: auto;
+  scrollbar-width: none; /* Para Firefox */
+  /* Espaço extra no final para garantir visibilidade do conteúdo */
+  max-width: 100%; /* Ajuste conforme necessário para a distância desejada do topo */
+  scrollbar-width: none; /* Para Firefox */
+   /* Espaço extra no final para garantir visibilidade do conteúdo */
+   
+}
+
+.app-window::-webkit-scrollbar {
+  display: none; /* Para Chrome, Safari, WebKit */
+}
+
+.app-content {
+  padding-bottom: 25px; /* Adiciona espaço no final do conteúdo */
+  /* Adicione mais estilos para o conteúdo aqui, se necessário */
+}
+
+
+/* Estilos para tornar a barra de rolagem invisível no Firefox */
+.app-window {
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Estilos para tornar a barra de rolagem invisível no Chrome, Safari e outros navegadores WebKit */
+.app-window::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, WebKit */
+}
+
+
+/* Estilos para o conteúdo da janela */
+.app-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
+  padding: 20px;
+}
+
+/* Estilos para a barra de ferramentas superior */
+.toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #1A6EFF;
+  padding: 15px;
+  border-top-left-radius: 0; /* Para preencher totalmente o topo, você pode querer remover o arredondamento */
+  border-top-right-radius: 0; /* Para preencher totalmente o topo, você pode querer remover o arredondamento */
+  display: flex;
+  justify-content: flex-end;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adiciona uma sombra à barra de ferramentas */
+}
+
+.right-icons {
+  display: flex;
+  align-items: center;
+}
+
+.inter-icon {
+  font-family: 'Inter', sans-serif;
+  font-size: 24px; /* Ajuste o tamanho conforme necessário */
+  color: #ffffff; /* Cor branca */
+  margin-left: 10px; /* Ajuste a margem conforme necessário */
+}
+
+
+/* Estilos para os botões da barra de ferramentas superior */
+.toolbar-button {
+  background-color: rgba(255, 255, 255, 0.213);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  border-radius: 7px;
+  width: 30px;
+  height: 30px;
+
+  /* Adicione atributos ARIA */
+  bleed: button;
+  initial-letter: "Descrição do botão";
+  /* Adicione feedback visual */
+  outline: none; /* Adicione um contorno ao focar */
+}
+
+/* Estilos para os ícones dos botões da barra de ferramentas superior */
+.toolbar-button .material-icons {
+  font-size: 25px;
+  color: rgb(255, 255, 255);
+}
+
+/* Adicione estados visuais para foco com contorno */
+.toolbar-button:focus {
+  outline: 2px solid #ffffff; /* Adicione um contorno ao focar */
+  outline-offset: 2px; /* Ajuste o espaçamento do contorno para evitar sobreposição com o botão */
+}
+
+
+/* Estilos para o contêiner que envolve os botões */
+.content-buttons {
+  display: flex;
+  justify-content: center; /* Centralize horizontalmente */
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: absolute;
+  left: 2px; /* Ajuste a distância do canto esquerdo */
+  right: 2px; /* Ajuste a distância do canto direito */
+  top: 90px; /* Ajuste a distância do canto inferior */
+}
+
+/* Estilos para cada botão da seção de ajustes de conteúdo */
+.content-button {
+  background-color: #ffffff;
+  border: 1px solid #8e8e8e;
+  border-radius: 10px;
+  cursor: pointer; 
+  color: rgb(0, 0, 0);
+  width: calc(33.33% - 10px);
+  height: 93px;
+  transition: background-color 0.3s, transform 0.3s, border-color 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+}
+
+/* Adicione estados visuais para foco com contorno nos botões de conteúdo */
+/*.content-button:focus {*/
+/*  outline: 2px solid #033a7da2; !* Adicione um contorno ao focar *!*/
+/*  outline-offset: 2px; !* Ajuste o espaçamento do contorno para evitar sobreposição com o botão *!*/
+/*}*/
+
+/* Ajuste a margem direita do último botão para evitar quebras desnecessárias */
+.content-button:nth-child(3n) {
+  margin-right: 0;
+}
+
+/* Estilos para o ícone dentro de cada botão da seção de ajustes de conteúdo */
+.content-button span {
+  font-size: 30px;
+  margin-bottom: 5px;
+}
+
+
+/* Container principal do slider */
+.slider-container1 {
+  width: 331px;
+  height: 80px;
+  background-color: #ffffff;
+  border: 1px solid #8e8e8e;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column; /* Organiza os elementos em coluna */
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box; /* Garante que as dimensões incluam a borda e o preenchimento */
+}
+
+
+
+/* Parte superior do slider com título, ícone e valor */
+.slider-top {
+  display: flex;
+  justify-content: space-between; /* Alinha o título/ícone e o valor nas extremidades */
+  align-items: center;
+  margin-bottom: 8px; /* Espaço entre o título/ícone e o controle deslizante */
+}
+
+/* Ícone e título do slider */
+.slider-icon-title {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* Ícone utilizando a classe material-icons */
+.icon-title .material-icons {
+  font-size: 24px;
+  color: #000000;
+}
+
+/* Título do slider */
+.slider-title {
+  font-size: 16px;
+  color: #000000;
+  margin-left: 8px;
+}
+
+/* Controle deslizante principal */
+.slider-control {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 20px;
+  background: #1A6EFF;
+  outline: none; /* Remove a borda padrão do foco, considere acessibilidade ao fazer isso */
+}
+
+/* Polegar do controle deslizante para navegadores WebKit (Chrome, Safari) */
+.slider-control::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1px solid #1A6EFF;
+  cursor: pointer;
+}
+
+/* Polegar do controle deslizante para navegadores Gecko (Firefox) */
+.slider::-moz-range-thumb {
+  width: 24px;
+  height: 25px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 4px solid #1A6EFF;
+  cursor: pointer; 
+
+}
+
+/* Valor do slider */
+.slider-value {
+  font-size: 16px;
+  color: #1A6EFF;
+
+}
   .balao {
     display: none;
     position: absolute;
@@ -290,120 +643,254 @@ function createIcon() {
 
   </style>
 
-  <div class="container-expand"> 
-
-  <div class="container" style="flex-direction:column; gap:5px;">
-    <span>Font Size</span>
-    <div class="container">
-      <button class="button" onclick="reduceFontSize()">-</button>
-      <div class="percentage" id="percentage">0%</div>
-      <button class="button" onclick="increaseFontSize()">+</button>
-    </div>
-    <span>Content Scaling</span>
-    <div class="container">
-      <button class="button" onclick="reduceZoom()">-</button>
-      <div class="percentage" id="percentageZoom">0%</div>
-      <button class="button" onclick="increaseZoom()">+</button>
-    </div>
-    <span>Line Height</span>
-    <div class="container">
-      <button class="button" onclick="reduceLineHeight()">-</button>
-      <div class="percentage" id="percentageLineHeight">0%</div>
-      <button class="button" onclick="increaseLineHeight()">+</button>
-    </div>
-    <span>Letter Spacing</span>
-    <div class="container">
-      <button class="button" onclick="reduceLetterSpacing()">-</button>
-      <div class="percentage" id="percentageLetterSpacing">0%</div>
-      <button class="button" onclick="increaseLetterSpacing()">+</button>
-    </div>
-    <div class="container">
-      <button id="btn-text-magnifier" class="button" onclick="updateTextMagnifier()">TEXT MAGNIFIER</button>
-    </div>
-    <div style="display: flex; gap: 1rem;">
-        <div class="container">
-          <button class="button" onclick="alignText('left')"><img style="max-width: 20px" alt="align left" src="align-left.png"/></button>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+   <button id="accessibilityButton" class="accessibility-button">
+        <span class="material-icons">accessibility_new</span>
+    </button>
+  
+  <div id="appWindow" class="app-window" role="application" aria-label="Janela do Aplicativo">
+        <div class="toolbar">
+            <button id="createshortcuts" class="toolbar-button" role="button" aria-label="Criar atalhos" tabindex="0"
+                    title="Criar Atalhos">
+                <span class="material-icons">add_circle_outline</span>
+            </button>
+            <button id="resetButton" class="toolbar-button" role="button" aria-label="Restaurar" tabindex="0"
+                    title="Reiniciar Configurações">
+                <span class="material-icons">cached</span>
+            </button>
+            <button id="hideButton" class="toolbar-button" role="button" aria-label="Ocultar" tabindex="0"
+                    title="Ocultar Interface">
+                <span class="material-icons">visibility_off</span>
+            </button>
+            <button id="closeButton" class="toolbar-button" role="button" aria-label="Fechar" tabindex="0"
+                    title="Fechar Janela">
+                <span class="material-icons">cancel</span>
+            </button>
         </div>
-        <div class="container">
-          <button class="button" onclick="alignText('center')"><img style="max-width: 20px" alt="align center" src="align-center.png"/></button>
-        </div>
-        <div class="container">
-          <button class="button" onclick="alignText('right')"><img style="max-width: 20px" alt="align right" src="align-right.png"/></button>
-        </div>
-    </div>
-    
-    <div class="container">
-          <button class="button" onclick="highlightHeading()">HIGHLIGHT HEADING</button>
-    </div>
-    <div class="container">
-          <button class="button" onclick="highlightLinks()">HIGHLIGHT LINKS</button>
-    </div>
-    <div class="container">
-          <button class="button" onclick="highlightButtons()">HIGHLIGHT BUTTONS</button>
-    </div>
-    <div class="container">
-          <button class="button" onclick="changeFontFamily()">CHANGE FONT FAMILY</button>
-    </div>
-    
-  </div>
 
-  <button class="button" onclick="clearLocalStorage()">RESET</button>
 
-  </div>
+        <!-- Conteúdo do aplicativo aqui -->
+
+        <div class="content-settings" role="group" aria-label="Configurações de Acessibilidade">
+            <div class="content-buttons">
+                <!-- ... Outros botões de configuração ... -->
+
+                <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
+                        title="Ampliador de Texto" tabindex="0">
+                    <span class="material-icons" aria-hidden="true">add_comment</span>
+                    Text Magnifier
+                </button>
+                <button id="highlightTitlesButton" class="content-button" role="button" aria-label="Highlight Titles"
+                        title="Highlight Titles" tabindex="0">
+                    <span class="material-icons" aria-hidden="true">format_color_text</span>
+                    Highlight Titles
+                </button>
+                <button id="highlightLinksButton" class="content-button" role="button" aria-label="Highlight Links"
+                        title="Highlight Links" tabindex="0">
+                    <span class="material-icons" aria-hidden="true">link</span>
+                    Highlight Links
+                </button>
+
+                <div class="slider-container1">
+                    <div class="slider-top">
+                        <label for="text_increase" class="slider-icon-title">
+                            <span class="material-icons" alt="Ícone para aumentar tamanho do texto">text_increase</span>
+                            <span class="slider-title">Font size</span>
+                        </label>
+                        <div id="sliderValue" class="slider-value" aria-live="polite">
+                            <span id="percentage">0%</span> <!-- Ajustado para mostrar 100% como valor padrão -->
+                        </div>
+                    </div>
+                    <input type="range" id="text_increase" class="slider-control" min="-100" max="200" value="0" step="5"
+                           aria-label="Controle deslizante de tamanho de fonte" aria-valuemin="-100" aria-valuemax="200"
+                           aria-valuenow="0" oninput="updateFontSizeSlide(this.value)">
+                </div>
+
+
+                <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
+                        title="Highlight Buttons" tabindex="0">
+                    <span class="material-icons" aria-hidden="true">smart_button</span>
+                    Highlight Buttons
+                </button>
+
+
+                <button id="readableFontButton" class="content-button" role="button" aria-label="Readable font"
+                        title="Readable font" tabindex="0">
+                    <span class="material-icons" aria-hidden="true">format_clear</span>
+                    Readable font
+                </button>
+                <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
+                        title="Friendly Dyslexia" tabindex="0">
+                    <span class="material-icons" aria-hidden="true">psychology</span>
+                    Friendly Dyslexia
+                </button>
+
+
+                <button id="alignLeft" class="content-button" role="button" aria-label="align left" title="align left"
+                        tabindex="0">
+                    <span class="material-icons" aria-hidden="true">format_align_left</span>
+                    Align left
+                </button>
+
+                <button id="alignCenter" class="content-button" role="button" aria-label="format align center"
+                        title="format align center" tabindex="0">
+                    <span class="material-icons" aria-hidden="true">format_align_center</span>
+                    Align center
+                </button>
+
+                <button id="alignRight" class="content-button" role="button" aria-label="format align right"
+                        title="format align right" tabindex="0">
+                    <span class="material-icons" aria-hidden="true">format_align_right</span>
+                    Align right
+                </button>
+
+                <div class="slider-container1">
+                    <div class="slider-top">
+                        <label for="content_scaling" class="slider-icon-title">
+                            <span class="material-icons"
+                                  alt="Ícone para ajustar o dimensionamento do conteúdo">zoom_in</span>
+                            <span class="slider-title">Content scaling</span>
+                        </label>
+                        <div id="contentScalingValue" class="slider-value" aria-live="polite">
+                            <span id="ContentScalingValue">0%</span>
+                        </div>
+                    </div>
+                    <input type="range" id="content_scaling" class="slider-control" min="-50" max="200" value="0"
+                           step="10" aria-label="Controle deslizante de dimensionamento de conteúdo" aria-valuemin="50"
+                           aria-valuemax="200" aria-valuenow="0" oninput="updateZoomSlide(this.value)">
+                </div>
+
+                <div class="slider-container1">
+                    <div class="slider-top">
+                        <label for="line_height" class="slider-icon-title">
+                            <span class="material-icons"
+                                  alt="Ícone para ajustar altura da linha">format_line_spacing</span>
+                            <span class="slider-title">Line height</span>
+                        </label>
+                        <div id="lineHeightValue" class="slider-value" aria-live="polite">
+                            <span id="LineHeightValue">1</span> <!-- Ajustado para mostrar 1.5 como valor padrão -->
+                        </div>
+                    </div>
+                    <input type="range" id="line_height" class="slider-control" min="1" max="3" step="0.5" value="1"
+                           aria-label="Controle deslizante de altura da linha" aria-valuemin="1" aria-valuemax="3"
+                           aria-valuenow="0" oninput="updateLineHeightSlide(this.value)">
+                </div>
+
+                <div class="slider-container1">
+                    <div class="slider-top">
+                        <label for="letter_spacing" class="slider-icon-title">
+                            <span class="material-icons"
+                                  alt="Ícone para ajustar o espaçamento entre letras">format_size</span>
+                            <span class="slider-title">Letter Spacing</span>
+                        </label>
+                        <div id="letterSpacingValue" class="slider-value" aria-live="polite">
+                            <span id="LetterSpacingValue">0px</span>
+                            <!-- Ajustado para mostrar 0px como valor padrão -->
+                        </div>
+                    </div>
+                    <input type="range" id="letter_spacing" class="slider-control" min="0" max="20" value="0" step="1"
+                           aria-label="Controle deslizante de espaçamento entre letras" aria-valuemin="0"
+                           aria-valuemax="20" aria-valuenow="0" oninput="updateLetterSpacingSlide(this.value)">
+                </div>
+
+
+                <!-- Adicione mais botões conforme necessário -->
+            </div>
+        </div>
+    </div>
 
     `;
 
     expandWindow.style.display = 'none';
     expandWindow.style.position = 'fixed';
-    expandWindow.style.bottom = '80px';
-    expandWindow.style.right = '20px';
-    expandWindow.style.padding = '10px';
-    expandWindow.style.backgroundColor = '#fff';
-    expandWindow.style.border = '1px solid #ccc';
-    expandWindow.style.borderRadius = '5px';
-    expandWindow.style.zIndex = 99999;
+    // expandWindow.style.zIndex = 99999;
     document.body.appendChild(expandWindow);
 
 
 }
 
 function toggleExpandWindow() {
-    let expandWindow = document.getElementById('expand-window');
-    expandWindow.style.display = (expandWindow.style.display === 'none' || expandWindow.style.display === '') ? 'block' : 'none';
+    let appWindow = document.getElementById('appWindow');
+    // console.log(expandWindow);
+
+    appWindow.style.display = (appWindow.style.display === 'none' || appWindow.style.display === '') ? 'block' : 'none';
 }
 
 
 // ******************** FONT SIZE ********************//
 
-function increaseFontSize() {
-    updateFontSize( 5)
-}
+// function increaseFontSize() {
+//     updateFontSize( 5)
+// }
+//
+// function reduceFontSize() {
+//     updateFontSize(-5)
+// }
 
-function reduceFontSize() {
-    updateFontSize(-5)
-}
+// function updateFontSize(defaultPercentage) {
+//
+//     const plusDays = addDays(new Date(), 2).getTime();
+//
+//     const lastLeafElementsWithText = getLastLeafElementsWithText();
+//     const percentageElement = document.getElementById('percentage');
+//     percentageElement.textContent = currentFontSize != null ? currentFontSize.percentage + defaultPercentage + '%'
+//     : defaultPercentage + '%';
+//
+//     lastLeafElementsWithText.forEach(function (txtTag) {
+//
+//         if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
+//             // Aplique os estilos apenas se não pertencer à classe 'app-window'
+//             let attName = txtTag.getAttribute('original-size');
+//             let initialSize = parseInt(attName);
+//             let newSize = initialSize + (initialSize * (currentFontSize !== null ? currentFontSize.percentage + defaultPercentage : defaultPercentage) / 100);
+//             // txtTag.style.fontSize = newSize + 'px';
+//             txtTag.style.setProperty('font-size', newSize + 'px', 'important');
+//         }
+//
+//
+//
+//     });
+//
+//     currentFontSize = {
+//         value: null,
+//         percentage: currentFontSize == null ? defaultPercentage : currentFontSize.percentage += defaultPercentage,
+//         expiry: plusDays
+//     }
+//
+//     setItemToLocalStorageWithExpiry("font-size",
+//         currentFontSize.value,
+//         currentFontSize.percentage);
+//
+//
+// }
 
-function updateFontSize(defaultPercentage) {
+function updateFontSizeSlide(defaultPercentage) {
 
     const plusDays = addDays(new Date(), 2).getTime();
 
     const lastLeafElementsWithText = getLastLeafElementsWithText();
     const percentageElement = document.getElementById('percentage');
-    percentageElement.textContent = currentFontSize != null ? currentFontSize.percentage + defaultPercentage + '%'
-    : defaultPercentage + '%';
+    percentageElement.textContent = defaultPercentage + '%';
 
     lastLeafElementsWithText.forEach(function (txtTag) {
 
-        let attName = txtTag.getAttribute('original-size');
-        let initialSize = parseInt(attName);
-        let newSize = initialSize + (initialSize * (currentFontSize !== null ? currentFontSize.percentage + defaultPercentage : defaultPercentage) / 100);
-        txtTag.style.fontSize = newSize + 'px';
+        if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
+            // Aplique os estilos apenas se não pertencer à classe 'app-window'
+            let attName = txtTag.getAttribute('original-size');
+            let initialSize = parseInt(attName);
+            let newSize = initialSize + (initialSize * defaultPercentage / 100);
+            // txtTag.style.fontSize = newSize + 'px';
+            txtTag.style.setProperty('font-size', newSize + 'px', 'important');
+        }
+
+
 
     });
 
     currentFontSize = {
         value: null,
-        percentage: currentFontSize == null ? defaultPercentage : currentFontSize.percentage += defaultPercentage,
+        percentage: defaultPercentage,
         expiry: plusDays
     }
 
@@ -425,13 +912,19 @@ function loadFontSize() {
             txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
         }
 
-        if(currentFontSize != null) {
-            let initialSize = parseInt(txtTag.getAttribute('original-size'));
-            let newSize = initialSize + (initialSize * currentFontSize.percentage / 100);
-            txtTag.style.fontSize = newSize + 'px';
-
+        if (currentFontSize != null) {
+            if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
+                let initialSize = parseInt(txtTag.getAttribute('original-size'));
+                let newSize = initialSize + (initialSize * currentFontSize.percentage / 100);
+                // txtTag.style.fontSize = newSize + 'px';
+                txtTag.style.setProperty('font-size', newSize + 'px', 'important');
+            }
             const percentageElement = document.getElementById('percentage');
             percentageElement.textContent = currentFontSize.percentage + '%';
+
+            const rangeElement = document.getElementById('text_increase');
+            rangeElement.value = currentFontSize.percentage;
+
         }
 
     });
@@ -440,32 +933,74 @@ function loadFontSize() {
 
 // *********** ZOOM ********** //
 
-function increaseZoom() {
-    updateZoom(0.016, false, 10)
+// function increaseZoom() {
+//     updateZoom(0.016, false, 10)
+// }
+//
+// function reduceZoom() {
+//     updateZoom(-0.016, false, 10)
+// }
+
+// function updateZoom(zoom, initial, defaultPercentage) {
+//
+//     const plusDays = addDays(new Date(), 2).getTime();
+//     const percentageZoomElement = document.getElementById('percentageZoom');
+//     percentageZoomElement.textContent = currentZoom != null ? currentZoom.percentage + defaultPercentage + '%' : defaultPercentage + '%';
+//
+//     let tagsDoPrimeiroNivel = getFirstChildElementsBelowBody();
+//
+//     for (let i = 0; i < tagsDoPrimeiroNivel.length; i++) {
+//         let zoomVal = parseFloat(window.getComputedStyle(tagsDoPrimeiroNivel[i]).zoom);
+//         let zoomFormated = isNaN(zoomVal) ? 1 : zoomVal;
+//         tagsDoPrimeiroNivel[i].style.zoom = zoomFormated + zoom;
+//
+//     }
+//
+//     currentZoom = {
+//         value: currentZoom == null ? zoom : currentZoom.value += zoom,
+//         percentage: currentZoom == null ? defaultPercentage : currentZoom.percentage += defaultPercentage,
+//         expiry: plusDays
+//     }
+//
+//     setItemToLocalStorageWithExpiry("zoom",
+//         currentZoom.value,
+//         currentZoom.percentage);
+//
+//
+// }
+
+function calculateZoomPercentageInPixels(percentage) {
+    let zoomValue = percentage * 0.32;
+    zoomValue = 1 + (zoomValue / 100);
+    return zoomValue;
 }
 
-function reduceZoom() {
-    updateZoom(-0.016, false, 10)
-}
+function updateZoomSlide(percentage) {
 
-function updateZoom(zoom, initial, defaultPercentage) {
+    let zoom = calculateZoomPercentageInPixels(percentage);
+    const percentageZoomElement = document.getElementById('ContentScalingValue');
+    const percentageZoomElementValue = document.getElementById('content_scaling');
+
 
     const plusDays = addDays(new Date(), 2).getTime();
-    const percentageZoomElement = document.getElementById('percentageZoom');
-    percentageZoomElement.textContent = currentZoom != null ? currentZoom.percentage + defaultPercentage + '%' : defaultPercentage + '%';
+
+    percentageZoomElement.textContent = percentage + '%';
+    percentageZoomElementValue.value = percentage;
+
 
     let tagsDoPrimeiroNivel = getFirstChildElementsBelowBody();
 
-    for (let i = 0; i < tagsDoPrimeiroNivel.length; i++) {
-        let zoomVal = parseFloat(window.getComputedStyle(tagsDoPrimeiroNivel[i]).zoom);
-        let zoomFormated = isNaN(zoomVal) ? 1 : zoomVal;
-        tagsDoPrimeiroNivel[i].style.zoom = zoomFormated + zoom;
+    tagsDoPrimeiroNivel.forEach(function(txtTag) {
 
-    }
+        if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button') && txtTag.id !== 'appWindow') {
+            txtTag.style.zoom = zoom;
+        }
+
+    });
 
     currentZoom = {
-        value: currentZoom == null ? zoom : currentZoom.value += zoom,
-        percentage: currentZoom == null ? defaultPercentage : currentZoom.percentage += defaultPercentage,
+        value: zoom,
+        percentage: percentage,
         expiry: plusDays
     }
 
@@ -477,75 +1012,108 @@ function updateZoom(zoom, initial, defaultPercentage) {
 }
 
 function loadZoom() {
-
     if(currentZoom !== null) {
-        const percentageZoomElement = document.getElementById('percentageZoom');
-        percentageZoomElement.textContent = currentZoom.percentage + '%';
-
-        let tagsDoPrimeiroNivel = getFirstChildElementsBelowBody();
-
-        for (let i = 0; i < tagsDoPrimeiroNivel.length; i++) {
-            let zoomVal = parseFloat(window.getComputedStyle(tagsDoPrimeiroNivel[i]).zoom);
-            let zoomFormated = isNaN(zoomVal) ? 1 : zoomVal;
-            tagsDoPrimeiroNivel[i].style.zoom = zoomFormated + currentZoom.value;
-        }
+        updateZoomSlide(currentZoom.percentage);
     }
-
 }
 
 // ******************** LINE HEIGHT ********************//
 
-function increaseLineHeight() {
-    updateLineHeight(4.0, 10)
-}
+// function increaseLineHeight() {
+//     updateLineHeight(4.0, 10)
+// }
+//
+// function reduceLineHeight() {
+//     updateLineHeight(-4.0, -10)
+// }
 
-function reduceLineHeight() {
-    updateLineHeight(-4.0, -10)
-}
+// function updateLineHeight(defaultValue, defaultPercentage) {
+//
+//     //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 4PX A CADA 10%
+//
+//     const plusDays = addDays(new Date(), 2).getTime();
+//     const percentageLineHeightElement = document.getElementById('percentageLineHeight');
+//     percentageLineHeightElement.textContent = currentLineHeight != null ? currentLineHeight.percentage + defaultPercentage + '%' : defaultPercentage + '%';
+//
+//     const lastLeafElementsWithText = getLastLeafElementsWithText();
+//
+//     lastLeafElementsWithText.forEach(function (txtTag) {
+//         let lineHeightVal = parseFloat(window.getComputedStyle(txtTag).lineHeight);
+//         let lineHeightFormated = isNaN(lineHeightVal) ? getLineHeightInPixelsIfText(txtTag) : lineHeightVal;
+//         txtTag.style.lineHeight = lineHeightFormated + defaultValue + 'px';
+//     });
+//
+//     currentLineHeight = {
+//         value: currentLineHeight == null ? defaultValue : currentLineHeight.value += defaultValue,
+//         percentage: currentLineHeight == null ? defaultPercentage : currentLineHeight.percentage += defaultPercentage,
+//         expiry: plusDays
+//     }
+//
+//     setItemToLocalStorageWithExpiry("line-height",
+//         currentLineHeight.value,
+//         currentLineHeight.percentage);
+//
+// }
 
-function updateLineHeight(defaultValue, defaultPercentage) {
 
-    //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 4PX A CADA 10%
+function updateLineHeightSlide(step) {
 
     const plusDays = addDays(new Date(), 2).getTime();
-    const percentageLineHeightElement = document.getElementById('percentageLineHeight');
-    percentageLineHeightElement.textContent = currentLineHeight != null ? currentLineHeight.percentage + defaultPercentage + '%' : defaultPercentage + '%';
+    const percentageLineHeightElement = document.getElementById('LineHeightValue');
+    percentageLineHeightElement.textContent = step;
+
+    const percentageLineHeightElementValue = document.getElementById('line_height');
+    percentageLineHeightElementValue.value = step;
+
+
 
     const lastLeafElementsWithText = getLastLeafElementsWithText();
+    // const lastLeafElementsWithText = percorrerElementos();
+
 
     lastLeafElementsWithText.forEach(function (txtTag) {
-        let lineHeightVal = parseFloat(window.getComputedStyle(txtTag).lineHeight);
-        let lineHeightFormated = isNaN(lineHeightVal) ? getLineHeightInPixelsIfText(txtTag) : lineHeightVal;
-        txtTag.style.lineHeight = lineHeightFormated + defaultValue + 'px';
+
+        let attName = txtTag.getAttribute('original-line-height');
+        if(attName == null) {
+            txtTag.setAttribute('original-line-height',
+                isNaN(parseInt(window.getComputedStyle(txtTag).lineHeight)) ? getLineHeightInPixelsIfText(txtTag) : window.getComputedStyle(txtTag).lineHeight);
+        }
+
+
+        if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
+            let lineHeightVal = parseFloat(window.getComputedStyle(txtTag).lineHeight);
+            let lineHeightFormated = isNaN(lineHeightVal) ? getLineHeightInPixelsIfText(txtTag) : lineHeightVal;
+
+            let attName = txtTag.getAttribute('original-line-height');
+            let initialSize = parseInt(attName);
+
+            if(initialSize !== null) {
+                lineHeightFormated = initialSize;
+            }
+
+            txtTag.style.setProperty('line-height', lineHeightFormated * step + 'px', 'important');
+        }
+
+
     });
 
     currentLineHeight = {
-        value: currentLineHeight == null ? defaultValue : currentLineHeight.value += defaultValue,
-        percentage: currentLineHeight == null ? defaultPercentage : currentLineHeight.percentage += defaultPercentage,
+        value: step,
+        percentage: null,
         expiry: plusDays
     }
 
     setItemToLocalStorageWithExpiry("line-height",
         currentLineHeight.value,
-        currentLineHeight.percentage);
+        null);
 
 }
 
+
 function loadLineHeight() {
-
     if(currentLineHeight !== null) {
-        const percentageLineHeightElement = document.getElementById('percentageLineHeight');
-        percentageLineHeightElement.textContent = currentLineHeight.percentage + '%';
-
-        const lastLeafElementsWithText = getLastLeafElementsWithText();
-
-        lastLeafElementsWithText.forEach(function (txtTag) {
-            let lh = parseFloat(window.getComputedStyle(txtTag).lineHeight);
-            let actualLineHeight = isNaN(lh) ? getLineHeightInPixelsIfText(txtTag) : lh;
-            txtTag.style.lineHeight = actualLineHeight + currentLineHeight.value + 'px';
-        });
+        updateLineHeightSlide(currentLineHeight.value);
     }
-
 }
 
 function getLineHeightInPixelsIfText(element) {
@@ -568,61 +1136,128 @@ function getLineHeightInPixelsIfText(element) {
 
 // *********** LETTER SPACING ********** //
 
-function increaseLetterSpacing() {
-    updateLetterSpacing(0.2, 10)
-}
+// function increaseLetterSpacing() {
+//     updateLetterSpacing(0.2, 10)
+// }
+//
+// function reduceLetterSpacing() {
+//     updateLetterSpacing(-0.2, -10)
+// }
 
-function reduceLetterSpacing() {
-    updateLetterSpacing(-0.2, -10)
-}
+// function updateLetterSpacing(defaultValue, defaultPercentage) {
+//
+//     //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 0.2PX A CADA 10%
+//
+//     const plusDays = addDays(new Date(), 2).getTime();
+//     const percentageLetterSpacingElement = document.getElementById('percentageLetterSpacing');
+//     percentageLetterSpacingElement.textContent = currentLetterSpacing != null ? currentLetterSpacing.percentage + defaultPercentage + '%' : defaultPercentage + '%';
+//
+//     const lastLeafElementsWithText = getLastLeafElementsWithText();
+//
+//     lastLeafElementsWithText.forEach(function (txtTag) {
+//         let letterSpacingVal = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
+//         let letterSpacingFormated = isNaN(letterSpacingVal) ? 0 : letterSpacingVal;
+//         txtTag.style.letterSpacing = letterSpacingFormated + defaultValue + 'px';
+//     });
+//
+//     currentLetterSpacing = {
+//         value: currentLetterSpacing == null ? defaultValue : currentLetterSpacing.value += defaultValue,
+//         percentage: currentLetterSpacing == null ? defaultPercentage : currentLetterSpacing.percentage += defaultPercentage,
+//         expiry: plusDays
+//     }
+//
+//     setItemToLocalStorageWithExpiry("letter-spacing",
+//         currentLetterSpacing.value,
+//         currentLetterSpacing.percentage);
+//
+// }
 
-function updateLetterSpacing(defaultValue, defaultPercentage) {
+function updateLetterSpacingSlide(pixels) {
 
     //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 0.2PX A CADA 10%
 
     const plusDays = addDays(new Date(), 2).getTime();
-    const percentageLetterSpacingElement = document.getElementById('percentageLetterSpacing');
-    percentageLetterSpacingElement.textContent = currentLetterSpacing != null ? currentLetterSpacing.percentage + defaultPercentage + '%' : defaultPercentage + '%';
+    const percentageLetterSpacingElement = document.getElementById('LetterSpacingValue');
+    percentageLetterSpacingElement.textContent = pixels + 'px';
+
+    const percentageLineHeightElementValue = document.getElementById('letter_spacing');
+    percentageLineHeightElementValue.value = pixels;
 
     const lastLeafElementsWithText = getLastLeafElementsWithText();
 
+
     lastLeafElementsWithText.forEach(function (txtTag) {
-        let letterSpacingVal = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
-        let letterSpacingFormated = isNaN(letterSpacingVal) ? 0 : letterSpacingVal;
-        txtTag.style.letterSpacing = letterSpacingFormated + defaultValue + 'px';
+
+        let attName = txtTag.getAttribute('original-letter-spacing');
+        if(attName == null) {
+            txtTag.setAttribute('original-letter-spacing',
+                isNaN(parseInt(window.getComputedStyle(txtTag).letterSpacing)) ? 0 : window.getComputedStyle(txtTag).letterSpacing);
+        }
+
+        if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
+            let letterSpacingVal = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
+            let letterSpacingFormated = isNaN(letterSpacingVal) ? 0 : letterSpacingVal;
+
+            let attName = txtTag.getAttribute('original-letter-spacing');
+            let initialSize = parseInt(attName);
+
+            if(initialSize !== null) {
+                letterSpacingFormated = initialSize;
+            }
+
+            txtTag.style.setProperty('letter-spacing', (letterSpacingFormated + pixels) + 'px', 'important');
+        }
+
+
     });
 
     currentLetterSpacing = {
-        value: currentLetterSpacing == null ? defaultValue : currentLetterSpacing.value += defaultValue,
-        percentage: currentLetterSpacing == null ? defaultPercentage : currentLetterSpacing.percentage += defaultPercentage,
+        value: pixels,
+        percentage: null,
         expiry: plusDays
     }
 
     setItemToLocalStorageWithExpiry("letter-spacing",
         currentLetterSpacing.value,
-        currentLetterSpacing.percentage);
-
+        null);
 
 }
 
+
 function loadLetterSpacing() {
-
     if(currentLetterSpacing !== null) {
-        const percentageLetterSpacingElement = document.getElementById('percentageLetterSpacing');
-        percentageLetterSpacingElement.textContent = currentLetterSpacing.percentage + '%';
-
-        const lastLeafElementsWithText = getLastLeafElementsWithText();
-
-        lastLeafElementsWithText.forEach(function (txtTag) {
-            let lh = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
-            let actualLetterSpacing = isNaN(lh) ? 0 : lh;
-            txtTag.style.letterSpacing = actualLetterSpacing + currentLetterSpacing.value + 'px';
-        });
+     updateLetterSpacingSlide(currentLetterSpacing.value);
     }
-
 }
 
 // ******************** RECUPERAR ELEMENTOS ********************//
+
+function percorrerElementos(bodyElement) {
+    let resultados = [];
+
+    function percorrer(elemento) {
+        // Ignora o próprio elemento <body> com a classe "app-window"
+        if (
+            elemento.tagName !== 'BODY' &&
+            !elemento.classList.contains('app-window') &&
+            elemento.id !== 'appWindow'
+        ) {
+            // Verifica se é o último elemento filho na árvore
+            if (!elemento.nextElementSibling) {
+                resultados.push(elemento);
+            }
+        }
+
+        // Percorre os filhos do elemento
+        for (let filho of elemento.children) {
+            percorrer(filho);
+        }
+    }
+
+    percorrer(document.body);
+    return resultados;
+}
+
 function getLastLeafElementsWithText() {
     const body = document.body;
     const elementsWithText = [];
@@ -631,17 +1266,20 @@ function getLastLeafElementsWithText() {
         // Verifica se o elemento é uma folha e tem texto
         // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
         if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
-            || (element.tagName === 'INPUT' || element.tagName === 'LABEL')) {
+            || (element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'LABEL')) {
             elementsWithText.push(element);
         }
         //QUANDO POSSUIR FILHOS
         else {
             //POSSUI CONTEUDO
-            if (element.textContent.trim() !== "") {
+            if (element.textContent.trim() !== "" && element.tagName !== 'BODY' &&
+                !element.classList.contains('app-window') &&
+                element.id !== 'appWindow') {
                 elementsWithText.push(element);
             }
 
-            for (let child of element.children) {
+
+                for (let child of element.children) {
                 traverse(child);
             }
         }
@@ -680,8 +1318,10 @@ function getElementCursorHover() {
             if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
                 || (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'label')) {
 
-                element.addEventListener("mouseover", mostrarBalao);
-                element.addEventListener("mouseout", esconderBalao);
+                if (!element.closest('.app-window') && !element.closest('.accessibility-button')) {
+                    element.addEventListener("mouseover", mostrarBalao);
+                    element.addEventListener("mouseout", esconderBalao);
+                }
 
             }
             //QUANDO POSSUIR FILHOS
@@ -698,6 +1338,8 @@ function getElementCursorHover() {
                 || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
                 || element.tagName.toLowerCase() === 'br' || element.tagName.toLowerCase() === 'i'
                 || element.tagName.toLowerCase() === 'svg' || element.tagName.toLowerCase() === 'img';
+
+
         }
 
         traverse(element);
@@ -791,7 +1433,9 @@ function atualizarPosicaoBalao(event, balao) {
 // Função para mostrar o balão com o texto maior
 function mostrarBalao(event) {
 
-    if (!textMagnifier || !textMagnifier.value) {
+    let textMagnifier = getItemFromLocalStorageWithExpiry("text-magnifier");
+
+    if (textMagnifier == null) {
         return;
     }
 
@@ -833,65 +1477,100 @@ function esconderBalao() {
 
 function updateTextMagnifier() {
 
-    if(textMagnifier == null) {
-        textMagnifier = {
-            value: true,
-            percentage: null
-        }
+    // Se a funcionalidade for desativada, esconde o balão
+    let balao = document.querySelector(".balao");
+    if (balao) {
+        balao.style.setProperty('display', 'none', 'important');
+        removeItemFromLocalStorage("text-magnifier");
+
     } else {
-        textMagnifier.value = !textMagnifier.value;
+        setItemToLocalStorageWithExpiry("text-magnifier",
+            true,
+            null);
+        getElementCursorHover();
     }
 
-    loadTextMagnifier();
+    changeStyleButtonSelected(textEnlargeButton);
 }
 
 function loadTextMagnifier() {
 
-    if(textMagnifier != null) {
+    if (textMagnifier !== null) {
+        updateTextMagnifier();
+    }
 
-        let element = document.getElementById("btn-text-magnifier");
+}
 
-        if (!textMagnifier.value) {
-            // Se a funcionalidade for desativada, esconde o balão
-            let balao = document.querySelector(".balao");
-            if (balao) {
-                balao.style.display = "none !important";
-                element.style.backgroundColor = "red";
+
+
+function changeAlignText(direction) {
+
+    let textAlignSaved = getItemFromLocalStorageWithExpiry("text-align");
+
+    if(textAlignSaved !== null && textAlignSaved.value === direction) {
+        indexActualTextAlign = 0;
+    }else {
+        indexActualTextAlign = direction;
+    }
+
+    setAlignText();
+
+    if(indexActualTextAlign === 0) {
+        removeItemFromLocalStorage("text-align");
+    } else {
+        setItemToLocalStorageWithExpiry("text-align",
+            indexActualTextAlign,
+            null);
+    }
+
+}
+
+
+function setAlignText() {
+
+    if (indexActualTextAlign !== null) {
+
+        let selectedAlignText = aligns[indexActualTextAlign];
+        let elements = getLastLeafElementsWithText();
+
+        for (let i = 0; i < elements.length; i++) {
+
+            // elements[i].style.setProperty('font-family', selectedFontFamily, 'important');
+
+            if (!elements[i].closest('.app-window') && !elements[i].closest('.accessibility-button')) {
+                // Aplique os estilos apenas se não pertencer à classe 'app-window'
+                elements[i].style.setProperty('text-align', selectedAlignText, 'important');
             }
-        }else {
-            getElementCursorHover();
-            element.style.backgroundColor = "green";
+
+            if (selectedAlignText === '') {
+                removeItemFromLocalStorage("text-align");
+
+            }
+
         }
 
-        setItemToLocalStorageWithExpiry("text-magnifier",
-            textMagnifier.value,
+        setItemToLocalStorageWithExpiry("text-align",
+            indexActualTextAlign,
             null);
 
+
+        if(indexActualTextAlign === 1){
+            changeStyleButtonSelectedAndDeselectOthers(alignLeft, [alignCenter, alignRight])
+        }else if(indexActualTextAlign === 2) {
+            changeStyleButtonSelectedAndDeselectOthers(alignCenter, [alignLeft, alignRight])
+        }else if (indexActualTextAlign === 3){
+            changeStyleButtonSelectedAndDeselectOthers(alignRight, [alignLeft, alignCenter])
+        }else {
+            changeStyleButtonSelectedAndDeselectOthers(null, [alignLeft, alignCenter, alignRight])
+        }
+
+
+
     }
 
 }
 
-function alignText(direction) {
 
-
-    const lastLeafElementsWithText = getLastLeafElementsWithText();
-
-    lastLeafElementsWithText.forEach(function (txtTag) {
-        txtTag.style.textAlign = direction;
-    });
-
-    setItemToLocalStorageWithExpiry("text-align",
-        direction,
-        null);
-}
-
-function loadTextAlign() {
-
-    if(textAlign != null) {
-        alignText(textAlign.value);
-    }
-
-}
 
 
 function highlightHeading() {
@@ -939,7 +1618,7 @@ function highlightHeading() {
 
         });
 
-
+        changeStyleButtonSelected(hlHeading);
 
 }
 
@@ -1014,6 +1693,8 @@ function highlightLinks() {
 
     });
 
+    changeStyleButtonSelected(highlightLinksButton);
+
 
 }
 
@@ -1043,23 +1724,25 @@ function highlightButtons() {
             let buscaBlack = Object.keys(blackColors).find(chave => blackColors[chave].valor === color);
 
 
-            if (buscaYellow) {
-                txtTag.style.background = yellowColors[buscaYellow].outroAtributo;
+            if(!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
+                if (buscaYellow) {
+                    txtTag.style.background = yellowColors[buscaYellow].outroAtributo;
+                } else {
+                    txtTag.style.background = '#FFFF00';
+                }
 
-            } else {
-                txtTag.style.background = '#FFFF00';
+                if (buscaBlack) {
+                    txtTag.style.color = blackColors[buscaBlack].outroAtributo;
+                } else {
+                    txtTag.style.color = '#000';
+                }
+
+                txtTag.setAttribute('data-inclowee-hlb-styled', 'true');
+                setItemToLocalStorageWithExpiry("highlight-buttons",
+                    true,
+                    null);
+
             }
-
-            if (buscaBlack) {
-                txtTag.style.color = blackColors[buscaBlack].outroAtributo;
-            } else {
-                txtTag.style.color = '#000';
-            }
-
-            txtTag.setAttribute('data-inclowee-hlb-styled', 'true');
-            setItemToLocalStorageWithExpiry("highlight-buttons",
-                true,
-                null);
 
         } else {
             txtTag.style.background = '';
@@ -1069,6 +1752,8 @@ function highlightButtons() {
         }
 
     });
+
+    changeStyleButtonSelected(highlightButtonsButton);
 
 }
 
@@ -1080,108 +1765,16 @@ function loadHighlightButtons() {
 
 }
 
-//
-// function setFontFamily(family) {
-//
-//     let txtTags = document.querySelectorAll('li, a, p, h1, h2, h3, h4, h5, h6, body, input[type="button"], button, input[type="submit"]');
-//
-//     // Cria um elemento <style>
-//     let estiloGlobal = document.createElement('style');
-//     estiloGlobal.setAttribute("id", "dyslexic-font")
-//     let estilo = document.createTextNode(' @font-face {\n' +
-//         '            font-family: \'OpenDyslexic\';\n' +
-//         '            src: url("OpenDyslexic-Regular.woff"),\n' +
-//         '            url("OpenDyslexic-Regular.woff");\n' +
-//         '            font-weight: normal;\n' +
-//         '            font-style: normal;\n' +
-//         '        }\n' +
-//         '\n' +
-//         '        @font-face {\n' +
-//         '            font-family: \'OpenDyslexic-Italic\';\n' +
-//         '            src: url("OpenDyslexic-Italic.woff"),\n' +
-//         '            url("OpenDyslexic-Italic.woff");\n' +
-//         '            font-weight: normal;\n' +
-//         '            font-style: italic;\n' +
-//         '        }\n' +
-//         '\n' +
-//         '        @font-face {\n' +
-//         '            font-family: \'OpenDyslexic-Bold\';\n' +
-//         '            src: url("OpenDyslexic-Bold.woff"),\n' +
-//         '            url("OpenDyslexic-Bold.woff");\n' +
-//         '            font-weight: bold;\n' +
-//         '            font-style: normal;\n' +
-//         '        }\n' +
-//         '\n' +
-//         '        @font-face {\n' +
-//         '            font-family: \'OpenDyslexic-Bold-Italic\';\n' +
-//         '            src: url("OpenDyslexic-Bold-Italic.woff"),\n' +
-//         '            url("OpenDyslexic-Bold-Italic.woff");\n' +
-//         '            font-weight: bold;\n' +
-//         '            font-style: italic;\n' +
-//         '        }');
-//
-//     estiloGlobal.appendChild(estilo);
-//     document.body.appendChild(estiloGlobal)
-//
-//     //readable - arial
-//
-//     txtTags.forEach(function (txtTag) {
-//
-//         let readableStyledSetted = txtTag.getAttribute('data-inclowee-rf-styled');
-//         let dyslexicStyledSetted = txtTag.getAttribute('data-inclowee-df-styled');
-//
-//         if (readableStyledSetted == null && dyslexicStyledSetted == null) {
-//
-//             txtTag.style.setProperty('font-family', family === 1 ? 'Arial, Helvetica, sans-serif'
-//                 : 'OpenDyslexic, sans-serif', 'important');
-//
-//             if(family === 1) {
-//                 txtTag.setAttribute('data-inclowee-rf-styled', 'true');
-//                 txtTag.removeAttribute('data-inclowee-df-styled');
-//             }else if (family === 2) {
-//                 txtTag.setAttribute('data-inclowee-df-styled', 'true');
-//                 txtTag.removeAttribute('data-inclowee-rf-styled');
-//             }
-//
-//             setItemToLocalStorageWithExpiry("font-family",
-//                 family,
-//                 null);
-//
-//         }
-//
-//         else if (readableStyledSetted) {
-//
-//         }
-//
-//         //else {
-//         //     txtTag.style.fontFamily = '';
-//         //     txtTag.removeAttribute("data-inclowee-f-styled");
-//         //     removeItemFromLocalStorage("font-family");
-//         //
-//         //     //DELTE DYSLEXIC STYLE FONT
-//         //     let folhaDeEstiloParaDeletar = document.getElementById("dyslexic-font");
-//         //     if (folhaDeEstiloParaDeletar) {
-//         //         // Obtém o pai da folha de estilo e remove a folha de estilo
-//         //         var paiDaFolhaDeEstilo = folhaDeEstiloParaDeletar.parentNode;
-//         //         paiDaFolhaDeEstilo.removeChild(folhaDeEstiloParaDeletar);
-//         //     }
-//         //
-//         // }
-//
-//     });
-//
-// }
-//
-// function loadFontFamily() {
-//
-//     if(fontFamily != null) {
-//         setFontFamily(fontFamily);
-//     }
-//
-// }
+function changeFontFamily(font) {
 
-function changeFontFamily() {
-    indexActualFontFamily = (indexActualFontFamily + 1) % fontes.length;
+    let fontFam = getItemFromLocalStorageWithExpiry("font-family");
+
+    if(fontFam !== null && fontFam.value === font) {
+        indexActualFontFamily = 0;
+    }else {
+        indexActualFontFamily = font;
+    }
+
     setFontFamily();
 
     if(indexActualFontFamily === 0) {
@@ -1208,22 +1801,45 @@ function setFontFamily() {
 
         let selectedFontFamily = fontes[indexActualFontFamily];
         let elements = document
-            .querySelectorAll('li, a, p, h1, h2, h3, h4, h5, h6, body, input[type="button"], button, input[type="submit"]');
+            .querySelectorAll('li, a, p, h1, span, h2, h3, h4, h5, h6, body, input[type="button"], button, input[type="submit"]');
         for (let i = 0; i < elements.length; i++) {
 
-            elements[i].style.fontFamily = selectedFontFamily;
+            // elements[i].style.setProperty('font-family', selectedFontFamily, 'important');
 
-            if (selectedFontFamily === 'inherit') {
+            if (!elements[i].closest('.app-window') && !elements[i].closest('.accessibility-button')) {
+                // Aplique os estilos apenas se não pertencer à classe 'app-window'
+                elements[i].style.setProperty('font-family', selectedFontFamily, 'important');
+            }
+
+            if (selectedFontFamily === '') {
                 removeItemFromLocalStorage("font-family");
 
                 if (styleDyslexic) {
                     let dadStyleDyslexic = styleDyslexic.parentNode;
-                    dadStyleDyslexic.removeChild(styleDyslexic);
+                    if(dadStyleDyslexic !== null) {
+                        dadStyleDyslexic.removeChild(styleDyslexic);
+                    }
                 }
 
             }
 
         }
+
+        setItemToLocalStorageWithExpiry("font-family",
+            indexActualFontFamily,
+            null);
+
+
+        if(indexActualFontFamily === 1){
+            changeStyleButtonSelectedAndDeselectOthers(readableFontButton, [friendlyDyslexiaButton])
+        }else if(indexActualFontFamily === 2) {
+            changeStyleButtonSelectedAndDeselectOthers(friendlyDyslexiaButton, [readableFontButton])
+        }else {
+            changeStyleButtonSelectedAndDeselectOthers(null, [readableFontButton, friendlyDyslexiaButton])
+        }
+
+
+
     }
 
 }
