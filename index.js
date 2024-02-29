@@ -639,7 +639,8 @@ function createIcon() {
     position: absolute;
     z-index: 1000; /* Valor alto para garantir que fique acima de outros elementos */
    }
-
+   
+  
   </style>
 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -801,13 +802,17 @@ function createIcon() {
 
     `;
 
-    expandWindow.style.display = 'none';
+    // expandWindow.style.display = 'none';
+    expandWindow.style.opacity = '0';
+    expandWindow.style.visibility = 'hidden';
     expandWindow.style.position = 'fixed';
     expandWindow.style.left = '0';
     expandWindow.style.top = '0';
     expandWindow.style.width = '100%';
     expandWindow.style.height = '100%';
     expandWindow.style.overflow = 'auto';
+    expandWindow.style.transition = 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out';
+    expandWindow.style.transform = 'translateY(50%)';
 
     window.onclick = function (event) {
         if (event.target == expandWindow) {
@@ -825,11 +830,16 @@ function toggleExpandWindow() {
     let appWindow = document.getElementById('appWindow');
     let button = document.getElementById('accessibilityButton');
 
-    if(appWindow.style.display === 'none' || appWindow.style.display === '') {
-        appWindow.style.setProperty('display', 'block', 'important');
+    if(appWindow.style.opacity === '0' || appWindow.style.opacity === '') {
+        appWindow.style.setProperty('opacity', '1', 'important');
+        appWindow.style.setProperty('visibility', 'visible', 'important');
+        appWindow.style.setProperty('transform', 'translateY(0)', 'important');
+        // expandWindow.style.transform = 'translateY(100%)'
         button.style.setProperty('display', 'none', 'important');
-    }else if(appWindow.style.display === 'block') {
-        appWindow.style.setProperty('display', 'none', 'important');
+    }else if(appWindow.style.opacity === '1') {
+        appWindow.style.setProperty('transform', 'translateY(50%)', 'important');
+        appWindow.style.setProperty('opacity', '0', 'important');
+        appWindow.style.setProperty('visibility', 'hidden', 'important');
         button.style.setProperty('display', 'flex', 'important');
     }
 
