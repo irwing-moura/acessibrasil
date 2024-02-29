@@ -396,7 +396,7 @@ function createIcon() {
   position: fixed;
   top: 10px; /* Ajuste conforme necessário para a distância desejada do topo */
   right: 20px; /* Mantém a posição à esquerda do navegador */
-  height: 740px; /* Ajusta para cobrir toda a altura do navegador */
+  height: 98%; /* Ajusta para cobrir toda a altura do navegador */
   width: 345px;
   max-width: 100%; /* Garante que a largura não ultrapasse a largura total do navegador */
   background-color: #f6f6f6;
@@ -405,7 +405,6 @@ function createIcon() {
   overflow: auto;
   scrollbar-width: none; /* Para Firefox */
   /* Espaço extra no final para garantir visibilidade do conteúdo */
-  max-width: 100%; /* Ajuste conforme necessário para a distância desejada do topo */
   scrollbar-width: none; /* Para Firefox */
    /* Espaço extra no final para garantir visibilidade do conteúdo */
    
@@ -645,9 +644,9 @@ function createIcon() {
 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   
-   <button id="accessibilityButton" class="accessibility-button">
-        <span class="material-icons">accessibility_new</span>
-    </button>
+<!--   <button id="accessibilityButton" class="accessibility-button">-->
+<!--        <span class="material-icons">accessibility_new</span>-->
+<!--    </button>-->
   
   <div id="appWindow" class="app-window" role="application" aria-label="Janela do Aplicativo">
         <div class="toolbar">
@@ -804,6 +803,18 @@ function createIcon() {
 
     expandWindow.style.display = 'none';
     expandWindow.style.position = 'fixed';
+    expandWindow.style.left = '0';
+    expandWindow.style.top = '0';
+    expandWindow.style.width = '100%';
+    expandWindow.style.height = '100%';
+    expandWindow.style.overflow = 'auto';
+
+    window.onclick = function (event) {
+        if (event.target == expandWindow) {
+            toggleExpandWindow();
+        }
+    }
+
     // expandWindow.style.zIndex = 99999;
     document.body.appendChild(expandWindow);
 
@@ -812,9 +823,17 @@ function createIcon() {
 
 function toggleExpandWindow() {
     let appWindow = document.getElementById('appWindow');
-    // console.log(expandWindow);
+    let button = document.getElementById('accessibilityButton');
 
-    appWindow.style.display = (appWindow.style.display === 'none' || appWindow.style.display === '') ? 'block' : 'none';
+    if(appWindow.style.display === 'none' || appWindow.style.display === '') {
+        appWindow.style.setProperty('display', 'block', 'important');
+        button.style.setProperty('display', 'none', 'important');
+    }else if(appWindow.style.display === 'block') {
+        appWindow.style.setProperty('display', 'none', 'important');
+        button.style.setProperty('display', 'flex', 'important');
+    }
+
+
 }
 
 
