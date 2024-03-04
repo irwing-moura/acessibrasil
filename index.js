@@ -25,6 +25,10 @@ let friendlyDyslexiaButton;
 let alignLeft;
 let alignCenter;
 let alignRight;
+let fontSizeSlide;
+let zoomSlide;
+let lineHeightSlide;
+let letterSpacingSlide;
 
 //FONT FAMILY
 let fontes = ['', 'Arial, sans-serif', 'OpenDyslexic'];
@@ -299,6 +303,30 @@ function assignFunctionsToIds() {
         changeAlignText(3);
     });
 
+    fontSizeSlide = document.getElementById("fontSizeSlide");
+    fontSizeSlide.addEventListener('input', function(event) {
+        let valorAtual = event.target.value;
+        updateFontSizeSlide(valorAtual);
+    });
+
+    zoomSlide = document.getElementById("zoomSlide");
+    zoomSlide.addEventListener('input', function(event) {
+        let valorAtual = event.target.value;
+        updateZoomSlide(valorAtual);
+    });
+
+
+    lineHeightSlide = document.getElementById("lineHeightSlide");
+    lineHeightSlide.addEventListener('input', function(event) {
+        let valorAtual = event.target.value;
+        updateLineHeightSlide(valorAtual);
+    });
+
+    letterSpacingSlide = document.getElementById("letterSpacingSlide");
+    letterSpacingSlide.addEventListener('input', function(event) {
+        let valorAtual = event.target.value;
+        updateLetterSpacingSlide(valorAtual);
+    });
 
 }
 
@@ -702,9 +730,9 @@ function createIcon() {
                             <span id="percentage">0%</span> <!-- Ajustado para mostrar 100% como valor padrão -->
                         </div>
                     </div>
-                    <input type="range" id="text_increase" class="slider-control" min="-100" max="200" value="0" step="5"
+                    <input type="range" id="fontSizeSlide" class="slider-control" min="-100" max="200" value="0" step="5"
                            aria-label="Controle deslizante de tamanho de fonte" aria-valuemin="-100" aria-valuemax="200"
-                           aria-valuenow="0" oninput="updateFontSizeSlide(this.value)">
+                           aria-valuenow="0">
                 </div>
 
 
@@ -747,7 +775,7 @@ function createIcon() {
 
                 <div class="slider-container1">
                     <div class="slider-top">
-                        <label for="content_scaling" class="slider-icon-title">
+                        <label for="zoomSlide" class="slider-icon-title">
                             <span class="material-icons"
                                   alt="Ícone para ajustar o dimensionamento do conteúdo">zoom_in</span>
                             <span class="slider-title">Content scaling</span>
@@ -756,14 +784,14 @@ function createIcon() {
                             <span id="ContentScalingValue">0%</span>
                         </div>
                     </div>
-                    <input type="range" id="content_scaling" class="slider-control" min="-50" max="200" value="0"
+                    <input type="range" id="zoomSlide" class="slider-control" min="-50" max="200" value="0"
                            step="10" aria-label="Controle deslizante de dimensionamento de conteúdo" aria-valuemin="50"
-                           aria-valuemax="200" aria-valuenow="0" oninput="updateZoomSlide(this.value)">
+                           aria-valuemax="200" aria-valuenow="0">
                 </div>
 
                 <div class="slider-container1">
                     <div class="slider-top">
-                        <label for="line_height" class="slider-icon-title">
+                        <label for="lineHeightSlide" class="slider-icon-title">
                             <span class="material-icons"
                                   alt="Ícone para ajustar altura da linha">format_line_spacing</span>
                             <span class="slider-title">Line height</span>
@@ -772,14 +800,14 @@ function createIcon() {
                             <span id="LineHeightValue">1</span> <!-- Ajustado para mostrar 1.5 como valor padrão -->
                         </div>
                     </div>
-                    <input type="range" id="line_height" class="slider-control" min="1" max="3" step="0.5" value="1"
+                    <input type="range" id="lineHeightSlide" class="slider-control" min="1" max="3" step="0.5" value="1"
                            aria-label="Controle deslizante de altura da linha" aria-valuemin="1" aria-valuemax="3"
-                           aria-valuenow="0" oninput="updateLineHeightSlide(this.value)">
+                           aria-valuenow="0">
                 </div>
 
                 <div class="slider-container1">
                     <div class="slider-top">
-                        <label for="letter_spacing" class="slider-icon-title">
+                        <label for="letterSpacingSlide" class="slider-icon-title">
                             <span class="material-icons"
                                   alt="Ícone para ajustar o espaçamento entre letras">format_size</span>
                             <span class="slider-title">Letter Spacing</span>
@@ -789,9 +817,9 @@ function createIcon() {
                             <!-- Ajustado para mostrar 0px como valor padrão -->
                         </div>
                     </div>
-                    <input type="range" id="letter_spacing" class="slider-control" min="0" max="20" value="0" step="1"
+                    <input type="range" id="letterSpacingSlide" class="slider-control" min="0" max="20" value="0" step="1"
                            aria-label="Controle deslizante de espaçamento entre letras" aria-valuemin="0"
-                           aria-valuemax="20" aria-valuenow="0" oninput="updateLetterSpacingSlide(this.value)">
+                           aria-valuemax="20" aria-valuenow="0">
                 </div>
 
 
@@ -1008,7 +1036,7 @@ function updateZoomSlide(percentage) {
 
     let zoom = calculateZoomPercentageInPixels(percentage);
     const percentageZoomElement = document.getElementById('ContentScalingValue');
-    const percentageZoomElementValue = document.getElementById('content_scaling');
+    const percentageZoomElementValue = document.getElementById('zoomSlide');
 
 
     const plusDays = addDays(new Date(), 2).getTime();
@@ -1091,7 +1119,7 @@ function updateLineHeightSlide(step) {
     const percentageLineHeightElement = document.getElementById('LineHeightValue');
     percentageLineHeightElement.textContent = step;
 
-    const percentageLineHeightElementValue = document.getElementById('line_height');
+    const percentageLineHeightElementValue = document.getElementById('lineHeightSlide');
     percentageLineHeightElementValue.value = step;
 
 
@@ -1209,7 +1237,7 @@ function updateLetterSpacingSlide(pixels) {
     const percentageLetterSpacingElement = document.getElementById('LetterSpacingValue');
     percentageLetterSpacingElement.textContent = pixels + 'px';
 
-    const percentageLineHeightElementValue = document.getElementById('letter_spacing');
+    const percentageLineHeightElementValue = document.getElementById('letterSpacingSlide');
     percentageLineHeightElementValue.value = pixels;
 
     const lastLeafElementsWithText = getLastLeafElementsWithText();
