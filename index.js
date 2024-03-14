@@ -1,16 +1,27 @@
 window.acessiBrasil = window.acessiBrasil || {};
 
-let currentFontSize = getItemFromLocalStorageWithExpiry("font-size");
-let currentZoom = getItemFromLocalStorageWithExpiry("zoom");
-let currentLineHeight = getItemFromLocalStorageWithExpiry("line-height");
-let currentLetterSpacing = getItemFromLocalStorageWithExpiry("letter-spacing");
+const FONT_SIZE_KEY = "font-size";
+const ZOOM_KEY = "zoom";
+const LINE_HEIGHT_KEY = "line-height";
+const LETTER_SPACING_KEY = "letter-spacing";
+const TEXT_MAGNIFIER_KEY = "text-magnifier";
+const TEXT_ALIGN_KEY = "text-align";
+const HIGHLIGHT_HEADINGS_KEY = "highlight-headings";
+const HIGHLIGHT_LINKS_KEY = "highlight-links";
+const HIGHLIGHT_BUTTONS_KEY = "highlight-buttons";
+const FONT_FAMILY_KEY = "font-family";
 
-let textMagnifier = getItemFromLocalStorageWithExpiry("text-magnifier");
-let textAlign = getItemFromLocalStorageWithExpiry("text-align");
-let hightlightHeadings = getItemFromLocalStorageWithExpiry("highlight-headings");
-let hightlightLinks = getItemFromLocalStorageWithExpiry("highlight-links");
-let hightlightButtons = getItemFromLocalStorageWithExpiry("highlight-buttons");
-let fontFamily = getItemFromLocalStorageWithExpiry("font-family");
+let currentFontSize = getItemFromLocalStorageWithExpiry(FONT_SIZE_KEY);
+let currentZoom = getItemFromLocalStorageWithExpiry(ZOOM_KEY);
+let currentLineHeight = getItemFromLocalStorageWithExpiry(LINE_HEIGHT_KEY);
+let currentLetterSpacing = getItemFromLocalStorageWithExpiry(LETTER_SPACING_KEY);
+
+let textMagnifier = getItemFromLocalStorageWithExpiry(TEXT_MAGNIFIER_KEY);
+let textAlign = getItemFromLocalStorageWithExpiry(TEXT_ALIGN_KEY);
+let hightlightHeadings = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HEADINGS_KEY);
+let hightlightLinks = getItemFromLocalStorageWithExpiry(HIGHLIGHT_LINKS_KEY);
+let hightlightButtons = getItemFromLocalStorageWithExpiry(HIGHLIGHT_BUTTONS_KEY);
+let fontFamily = getItemFromLocalStorageWithExpiry(FONT_FAMILY_KEY);
 
 let closeButton;
 let resetButton;
@@ -246,6 +257,47 @@ window.acessiBrasil.init = function init() {
 
 function assignFunctionsToIds() {
 
+    const rangeButtons = document.querySelectorAll('.minus-button, .plus-button');
+
+    rangeButtons.forEach(elemento => {
+        elemento.addEventListener('click', () => {
+
+            //elemento que deve se trocar o texto
+            // let percentageElement = elemento.offsetParent.children[1];
+            let percentAcrescentar;
+
+            if(elemento.className.includes('minus-button')) {
+                percentAcrescentar = -10;
+
+            } else if(elemento.className.includes('plus-button')) {
+                percentAcrescentar = 10;
+            }
+
+            const elementoPai = elemento.parentNode.parentNode;
+            let func = elementoPai.getAttribute('func');
+
+            if(func === FONT_SIZE_KEY) {
+                percentAcrescentar = currentFontSize != null ? currentFontSize.percentage + percentAcrescentar : percentAcrescentar;
+                updateFontSizeSlide(percentAcrescentar);
+            }
+            else if(func === ZOOM_KEY) {
+                percentAcrescentar = currentZoom != null ? currentZoom.percentage + percentAcrescentar : percentAcrescentar;
+                updateZoomSlide(percentAcrescentar);
+            }
+            else if(func === LINE_HEIGHT_KEY) {
+                percentAcrescentar = currentLineHeight != null ? currentLineHeight.percentage + percentAcrescentar : percentAcrescentar;
+                updateLineHeightSlide(percentAcrescentar);
+            }
+            else if(func === LETTER_SPACING_KEY) {
+                percentAcrescentar = currentLetterSpacing != null ? currentLetterSpacing.percentage + percentAcrescentar : percentAcrescentar;
+                updateLetterSpacingSlide(percentAcrescentar);
+            }
+
+        });
+    });
+
+
+
     //HEADER
 
     closeButton = document.getElementById("closeButton");
@@ -303,44 +355,29 @@ function assignFunctionsToIds() {
         changeAlignText(3);
     });
 
-    fontSizeSlide = document.getElementById("fontSizeSlide");
-    fontSizeSlide.addEventListener('input', function(event) {
-        let valorAtual = event.target.value;
-        updateFontSizeSlide(valorAtual);
-    });
-
-    zoomSlide = document.getElementById("zoomSlide");
-    zoomSlide.addEventListener('input', function(event) {
-        let valorAtual = event.target.value;
-        updateZoomSlide(valorAtual);
-    });
-
-
-    lineHeightSlide = document.getElementById("lineHeightSlide");
-    lineHeightSlide.addEventListener('input', function(event) {
-        let valorAtual = event.target.value;
-        updateLineHeightSlide(valorAtual);
-    });
-
-    letterSpacingSlide = document.getElementById("letterSpacingSlide");
-    letterSpacingSlide.addEventListener('input', function(event) {
-        let valorAtual = event.target.value;
-        updateLetterSpacingSlide(valorAtual);
-    });
-
 }
 
+
+function changeTextAndColorRangeValue(percentAcrescentar, percentageElement){
+    if(percentAcrescentar === 0) {
+        percentageElement.style.setProperty('color', '#686868', 'important');
+        percentageElement.textContent = 'Default';
+    } else {
+        percentageElement.style.setProperty('color', '#1A6EFF', 'important');
+        percentageElement.textContent = percentAcrescentar + '%';
+    }
+}
 
 function changeStyleButtonSelected(id) {
 
 
     if(id.style.background === 'rgb(26, 110, 255)') {
         id.style.background = '#ffffff';
-        id.style.borderColor = '#8e8e8e';
+        // id.style.borderColor = 'transparent';
         id.style.color = '#000';
     }else {
         id.style.background = '#1a6eff'; //#ffffff
-        id.style.borderColor = '#1a6eff'; //#8e8e8e
+        // id.style.borderColor = '#1a6eff'; //#8e8e8e
         id.style.color = '#fff'; //#000
     }
 
@@ -392,8 +429,8 @@ function createIcon() {
   position: fixed;
   bottom: 20px;
   right: 40px;
-  width: 75px;
-  height: 75px;
+  width: 60px;
+  height: 60px;
   background-color: #1A6EFF;
   border: 2px solid #ffffff;
   border-radius: 50%;
@@ -427,7 +464,7 @@ function createIcon() {
   height: 98%; /* Ajusta para cobrir toda a altura do navegador */
   width: 345px;
   max-width: 100%; /* Garante que a largura não ultrapasse a largura total do navegador */
-  background-color: #f6f6f6;
+  background-color: #eff1f5;
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Aplica uma sombra em torno da janela */
   overflow: auto;
@@ -479,8 +516,33 @@ function createIcon() {
   border-top-left-radius: 0; /* Para preencher totalmente o topo, você pode querer remover o arredondamento */
   border-top-right-radius: 0; /* Para preencher totalmente o topo, você pode querer remover o arredondamento */
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adiciona uma sombra à barra de ferramentas */
+}
+
+.toolbar-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+button {
+    /*transition: all 0.15s ease-in 0s;*/
+    transition: opacity 0.5s ease-in-out, transform 0.15s ease-in-out;
+    
+    /*opacity 0.5s ease-in-out, transform 0.5s ease-in-out*/
+}
+
+#closeButton {
+    background: none !important;
+}
+
+#closeButton:hover {
+    transform: scale(1.15);
+}
+
+#closeButton span {
+    font-size: 19px !important;
 }
 
 .right-icons {
@@ -523,10 +585,10 @@ function createIcon() {
 }
 
 /* Adicione estados visuais para foco com contorno */
-.toolbar-button:focus {
-  outline: 2px solid #ffffff; /* Adicione um contorno ao focar */
-  outline-offset: 2px; /* Ajuste o espaçamento do contorno para evitar sobreposição com o botão */
-}
+/*.toolbar-button:focus {*/
+/*  outline: 2px solid #ffffff; !* Adicione um contorno ao focar *!*/
+/*  outline-offset: 2px; !* Ajuste o espaçamento do contorno para evitar sobreposição com o botão *!*/
+/*}*/
 
 
 /* Estilos para o contêiner que envolve os botões */
@@ -545,13 +607,13 @@ function createIcon() {
 /* Estilos para cada botão da seção de ajustes de conteúdo */
 .content-button {
   background-color: #ffffff;
-  border: 1px solid #8e8e8e;
+  border: 2px solid transparent;
   border-radius: 10px;
   cursor: pointer; 
   color: rgb(0, 0, 0);
   width: calc(33.33% - 10px);
   height: 93px;
-  transition: background-color 0.3s, transform 0.3s, border-color 0.3s;
+  transition: border-color .15s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -559,6 +621,10 @@ function createIcon() {
   text-align: center;
 
 }
+
+.content-button:hover {
+    border-color: #1A6EFF;
+ }
 
 /* Adicione estados visuais para foco com contorno nos botões de conteúdo */
 /*.content-button:focus {*/
@@ -579,11 +645,12 @@ function createIcon() {
 
 
 /* Container principal do slider */
-.slider-container1 {
+.range-container {
   width: 331px;
-  height: 80px;
+  /*height: 80px;*/
+  max-height: 100px;
   background-color: #ffffff;
-  border: 1px solid #8e8e8e;
+  border: 2px solid transparent;
   border-radius: 10px;
   display: flex;
   flex-direction: column; /* Organiza os elementos em coluna */
@@ -595,9 +662,9 @@ function createIcon() {
 
 
 /* Parte superior do slider com título, ícone e valor */
-.slider-top {
+.title-container {
   display: flex;
-  justify-content: space-between; /* Alinha o título/ícone e o valor nas extremidades */
+  justify-content: center; /* Alinha o título/ícone e o valor nas extremidades */
   align-items: center;
   margin-bottom: 8px; /* Espaço entre o título/ícone e o controle deslizante */
 }
@@ -668,6 +735,54 @@ function createIcon() {
     z-index: 1000; /* Valor alto para garantir que fique acima de outros elementos */
    }
    
+   .range {
+    position: relative;
+    width: 90%;
+    margin: auto;
+    margin-bottom: 13px;
+   }
+   
+   .base-range {
+    height: 32px;
+    border-radius: 10px;
+    direction: ltr;
+    background-color: #eff1f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #686868;
+   }
+   
+   .arrow {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border-color: #1A6EFF;
+    background: #1A6EFF;
+    border-style: solid;
+    position: absolute;
+    z-index: 200000000000;
+    top: 0;
+    cursor: pointer;
+    font-size: 20px;
+   }
+   
+   .arrow:hover {
+    transform: scale(1.1);
+   }
+   
+   .left {
+     left: -15px;
+   }
+  
+   .right { 
+    right: -15px;
+   }
+  
   
   </style>
 
@@ -678,23 +793,26 @@ function createIcon() {
 <!--    </button>-->
   
   <div id="appWindow" class="app-window" role="application" aria-label="Janela do Aplicativo">
+  
         <div class="toolbar">
-            <button id="createshortcuts" class="toolbar-button" role="button" aria-label="Criar atalhos" tabindex="0"
-                    title="Criar Atalhos">
-                <span class="material-icons">add_circle_outline</span>
-            </button>
-            <button id="resetButton" class="toolbar-button" role="button" aria-label="Restaurar" tabindex="0"
-                    title="Reiniciar Configurações">
-                <span class="material-icons">cached</span>
-            </button>
-            <button id="hideButton" class="toolbar-button" role="button" aria-label="Ocultar" tabindex="0"
-                    title="Ocultar Interface">
-                <span class="material-icons">visibility_off</span>
-            </button>
             <button id="closeButton" class="toolbar-button" role="button" aria-label="Fechar" tabindex="0"
                     title="Fechar Janela">
-                <span class="material-icons">cancel</span>
+                <span class="material-icons">close</span>
             </button>
+            <div class="toolbar-actions">
+                <button id="createshortcuts" class="toolbar-button" role="button" aria-label="Criar atalhos" tabindex="0"
+                        title="Criar Atalhos">
+                    <span class="material-icons">add_circle_outline</span>
+                </button>
+                <button id="resetButton" class="toolbar-button" role="button" aria-label="Restaurar" tabindex="0"
+                        title="Reiniciar Configurações">
+                    <span class="material-icons">cached</span>
+                </button>
+                <button id="hideButton" class="toolbar-button" role="button" aria-label="Ocultar" tabindex="0"
+                        title="Ocultar Interface">
+                    <span class="material-icons">visibility_off</span>
+                </button>
+            </div>
         </div>
 
 
@@ -719,21 +837,23 @@ function createIcon() {
                     <span class="material-icons" aria-hidden="true">link</span>
                     Highlight Links
                 </button>
-
-                <div class="slider-container1">
-                    <div class="slider-top">
-                        <label for="text_increase" class="slider-icon-title">
-                            <span class="material-icons" alt="Ícone para aumentar tamanho do texto">text_increase</span>
-                            <span class="slider-title">Font size</span>
+  
+                <div class="range-container" func="${FONT_SIZE_KEY}">
+                    <div class="title-container">
+                        <label for="letterSpacingSlide" class="slider-icon-title">
+                            <span class="material-icons">text_increase</span>
+                            <span class="slider-title">Font Size</span>
                         </label>
-                        <div id="sliderValue" class="slider-value" aria-live="polite">
-                            <span id="percentage">0%</span> <!-- Ajustado para mostrar 100% como valor padrão -->
-                        </div>
                     </div>
-                    <input type="range" id="fontSizeSlide" class="slider-control" min="-100" max="200" value="0" step="5"
-                           aria-label="Controle deslizante de tamanho de fonte" aria-valuemin="-100" aria-valuemax="200"
-                           aria-valuenow="0">
+                    
+                    <div class="range">
+                        <button class="material-icons arrow left minus-button">expand_more</button>
+                        <div class="base-range">Default</div>
+                        <button class="material-icons arrow right plus-button">expand_less</button>
+                    </div>
+                    
                 </div>
+                
 
 
                 <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
@@ -743,10 +863,10 @@ function createIcon() {
                 </button>
 
 
-                <button id="readableFontButton" class="content-button" role="button" aria-label="Readable font"
-                        title="Readable font" tabindex="0">
+                <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
+                        title="Readable Font" tabindex="0">
                     <span class="material-icons" aria-hidden="true">format_clear</span>
-                    Readable font
+                    Readable Font
                 </button>
                 <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
                         title="Friendly Dyslexia" tabindex="0">
@@ -758,71 +878,70 @@ function createIcon() {
                 <button id="alignLeft" class="content-button" role="button" aria-label="align left" title="align left"
                         tabindex="0">
                     <span class="material-icons" aria-hidden="true">format_align_left</span>
-                    Align left
+                    Align Left
                 </button>
 
                 <button id="alignCenter" class="content-button" role="button" aria-label="format align center"
                         title="format align center" tabindex="0">
                     <span class="material-icons" aria-hidden="true">format_align_center</span>
-                    Align center
+                    Align Center
                 </button>
 
                 <button id="alignRight" class="content-button" role="button" aria-label="format align right"
                         title="format align right" tabindex="0">
                     <span class="material-icons" aria-hidden="true">format_align_right</span>
-                    Align right
+                    Align Right
                 </button>
-
-                <div class="slider-container1">
-                    <div class="slider-top">
-                        <label for="zoomSlide" class="slider-icon-title">
-                            <span class="material-icons"
-                                  alt="Ícone para ajustar o dimensionamento do conteúdo">zoom_in</span>
-                            <span class="slider-title">Content scaling</span>
-                        </label>
-                        <div id="contentScalingValue" class="slider-value" aria-live="polite">
-                            <span id="ContentScalingValue">0%</span>
-                        </div>
-                    </div>
-                    <input type="range" id="zoomSlide" class="slider-control" min="-50" max="200" value="0"
-                           step="10" aria-label="Controle deslizante de dimensionamento de conteúdo" aria-valuemin="50"
-                           aria-valuemax="200" aria-valuenow="0">
-                </div>
-
-                <div class="slider-container1">
-                    <div class="slider-top">
-                        <label for="lineHeightSlide" class="slider-icon-title">
-                            <span class="material-icons"
-                                  alt="Ícone para ajustar altura da linha">format_line_spacing</span>
-                            <span class="slider-title">Line height</span>
-                        </label>
-                        <div id="lineHeightValue" class="slider-value" aria-live="polite">
-                            <span id="LineHeightValue">1</span> <!-- Ajustado para mostrar 1.5 como valor padrão -->
-                        </div>
-                    </div>
-                    <input type="range" id="lineHeightSlide" class="slider-control" min="1" max="3" step="0.5" value="1"
-                           aria-label="Controle deslizante de altura da linha" aria-valuemin="1" aria-valuemax="3"
-                           aria-valuenow="0">
-                </div>
-
-                <div class="slider-container1">
-                    <div class="slider-top">
+                
+                <div class="range-container" func="${ZOOM_KEY}">
+                    <div class="title-container">
                         <label for="letterSpacingSlide" class="slider-icon-title">
-                            <span class="material-icons"
-                                  alt="Ícone para ajustar o espaçamento entre letras">format_size</span>
+                            <span class="material-icons">zoom_in</span>
+                            <span class="slider-title">Content Scaling</span>
+                        </label>
+                    </div>
+                    
+                    <div class="range">
+                        <button class="material-icons arrow left minus-button">expand_more</button>
+                        <div class="base-range">Default</div>
+                        <button class="material-icons arrow right plus-button">expand_less</button>
+                    </div>
+                    
+                </div>
+                
+                
+                <div class="range-container" func="${LINE_HEIGHT_KEY}">
+                    <div class="title-container">
+                        <label for="letterSpacingSlide" class="slider-icon-title">
+                            <span class="material-icons">format_line_spacing</span>
+                            <span class="slider-title">Line Height</span>
+                        </label>
+                    </div>
+                    
+                    <div class="range">
+                        <button class="material-icons arrow left minus-button">expand_more</button>
+                        <div class="base-range">Default</div>
+                        <button class="material-icons arrow right plus-button">expand_less</button>
+                    </div>
+                    
+                </div>
+                
+                <div class="range-container" func="${LETTER_SPACING_KEY}">
+                    <div class="title-container">
+                        <label for="letterSpacingSlide" class="slider-icon-title">
+                            <span class="material-icons">format_size</span>
                             <span class="slider-title">Letter Spacing</span>
                         </label>
-                        <div id="letterSpacingValue" class="slider-value" aria-live="polite">
-                            <span id="LetterSpacingValue">0px</span>
-                            <!-- Ajustado para mostrar 0px como valor padrão -->
-                        </div>
                     </div>
-                    <input type="range" id="letterSpacingSlide" class="slider-control" min="0" max="20" value="0" step="1"
-                           aria-label="Controle deslizante de espaçamento entre letras" aria-valuemin="0"
-                           aria-valuemax="20" aria-valuenow="0">
+                    
+                    <div class="range">
+                        <button class="material-icons arrow left minus-button">expand_more</button>
+                        <div class="base-range">Default</div>
+                        <button class="material-icons arrow right plus-button">expand_less</button>
+                    </div>
+                    
                 </div>
-
-
+            
                 <!-- Adicione mais botões conforme necessário -->
             </div>
         </div>
@@ -877,59 +996,9 @@ function toggleExpandWindow() {
 
 // ******************** FONT SIZE ********************//
 
-// function increaseFontSize() {
-//     updateFontSize( 5)
-// }
-//
-// function reduceFontSize() {
-//     updateFontSize(-5)
-// }
-
-// function updateFontSize(defaultPercentage) {
-//
-//     const plusDays = addDays(new Date(), 2).getTime();
-//
-//     const lastLeafElementsWithText = getLastLeafElementsWithText();
-//     const percentageElement = document.getElementById('percentage');
-//     percentageElement.textContent = currentFontSize != null ? currentFontSize.percentage + defaultPercentage + '%'
-//     : defaultPercentage + '%';
-//
-//     lastLeafElementsWithText.forEach(function (txtTag) {
-//
-//         if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
-//             // Aplique os estilos apenas se não pertencer à classe 'app-window'
-//             let attName = txtTag.getAttribute('original-size');
-//             let initialSize = parseInt(attName);
-//             let newSize = initialSize + (initialSize * (currentFontSize !== null ? currentFontSize.percentage + defaultPercentage : defaultPercentage) / 100);
-//             // txtTag.style.fontSize = newSize + 'px';
-//             txtTag.style.setProperty('font-size', newSize + 'px', 'important');
-//         }
-//
-//
-//
-//     });
-//
-//     currentFontSize = {
-//         value: null,
-//         percentage: currentFontSize == null ? defaultPercentage : currentFontSize.percentage += defaultPercentage,
-//         expiry: plusDays
-//     }
-//
-//     setItemToLocalStorageWithExpiry("font-size",
-//         currentFontSize.value,
-//         currentFontSize.percentage);
-//
-//
-// }
-
 function updateFontSizeSlide(defaultPercentage) {
 
-    const plusDays = addDays(new Date(), 2).getTime();
-
     const lastLeafElementsWithText = getLastLeafElementsWithText();
-    const percentageElement = document.getElementById('percentage');
-    percentageElement.textContent = defaultPercentage + '%';
-
     lastLeafElementsWithText.forEach(function (txtTag) {
 
         if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
@@ -945,6 +1014,7 @@ function updateFontSizeSlide(defaultPercentage) {
 
     });
 
+    const plusDays = addDays(new Date(), 2).getTime();
     currentFontSize = {
         value: null,
         percentage: defaultPercentage,
@@ -955,6 +1025,9 @@ function updateFontSizeSlide(defaultPercentage) {
         currentFontSize.value,
         currentFontSize.percentage);
 
+    const percentageElement = document.querySelector(`[func="${FONT_SIZE_KEY}"]`).children[1]
+        .getElementsByClassName('base-range')[0];
+    changeTextAndColorRangeValue(defaultPercentage, percentageElement);
 
 }
 
@@ -976,12 +1049,7 @@ function loadFontSize() {
                 // txtTag.style.fontSize = newSize + 'px';
                 txtTag.style.setProperty('font-size', newSize + 'px', 'important');
             }
-            const percentageElement = document.getElementById('percentage');
-            percentageElement.textContent = currentFontSize.percentage + '%';
-
-            const rangeElement = document.getElementById('text_increase');
-            rangeElement.value = currentFontSize.percentage;
-
+            updateFontSizeSlide(currentFontSize.percentage);
         }
 
     });
@@ -990,63 +1058,23 @@ function loadFontSize() {
 
 // *********** ZOOM ********** //
 
-// function increaseZoom() {
-//     updateZoom(0.016, false, 10)
-// }
-//
-// function reduceZoom() {
-//     updateZoom(-0.016, false, 10)
-// }
-
-// function updateZoom(zoom, initial, defaultPercentage) {
-//
-//     const plusDays = addDays(new Date(), 2).getTime();
-//     const percentageZoomElement = document.getElementById('percentageZoom');
-//     percentageZoomElement.textContent = currentZoom != null ? currentZoom.percentage + defaultPercentage + '%' : defaultPercentage + '%';
-//
-//     let tagsDoPrimeiroNivel = getFirstChildElementsBelowBody();
-//
-//     for (let i = 0; i < tagsDoPrimeiroNivel.length; i++) {
-//         let zoomVal = parseFloat(window.getComputedStyle(tagsDoPrimeiroNivel[i]).zoom);
-//         let zoomFormated = isNaN(zoomVal) ? 1 : zoomVal;
-//         tagsDoPrimeiroNivel[i].style.zoom = zoomFormated + zoom;
-//
-//     }
-//
-//     currentZoom = {
-//         value: currentZoom == null ? zoom : currentZoom.value += zoom,
-//         percentage: currentZoom == null ? defaultPercentage : currentZoom.percentage += defaultPercentage,
-//         expiry: plusDays
-//     }
-//
-//     setItemToLocalStorageWithExpiry("zoom",
-//         currentZoom.value,
-//         currentZoom.percentage);
-//
-//
-// }
-
 function calculateZoomPercentageInPixels(percentage) {
     let zoomValue = percentage * 0.32;
     zoomValue = 1 + (zoomValue / 100);
     return zoomValue;
 }
 
+function calculateLetterSpacingInPixels(percentage) {
+    let letterSpacing = percentage * 2;
+    letterSpacing = 1 + (letterSpacing / 100);
+    return letterSpacing;
+}
+
 function updateZoomSlide(percentage) {
 
     let zoom = calculateZoomPercentageInPixels(percentage);
-    const percentageZoomElement = document.getElementById('ContentScalingValue');
-    const percentageZoomElementValue = document.getElementById('zoomSlide');
-
-
-    const plusDays = addDays(new Date(), 2).getTime();
-
-    percentageZoomElement.textContent = percentage + '%';
-    percentageZoomElementValue.value = percentage;
-
 
     let tagsDoPrimeiroNivel = getFirstChildElementsBelowBody();
-
     tagsDoPrimeiroNivel.forEach(function(txtTag) {
 
         if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button') && txtTag.id !== 'appWindow') {
@@ -1055,6 +1083,7 @@ function updateZoomSlide(percentage) {
 
     });
 
+    const plusDays = addDays(new Date(), 2).getTime();
     currentZoom = {
         value: zoom,
         percentage: percentage,
@@ -1064,6 +1093,11 @@ function updateZoomSlide(percentage) {
     setItemToLocalStorageWithExpiry("zoom",
         currentZoom.value,
         currentZoom.percentage);
+
+
+    const percentageElement = document.querySelector(`[func="${ZOOM_KEY}"]`).children[1]
+        .getElementsByClassName('base-range')[0];
+    changeTextAndColorRangeValue(percentage, percentageElement);
 
 
 }
@@ -1076,57 +1110,10 @@ function loadZoom() {
 
 // ******************** LINE HEIGHT ********************//
 
-// function increaseLineHeight() {
-//     updateLineHeight(4.0, 10)
-// }
-//
-// function reduceLineHeight() {
-//     updateLineHeight(-4.0, -10)
-// }
-
-// function updateLineHeight(defaultValue, defaultPercentage) {
-//
-//     //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 4PX A CADA 10%
-//
-//     const plusDays = addDays(new Date(), 2).getTime();
-//     const percentageLineHeightElement = document.getElementById('percentageLineHeight');
-//     percentageLineHeightElement.textContent = currentLineHeight != null ? currentLineHeight.percentage + defaultPercentage + '%' : defaultPercentage + '%';
-//
-//     const lastLeafElementsWithText = getLastLeafElementsWithText();
-//
-//     lastLeafElementsWithText.forEach(function (txtTag) {
-//         let lineHeightVal = parseFloat(window.getComputedStyle(txtTag).lineHeight);
-//         let lineHeightFormated = isNaN(lineHeightVal) ? getLineHeightInPixelsIfText(txtTag) : lineHeightVal;
-//         txtTag.style.lineHeight = lineHeightFormated + defaultValue + 'px';
-//     });
-//
-//     currentLineHeight = {
-//         value: currentLineHeight == null ? defaultValue : currentLineHeight.value += defaultValue,
-//         percentage: currentLineHeight == null ? defaultPercentage : currentLineHeight.percentage += defaultPercentage,
-//         expiry: plusDays
-//     }
-//
-//     setItemToLocalStorageWithExpiry("line-height",
-//         currentLineHeight.value,
-//         currentLineHeight.percentage);
-//
-// }
-
-
-function updateLineHeightSlide(step) {
-
-    const plusDays = addDays(new Date(), 2).getTime();
-    const percentageLineHeightElement = document.getElementById('LineHeightValue');
-    percentageLineHeightElement.textContent = step;
-
-    const percentageLineHeightElementValue = document.getElementById('lineHeightSlide');
-    percentageLineHeightElementValue.value = step;
-
+function updateLineHeightSlide(percentage) {
 
 
     const lastLeafElementsWithText = getLastLeafElementsWithText();
-    // const lastLeafElementsWithText = percorrerElementos();
-
 
     lastLeafElementsWithText.forEach(function (txtTag) {
 
@@ -1148,28 +1135,34 @@ function updateLineHeightSlide(step) {
                 lineHeightFormated = initialSize;
             }
 
-            txtTag.style.setProperty('line-height', lineHeightFormated * step + 'px', 'important');
+            txtTag.style.setProperty('line-height', lineHeightFormated + (lineHeightFormated * percentage / 100)  + 'px', 'important');
         }
 
 
     });
 
+    const plusDays = addDays(new Date(), 2).getTime();
     currentLineHeight = {
-        value: step,
-        percentage: null,
+        value: null,
+        percentage: percentage,
         expiry: plusDays
     }
 
     setItemToLocalStorageWithExpiry("line-height",
-        currentLineHeight.value,
-        null);
+        null,
+        percentage);
+
+
+    const percentageElement = document.querySelector(`[func="${LINE_HEIGHT_KEY}"]`).children[1]
+        .getElementsByClassName('base-range')[0];
+    changeTextAndColorRangeValue(percentage, percentageElement);
 
 }
 
 
 function loadLineHeight() {
     if(currentLineHeight !== null) {
-        updateLineHeightSlide(currentLineHeight.value);
+        updateLineHeightSlide(currentLineHeight.percentage);
     }
 }
 
@@ -1229,20 +1222,13 @@ function getLineHeightInPixelsIfText(element) {
 //
 // }
 
-function updateLetterSpacingSlide(pixels) {
+function updateLetterSpacingSlide(percentage) {
 
     //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 0.2PX A CADA 10%
 
-    const plusDays = addDays(new Date(), 2).getTime();
-    const percentageLetterSpacingElement = document.getElementById('LetterSpacingValue');
-    percentageLetterSpacingElement.textContent = pixels + 'px';
-
-    const percentageLineHeightElementValue = document.getElementById('letterSpacingSlide');
-    percentageLineHeightElementValue.value = pixels;
+    let letterSpacingAdd = calculateLetterSpacingInPixels(percentage);
 
     const lastLeafElementsWithText = getLastLeafElementsWithText();
-
-
     lastLeafElementsWithText.forEach(function (txtTag) {
 
         let attName = txtTag.getAttribute('original-letter-spacing');
@@ -1262,28 +1248,35 @@ function updateLetterSpacingSlide(pixels) {
                 letterSpacingFormated = initialSize;
             }
 
-            txtTag.style.setProperty('letter-spacing', (letterSpacingFormated + pixels) + 'px', 'important');
+            txtTag.style.setProperty('letter-spacing', letterSpacingFormated + letterSpacingAdd + 'px', 'important');
         }
 
 
     });
 
+    const plusDays = addDays(new Date(), 2).getTime();
+
     currentLetterSpacing = {
-        value: pixels,
-        percentage: null,
+        value: null,
+        percentage: percentage,
         expiry: plusDays
     }
 
     setItemToLocalStorageWithExpiry("letter-spacing",
-        currentLetterSpacing.value,
-        null);
+        null,
+        percentage);
+
+
+    const percentageElement = document.querySelector(`[func="${LETTER_SPACING_KEY}"]`).children[1]
+        .getElementsByClassName('base-range')[0];
+    changeTextAndColorRangeValue(percentage, percentageElement);
 
 }
 
 
 function loadLetterSpacing() {
     if(currentLetterSpacing !== null) {
-     updateLetterSpacingSlide(currentLetterSpacing.value);
+     updateLetterSpacingSlide(currentLetterSpacing.percentage);
     }
 }
 
