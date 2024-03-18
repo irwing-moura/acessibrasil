@@ -1946,34 +1946,10 @@ function createStyleFontDyslexic() {
     estiloGlobal.setAttribute("id", "dyslexic-font")
     let estilo = document.createTextNode(' @font-face {\n' +
         '            font-family: \'OpenDyslexic\';\n' +
-        '            src: url("OpenDyslexic-Regular.woff"),\n' +
+        '            src: url("https://raw.githack.com/irwing-moura/acessibrasil/main/OpenDyslexic-Regular.woff");,\n' +
         '            url("OpenDyslexic-Regular.woff");\n' +
         '            font-weight: normal;\n' +
         '            font-style: normal;\n' +
-        '        }\n' +
-        '\n' +
-        '        @font-face {\n' +
-        '            font-family: \'OpenDyslexic-Italic\';\n' +
-        '            src: url("OpenDyslexic-Italic.woff"),\n' +
-        '            url("OpenDyslexic-Italic.woff");\n' +
-        '            font-weight: normal;\n' +
-        '            font-style: italic;\n' +
-        '        }\n' +
-        '\n' +
-        '        @font-face {\n' +
-        '            font-family: \'OpenDyslexic-Bold\';\n' +
-        '            src: url("OpenDyslexic-Bold.woff"),\n' +
-        '            url("OpenDyslexic-Bold.woff");\n' +
-        '            font-weight: bold;\n' +
-        '            font-style: normal;\n' +
-        '        }\n' +
-        '\n' +
-        '        @font-face {\n' +
-        '            font-family: \'OpenDyslexic-Bold-Italic\';\n' +
-        '            src: url("OpenDyslexic-Bold-Italic.woff"),\n' +
-        '            url("OpenDyslexic-Bold-Italic.woff");\n' +
-        '            font-weight: bold;\n' +
-        '            font-style: italic;\n' +
         '        }');
 
     estiloGlobal.appendChild(estilo);
