@@ -484,18 +484,20 @@ function createIcon() {
 
 /* Estilos gerais para a janela do aplicativo */
 .app-window {
+  
   position: fixed;
-  top: 10px; /* Ajuste conforme necessário para a distância desejada do topo */
-  right: 20px; /* Mantém a posição à esquerda do navegador */
-  height: 98%; /* Ajusta para cobrir toda a altura do navegador */
-  /*height: fit-content; !* Ajusta para cobrir toda a altura do navegador *!*/
-  width: 345px;
-  max-width: 100%; /* Garante que a largura não ultrapasse a largura total do navegador */
+  top: 10px;
+  /*left: 0;*/
+  right: 20px;
+  height: 98%; /* Ocupa 100% da altura da tela */
+  max-width: 345px;
+  width: 100%; /* Ocupa 100% da largura da tela */
+  /*max-width: 100%; !* Garante que a largura não ultrapasse a largura total do navegador *!*/
   background-color: #eff1f5;
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Aplica uma sombra em torno da janela */
-  overflow: auto;
-  scrollbar-width: none; /* Para Firefox */
+  overflow: hidden; /* Impede rolagem na .app-window */
+  user-select: none;
    
 }
 
@@ -617,10 +619,20 @@ button {
 }
 
 /* Estilos para o contêiner que envolve os botões */
+/*.content-container {*/
+/*  display: flex;*/
+/*  flex-direction: column;*/
+/*  height: 90%;*/
+/*}*/
+
 .content-container {
-  display: flex;
-  flex-direction: column;
-  height: 90%;
+  max-height: calc(100% - 60px); /* Ajuste conforme necessário para considerar outros elementos como a barra de ferramentas */
+  overflow-y: auto; /* Habilita a rolagem vertical se o conteúdo exceder a altura máxima */
+  scrollbar-width: none; /* Para Firefox */
+}
+
+.content-container::-webkit-scrollbar {
+  display: none; /* Para Chrome, Safari, WebKit */
 }
 
 /* Estilos para cada botão da seção de ajustes de conteúdo */
