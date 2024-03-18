@@ -329,11 +329,11 @@ function assignFunctionsToIds() {
         let content = document.getElementsByClassName('content-buttons')[0];
         let arrow = document.getElementById('contentButton');
 
-        if(content.style.getPropertyValue('height') === '' || content.style.getPropertyValue('height') === '100%') {
-            content.style.setProperty('height', '0', 'important');
+        if(content.classList.contains('active')) {
+            content.classList.remove('active')
             arrow.style.setProperty('transform', 'rotate(90deg)', 'important');
-        }else {
-            content.style.setProperty('height', '100%', 'important')
+        } else {
+            content.classList.toggle('active');
             arrow.style.setProperty('transform', 'rotate(0deg)', 'important');
         }
 
@@ -465,6 +465,7 @@ function createIcon() {
   cursor: pointer;
   z-index: 1000;
   transition: background-color 0.3s, transform 0.3s;
+  user-select: none;
 }
 
 .accessibility-button:focus,
@@ -807,7 +808,6 @@ button {
      margin: 15px 10px;
      color: #414141;
      font-weight: 600;
-     user-select: none;
    }
   
    .content-buttons {
@@ -817,13 +817,18 @@ button {
     flex-wrap: wrap;
     gap: 10px;
     overflow: auto hidden;
-    transition: height 0.5s ease 0s;
-    height: 100%;
+    transition: max-height 0.5s ease 0s;
+    /*height: 100%;*/
+    max-height: 0;
+   }
+   
+   .content-buttons.active {
+      max-height: 750px; /* Ajuste este valor baseado no conteúdo esperado */
    }
    
    #contentButton {
        cursor: pointer;
-       transition: all 0.5s ease 0s;
+       transition: transform 0.5s ease 0s;
    }
   
   </style>
@@ -865,7 +870,7 @@ button {
                     <span id="contentButton" class="material-icons">arrow_drop_down</span>
                 </div>
 
-                <div class="content-buttons">
+                <div class="content-buttons active">
 
                     <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
                             title="Ampliador de Texto" tabindex="0">
@@ -1045,6 +1050,11 @@ function toggleExpandWindow() {
 
 function updateFontSizeSlide(defaultPercentage) {
 
+
+    if(defaultPercentage > 200 || defaultPercentage < -200) {
+        return;
+    }
+
     const lastLeafElementsWithText = getLastLeafElementsWithText();
     lastLeafElementsWithText.forEach(function (txtTag) {
 
@@ -1119,6 +1129,10 @@ function calculateLetterSpacingInPixels(percentage) {
 
 function updateZoomSlide(percentage) {
 
+    if(percentage > 200 || percentage < -200) {
+        return;
+    }
+
     let zoom = calculateZoomPercentageInPixels(percentage);
 
     let tagsDoPrimeiroNivel = getFirstChildElementsBelowBody();
@@ -1159,6 +1173,9 @@ function loadZoom() {
 
 function updateLineHeightSlide(percentage) {
 
+    if(percentage > 200 || percentage < -200) {
+        return;
+    }
 
     const lastLeafElementsWithText = getLastLeafElementsWithText();
 
@@ -1233,45 +1250,13 @@ function getLineHeightInPixelsIfText(element) {
 
 // *********** LETTER SPACING ********** //
 
-// function increaseLetterSpacing() {
-//     updateLetterSpacing(0.2, 10)
-// }
-//
-// function reduceLetterSpacing() {
-//     updateLetterSpacing(-0.2, -10)
-// }
-
-// function updateLetterSpacing(defaultValue, defaultPercentage) {
-//
-//     //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 0.2PX A CADA 10%
-//
-//     const plusDays = addDays(new Date(), 2).getTime();
-//     const percentageLetterSpacingElement = document.getElementById('percentageLetterSpacing');
-//     percentageLetterSpacingElement.textContent = currentLetterSpacing != null ? currentLetterSpacing.percentage + defaultPercentage + '%' : defaultPercentage + '%';
-//
-//     const lastLeafElementsWithText = getLastLeafElementsWithText();
-//
-//     lastLeafElementsWithText.forEach(function (txtTag) {
-//         let letterSpacingVal = parseFloat(window.getComputedStyle(txtTag).letterSpacing);
-//         let letterSpacingFormated = isNaN(letterSpacingVal) ? 0 : letterSpacingVal;
-//         txtTag.style.letterSpacing = letterSpacingFormated + defaultValue + 'px';
-//     });
-//
-//     currentLetterSpacing = {
-//         value: currentLetterSpacing == null ? defaultValue : currentLetterSpacing.value += defaultValue,
-//         percentage: currentLetterSpacing == null ? defaultPercentage : currentLetterSpacing.percentage += defaultPercentage,
-//         expiry: plusDays
-//     }
-//
-//     setItemToLocalStorageWithExpiry("letter-spacing",
-//         currentLetterSpacing.value,
-//         currentLetterSpacing.percentage);
-//
-// }
-
 function updateLetterSpacingSlide(percentage) {
 
     //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 0.2PX A CADA 10%
+
+    if(percentage > 200 || percentage < -200) {
+        return;
+    }
 
     let letterSpacingAdd = calculateLetterSpacingInPixels(percentage);
 
