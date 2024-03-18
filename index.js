@@ -1019,6 +1019,7 @@ button {
     expandWindow.style.position = 'fixed';
     expandWindow.style.left = '0';
     expandWindow.style.top = '0';
+    expandWindow.style.zIndex = '9999';
     expandWindow.style.width = '100%';
     expandWindow.style.height = '100%';
     expandWindow.style.overflow = 'auto';
