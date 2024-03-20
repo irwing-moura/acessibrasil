@@ -786,8 +786,10 @@ button {
    
    .arrow {
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    width: 100%;
+    height: 100%;
+    max-width: 32px;
+    max-height: 32px;
     display: flex !important;
     align-items: center;
     justify-content: center;
