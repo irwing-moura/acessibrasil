@@ -1898,7 +1898,7 @@ function setFontFamily() {
 
         let selectedFontFamily = fontes[indexActualFontFamily];
         let elements = document
-            .querySelectorAll('li, a, p, h1, span, h2, h3, h4, h5, h6, body, input[type="button"], button, input[type="submit"]');
+            .querySelectorAll('li, a, p, h1, span, h2, h3, h4, h5, h6, input[type="button"], button, input[type="submit"]');
         for (let i = 0; i < elements.length; i++) {
 
             // elements[i].style.setProperty('font-family', selectedFontFamily, 'important');
