@@ -257,6 +257,93 @@ window.acessiBrasil.init = function init() {
     loadHighlightButtons();
     setFontFamily();
     setAlignText();
+    loadMagnify();
+
+}
+
+function loadMagnify() {
+
+    /*Função da Lupa */
+
+    class Magnifier {
+        constructor(magnifyButtonId) {
+            this.magnifyButton = document.getElementById(magnifyButtonId);
+            this.magnification = 1.6;
+            this.active = false;
+            this.setupMagnifier();
+        }
+
+        setupMagnifier() {
+            this.magnifier = document.createElement('div');
+            this.magnifier.className = 'magnifier';
+            this.magnifier.innerHTML = `
+            <div class="magnifier__scope">
+                <iframe src="${window.location.href}#no-magnify"></iframe>
+            </div>
+        `;
+            this.portal = this.magnifier.querySelector('iframe');
+            document.body.appendChild(this.magnifier);
+            this.magnifier.style.display = 'none'; // Inicialmente oculto
+
+            this.magnifyButton.addEventListener('click', () => {
+                if (this.active) {
+                    this.teardown();
+                } else {
+                    toggleExpandWindow();
+                    this.activateMagnifier({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+                }
+            });
+        }
+
+        teardown() {
+            if (this.magnifier) this.magnifier.style.display = 'none';
+            this.active = false;
+            this.magnifyButton.classList.remove('active');
+            this.removeEventListeners();
+        }
+
+        removeEventListeners() {
+            window.removeEventListener('pointermove', this.pointerSync.bind(this));
+            window.removeEventListener('keydown', this.handleKeys.bind(this));
+            document.removeEventListener('dblclick', this.teardown.bind(this));
+        }
+
+        pointerSync({ x, y }) {
+            document.documentElement.style.setProperty('--magnify-x', x);
+            document.documentElement.style.setProperty('--magnify-y', y);
+        }
+
+        handleKeys({ key }) {
+            switch (key) {
+                case '+':
+                case '-':
+                    this.magnification += (key === '+' ? 0.2 : -0.2);
+                    this.magnification = Math.min(Math.max(this.magnification, 1), 5); // Limita entre 1 e 5
+                    document.documentElement.style.setProperty('--magnification', this.magnification);
+                    break;
+                case 'Escape':
+                    this.teardown();
+                    break;
+            }
+        }
+
+        activateMagnifier({ x, y }) {
+            if (this.active) return;
+            this.active = true;
+            this.magnifyButton.classList.add('active');
+            this.magnifier.style.display = 'block'; // Mostra o magnifier
+            this.addEventListeners({ x, y });
+        }
+
+        addEventListeners({ x, y }) {
+            window.addEventListener('pointermove', this.pointerSync.bind(this));
+            window.addEventListener('keydown', this.handleKeys.bind(this));
+            document.addEventListener('dblclick', this.teardown.bind(this));
+            this.pointerSync({ x, y });
+        }
+    }
+
+    const magnifier = new Magnifier('magnifyButton');
 
 }
 
@@ -837,13 +924,79 @@ button {
    }
    
    .content-buttons.active {
-      max-height: 750px; /* Ajuste este valor baseado no conteúdo esperado */
+      /*max-height: 750px; !* Ajuste este valor baseado no conteúdo esperado *!*/
+      max-height: 1000px;
+      padding-bottom: 20px;
    }
    
    #contentButton {
        cursor: pointer;
        transition: transform 0.5s ease 0s;
    }
+
+   @media (max-width: 700px) {
+    #appWindow {
+      position: fixed; /* ou 'absolute', dependendo do layout */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%; /* Ajuste a largura conforme necessário */
+      /* Certifique-se de que a altura e outras propriedades estejam configuradas conforme desejado */
+    }
+  }
+  
+/*  ESTILOS DA LUPA */
+:root {
+    --border-color-magnify: hsl(0 0% 80%);
+    --background-color-magnify: hsl(0 0% 90%);
+    --border-radius-magnify: 50%;
+}
+
+.magnifier iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    border: 0;
+    transform-origin: 100% 0;
+    max-width: unset;
+    pointer-events: none;
+    transform: translateX(calc(var(--magnify-x, 0) * -1px)) translateY(calc(var(--magnify-y, 0) * -1px));
+}
+
+.magnifier__scope {
+    height: 100%;
+    width: 100%;
+    scale: var(--magnification, 1.7);
+    transition: scale 0.2s ease;
+}
+
+.magnifier {
+    width: 250px;
+    aspect-ratio: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    translate: calc(var(--magnify-x, 0) * 1px) calc(var(--magnify-y, 0) * 1px);
+    transform: translate(-50%, -50%);
+    border: 2px solid var(--border-color-magnify);
+    border-radius: var(--border-radius-magnify);
+    cursor: none;
+    z-index: 999999;
+    overflow: hidden;
+    background: var(--background-color-magnify);
+    user-select: none;
+}
+
+.magnifier::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: var(--border-radius-magnify);
+    border: 2px solid white;
+}
+
+
   
   </style>
 
@@ -901,7 +1054,7 @@ button {
                         <span class="material-icons" aria-hidden="true">link</span>
                         Highlight Links
                     </button>
-      
+                 
                     <div class="range-container" func="${FONT_SIZE_KEY}">
                         <div class="title-container">
                             <label for="letterSpacingSlide" class="slider-icon-title">
@@ -1005,6 +1158,12 @@ button {
                         </div>
                         
                     </div>
+                    
+                     <button id="magnifyButton" class="content-button" role="button" aria-label="Magnify"
+                            title="Magnify" tabindex="0">
+                        <span class="material-icons" aria-hidden="true">search</span>
+                        Magnify
+                    </button>
                 
             
             
@@ -1055,11 +1214,11 @@ function toggleExpandWindow() {
         appWindow.style.setProperty('opacity', '0', 'important');
         appWindow.style.setProperty('visibility', 'hidden', 'important');
         button.style.setProperty('display', 'flex', 'important');
+        document.getElementsByClassName("content-container")[0].scrollTo({ top: 0});
     }
 
 
 }
-
 
 // ******************** FONT SIZE ********************//
 
