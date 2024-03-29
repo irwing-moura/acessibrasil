@@ -293,6 +293,14 @@ function loadMagnify() {
                     this.activateMagnifier({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
                 }
             });
+    
+            // Adiciona o listener para o evento de scroll
+            window.addEventListener('scroll', () => {
+                if (this.active) {
+                    const { x, y } = this.getCenterPosition();
+                    this.pointerSync({ x, y });
+                }
+            });
         }
 
         teardown() {
@@ -341,8 +349,16 @@ function loadMagnify() {
             document.addEventListener('dblclick', this.teardown.bind(this));
             this.pointerSync({ x, y });
         }
+    
+        getCenterPosition() {
+            const rect = this.magnifyButton.getBoundingClientRect();
+            return {
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2 + window.scrollY
+            };
+        }
     }
-
+    
     const magnifier = new Magnifier('magnifyButton');
 
 }
@@ -715,12 +731,34 @@ button {
 .content-container {
   max-height: calc(100% - 60px); /* Ajuste conforme necessário para considerar outros elementos como a barra de ferramentas */
   overflow-y: auto; /* Habilita a rolagem vertical se o conteúdo exceder a altura máxima */
-  scrollbar-width: none; /* Para Firefox */
 }
 
-.content-container::-webkit-scrollbar {
-  display: none; /* Para Chrome, Safari, WebKit */
+.scrollable-content {
+    display:flex;
+    flex-direction: column;
 }
+
+/* width */
+.content-container::-webkit-scrollbar {
+    width: 5px;
+}
+
+/* Track */
+.content-container::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #f1f1f1;
+  border-radius: 10px;
+}
+
+/* Handle */
+.content-container::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.content-container:hover::-webkit-scrollbar-thumb {
+    background: #c2c7d3;
+}
+
 
 /* Estilos para cada botão da seção de ajustes de conteúdo */
 .content-button {
@@ -764,8 +802,7 @@ button {
 
 /* Container principal do slider */
 .range-container {
-  width: 331px;
-  /*height: 80px;*/
+  width: 97%;
   max-height: 100px;
   background-color: #ffffff;
   border: 2px solid transparent;
@@ -1030,145 +1067,150 @@ button {
         <!-- Conteúdo do aplicativo aqui -->
 
             <div class="content-container">
-                <!-- ... Outros botões de configuração ... -->
-
-                <div class="title">
-                    <span>Content</span>
-                    <span id="contentButton" class="material-icons">arrow_drop_down</span>
-                </div>
-
-                <div class="content-buttons active">
-
-                    <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
-                            title="Ampliador de Texto" tabindex="0">
-                        <span class="material-icons" aria-hidden="true">add_comment</span>
-                        Text Magnifier
-                    </button>
-                    <button id="highlightTitlesButton" class="content-button" role="button" aria-label="Highlight Titles"
-                            title="Highlight Titles" tabindex="0">
-                        <span class="material-icons" aria-hidden="true">format_color_text</span>
-                        Highlight Titles
-                    </button>
-                    <button id="highlightLinksButton" class="content-button" role="button" aria-label="Highlight Links"
-                            title="Highlight Links" tabindex="0">
-                        <span class="material-icons" aria-hidden="true">link</span>
-                        Highlight Links
-                    </button>
-                 
-                    <div class="range-container" func="${FONT_SIZE_KEY}">
-                        <div class="title-container">
-                            <label for="letterSpacingSlide" class="slider-icon-title">
-                                <span class="material-icons">text_increase</span>
-                                <span class="slider-title">Font Size</span>
-                            </label>
-                        </div>
-                        
-                        <div class="range">
-                            <button class="material-icons arrow left minus-button">expand_more</button>
-                            <div class="base-range">Default</div>
-                            <button class="material-icons arrow right plus-button">expand_less</button>
-                        </div>
-                        
-                    </div>
-                    
-    
-    
-                    <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
-                            title="Highlight Buttons" tabindex="0">
-                        <span class="material-icons" aria-hidden="true">smart_button</span>
-                        Highlight Buttons
-                    </button>
-    
-    
-                    <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
-                            title="Readable Font" tabindex="0">
-                        <span class="material-icons" aria-hidden="true">format_clear</span>
-                        Readable Font
-                    </button>
-                    <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
-                            title="Friendly Dyslexia" tabindex="0">
-                        <span class="material-icons" aria-hidden="true">psychology</span>
-                        Friendly Dyslexia
-                    </button>
-    
-    
-                    <button id="alignLeft" class="content-button" role="button" aria-label="align left" title="align left"
-                            tabindex="0">
-                        <span class="material-icons" aria-hidden="true">format_align_left</span>
-                        Align Left
-                    </button>
-    
-                    <button id="alignCenter" class="content-button" role="button" aria-label="format align center"
-                            title="format align center" tabindex="0">
-                        <span class="material-icons" aria-hidden="true">format_align_center</span>
-                        Align Center
-                    </button>
-    
-                    <button id="alignRight" class="content-button" role="button" aria-label="format align right"
-                            title="format align right" tabindex="0">
-                        <span class="material-icons" aria-hidden="true">format_align_right</span>
-                        Align Right
-                    </button>
-                    
-                    <div class="range-container" func="${ZOOM_KEY}">
-                        <div class="title-container">
-                            <label for="letterSpacingSlide" class="slider-icon-title">
-                                <span class="material-icons">zoom_in</span>
-                                <span class="slider-title">Content Scaling</span>
-                            </label>
-                        </div>
-                        
-                        <div class="range">
-                            <button class="material-icons arrow left minus-button">expand_more</button>
-                            <div class="base-range">Default</div>
-                            <button class="material-icons arrow right plus-button">expand_less</button>
-                        </div>
-                        
-                    </div>
-                    
-                    
-                    <div class="range-container" func="${LINE_HEIGHT_KEY}">
-                        <div class="title-container">
-                            <label for="letterSpacingSlide" class="slider-icon-title">
-                                <span class="material-icons">format_line_spacing</span>
-                                <span class="slider-title">Line Height</span>
-                            </label>
-                        </div>
-                        
-                        <div class="range">
-                            <button class="material-icons arrow left minus-button">expand_more</button>
-                            <div class="base-range">Default</div>
-                            <button class="material-icons arrow right plus-button">expand_less</button>
-                        </div>
-                        
-                    </div>
-                    
-                    <div class="range-container" func="${LETTER_SPACING_KEY}">
-                        <div class="title-container">
-                            <label for="letterSpacingSlide" class="slider-icon-title">
-                                <span class="material-icons">format_size</span>
-                                <span class="slider-title">Letter Spacing</span>
-                            </label>
-                        </div>
-                        
-                        <div class="range">
-                            <button class="material-icons arrow left minus-button">expand_more</button>
-                            <div class="base-range">Default</div>
-                            <button class="material-icons arrow right plus-button">expand_less</button>
-                        </div>
-                        
-                    </div>
-                    
-                     <button id="magnifyButton" class="content-button" role="button" aria-label="Magnify"
-                            title="Magnify" tabindex="0">
-                        <span class="material-icons" aria-hidden="true">search</span>
-                        Magnify
-                    </button>
                 
+
+                <div class="scrollable-content">
             
-            
-                </div>
+                    <!-- ... Outros botões de configuração ... -->
+
+
+                    <div class="title">
+                        <span>Content</span>
+                        <span id="contentButton" class="material-icons">arrow_drop_down</span>
+                    </div>
+
+                    <div class="content-buttons active">
+
+                        <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
+                                title="Ampliador de Texto" tabindex="0">
+                            <span class="material-icons" aria-hidden="true">add_comment</span>
+                            Text Magnifier
+                        </button>
+                        <button id="highlightTitlesButton" class="content-button" role="button" aria-label="Highlight Titles"
+                                title="Highlight Titles" tabindex="0">
+                            <span class="material-icons" aria-hidden="true">format_color_text</span>
+                            Highlight Titles
+                        </button>
+                        <button id="highlightLinksButton" class="content-button" role="button" aria-label="Highlight Links"
+                                title="Highlight Links" tabindex="0">
+                            <span class="material-icons" aria-hidden="true">link</span>
+                            Highlight Links
+                        </button>
+                    
+                        <div class="range-container" func="${FONT_SIZE_KEY}">
+                            <div class="title-container">
+                                <label for="letterSpacingSlide" class="slider-icon-title">
+                                    <span class="material-icons">text_increase</span>
+                                    <span class="slider-title">Font Size</span>
+                                </label>
+                            </div>
+                            
+                            <div class="range">
+                                <button class="material-icons arrow left minus-button">expand_more</button>
+                                <div class="base-range">Default</div>
+                                <button class="material-icons arrow right plus-button">expand_less</button>
+                            </div>
+                            
+                        </div>
+                        
+        
+        
+                        <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
+                                title="Highlight Buttons" tabindex="0">
+                            <span class="material-icons" aria-hidden="true">smart_button</span>
+                            Highlight Buttons
+                        </button>
+        
+        
+                        <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
+                                title="Readable Font" tabindex="0">
+                            <span class="material-icons" aria-hidden="true">format_clear</span>
+                            Readable Font
+                        </button>
+                        <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
+                                title="Friendly Dyslexia" tabindex="0">
+                            <span class="material-icons" aria-hidden="true">psychology</span>
+                            Friendly Dyslexia
+                        </button>
+        
+        
+                        <button id="alignLeft" class="content-button" role="button" aria-label="align left" title="align left"
+                                tabindex="0">
+                            <span class="material-icons" aria-hidden="true">format_align_left</span>
+                            Align Left
+                        </button>
+        
+                        <button id="alignCenter" class="content-button" role="button" aria-label="format align center"
+                                title="format align center" tabindex="0">
+                            <span class="material-icons" aria-hidden="true">format_align_center</span>
+                            Align Center
+                        </button>
+        
+                        <button id="alignRight" class="content-button" role="button" aria-label="format align right"
+                                title="format align right" tabindex="0">
+                            <span class="material-icons" aria-hidden="true">format_align_right</span>
+                            Align Right
+                        </button>
+                        
+                        <div class="range-container" func="${ZOOM_KEY}">
+                            <div class="title-container">
+                                <label for="letterSpacingSlide" class="slider-icon-title">
+                                    <span class="material-icons">zoom_in</span>
+                                    <span class="slider-title">Content Scaling</span>
+                                </label>
+                            </div>
+                            
+                            <div class="range">
+                                <button class="material-icons arrow left minus-button">expand_more</button>
+                                <div class="base-range">Default</div>
+                                <button class="material-icons arrow right plus-button">expand_less</button>
+                            </div>
+                            
+                        </div>
+                        
+                        
+                        <div class="range-container" func="${LINE_HEIGHT_KEY}">
+                            <div class="title-container">
+                                <label for="letterSpacingSlide" class="slider-icon-title">
+                                    <span class="material-icons">format_line_spacing</span>
+                                    <span class="slider-title">Line Height</span>
+                                </label>
+                            </div>
+                            
+                            <div class="range">
+                                <button class="material-icons arrow left minus-button">expand_more</button>
+                                <div class="base-range">Default</div>
+                                <button class="material-icons arrow right plus-button">expand_less</button>
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="range-container" func="${LETTER_SPACING_KEY}">
+                            <div class="title-container">
+                                <label for="letterSpacingSlide" class="slider-icon-title">
+                                    <span class="material-icons">format_size</span>
+                                    <span class="slider-title">Letter Spacing</span>
+                                </label>
+                            </div>
+                            
+                            <div class="range">
+                                <button class="material-icons arrow left minus-button">expand_more</button>
+                                <div class="base-range">Default</div>
+                                <button class="material-icons arrow right plus-button">expand_less</button>
+                            </div>
+                            
+                        </div>
+                        
+                        <button id="magnifyButton" class="content-button" role="button" aria-label="Magnify"
+                                title="Magnify" tabindex="0">
+                            <span class="material-icons" aria-hidden="true">search</span>
+                            Magnify
+                        </button>
+                    
                 
+                
+                    </div>
+                </div>
             </div>
     </div>
 
