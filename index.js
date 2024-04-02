@@ -293,7 +293,7 @@ function loadMagnify() {
                     this.activateMagnifier({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
                 }
             });
-    
+
             // Adiciona o listener para o evento de scroll
             window.addEventListener('scroll', () => {
                 if (this.active) {
@@ -349,7 +349,7 @@ function loadMagnify() {
             document.addEventListener('dblclick', this.teardown.bind(this));
             this.pointerSync({ x, y });
         }
-    
+
         getCenterPosition() {
             const rect = this.magnifyButton.getBoundingClientRect();
             return {
@@ -358,7 +358,7 @@ function loadMagnify() {
             };
         }
     }
-    
+
     const magnifier = new Magnifier('magnifyButton');
 
 }
@@ -738,6 +738,14 @@ button {
     flex-direction: column;
 }
 
+.container-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
 /* width */
 .content-container::-webkit-scrollbar {
     width: 5px;
@@ -767,8 +775,8 @@ button {
   border-radius: 10px;
   cursor: pointer; 
   color: rgb(0, 0, 0);
-  width: calc(33.33% - 10px);
-  height: 93px;
+  width: 100%;
+  height: 100px;
   transition: border-color .15s ease;
   display: flex;
   flex-direction: column;
@@ -802,7 +810,7 @@ button {
 
 /* Container principal do slider */
 .range-container {
-  width: 97%;
+  width: 100%;
   max-height: 100px;
   background-color: #ffffff;
   border: 2px solid transparent;
@@ -958,6 +966,8 @@ button {
     transition: max-height 0.5s ease 0s;
     /*height: 100%;*/
     max-height: 0;
+    padding-left: 7px;
+    padding-right: 4px;
    }
    
    .content-buttons.active {
@@ -1081,6 +1091,8 @@ button {
 
                     <div class="content-buttons active">
 
+                    <div class="container-buttons">
+
                         <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
                                 title="Ampliador de Texto" tabindex="0">
                             <span class="material-icons" aria-hidden="true">add_comment</span>
@@ -1096,6 +1108,7 @@ button {
                             <span class="material-icons" aria-hidden="true">link</span>
                             Highlight Links
                         </button>
+                    </div>
                     
                         <div class="range-container" func="${FONT_SIZE_KEY}">
                             <div class="title-container">
@@ -1114,25 +1127,27 @@ button {
                         </div>
                         
         
-        
-                        <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
-                                title="Highlight Buttons" tabindex="0">
-                            <span class="material-icons" aria-hidden="true">smart_button</span>
-                            Highlight Buttons
-                        </button>
-        
-        
-                        <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
-                                title="Readable Font" tabindex="0">
-                            <span class="material-icons" aria-hidden="true">format_clear</span>
-                            Readable Font
-                        </button>
-                        <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
-                                title="Friendly Dyslexia" tabindex="0">
-                            <span class="material-icons" aria-hidden="true">psychology</span>
-                            Friendly Dyslexia
-                        </button>
-        
+                        <div class="container-buttons">
+                            <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
+                                    title="Highlight Buttons" tabindex="0">
+                                <span class="material-icons" aria-hidden="true">smart_button</span>
+                                Highlight Buttons
+                            </button>
+            
+            
+                            <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
+                                    title="Readable Font" tabindex="0">
+                                <span class="material-icons" aria-hidden="true">format_clear</span>
+                                Readable Font
+                            </button>
+                            <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
+                                    title="Friendly Dyslexia" tabindex="0">
+                                <span class="material-icons" aria-hidden="true">psychology</span>
+                                Friendly Dyslexia
+                            </button>
+                        </div>
+                        
+                        <div class="container-buttons">
         
                         <button id="alignLeft" class="content-button" role="button" aria-label="align left" title="align left"
                                 tabindex="0">
@@ -1151,6 +1166,8 @@ button {
                             <span class="material-icons" aria-hidden="true">format_align_right</span>
                             Align Right
                         </button>
+                        
+                        </div>
                         
                         <div class="range-container" func="${ZOOM_KEY}">
                             <div class="title-container">
@@ -1201,12 +1218,14 @@ button {
                             
                         </div>
                         
-                        <button id="magnifyButton" class="content-button" role="button" aria-label="Magnify"
-                                title="Magnify" tabindex="0">
-                            <span class="material-icons" aria-hidden="true">search</span>
-                            Magnify
-                        </button>
-                    
+                        <div class="container-buttons">
+                        
+                            <button id="magnifyButton" class="content-button" role="button" aria-label="Magnify"
+                                    title="Magnify" tabindex="0">
+                                <span class="material-icons" aria-hidden="true">search</span>
+                                Magnify
+                            </button>
+                        </div>
                 
                 
                     </div>
