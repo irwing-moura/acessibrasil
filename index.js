@@ -498,6 +498,8 @@ function createIcon() {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Aplica uma sombra em torno da janela */
   overflow: hidden; /* Impede rolagem na .app-window */
   user-select: none;
+  
+  font-family: Arial, Helvetica, sans-serif;
    
 }
 
@@ -878,6 +880,14 @@ button {
        transition: transform 0.5s ease 0s;
    }
 
+   @media (max-width: 980px) {
+  
+    #textEnlargeButton {
+        display: none;
+    }
+    
+  }
+  
    @media (max-width: 700px) {
     #appWindow {
       position: fixed; /* ou 'absolute', dependendo do layout */
@@ -885,8 +895,9 @@ button {
       transform: translateX(-50%);
       width: 90%; /* Ajuste a largura conforme necessário */
       /* Certifique-se de que a altura e outras propriedades estejam configuradas conforme desejado */
-    }
+    } 
   }
+  
   
   </style>
 
