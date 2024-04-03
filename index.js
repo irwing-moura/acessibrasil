@@ -244,6 +244,39 @@ let blackColors  = {
     }
 }
 
+const tagsQueDevemMostrarBalaoMesmoComMaisDeUmItem = [
+    "select",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "ul",
+    "ol",
+    "dl",
+    "dt",
+    "dd",
+    "li",
+    "a",
+    "p",
+    "span",
+    "a",
+    "strong",
+    "em",
+    "b",
+    "i",
+    "u",
+    "s",
+    "q",
+    "abbr",
+    "cite",
+    "code",
+    "kbd",
+    "mark",
+    "time"
+];
+
 window.acessiBrasil.init = function init() {
     createIcon();
     assignFunctionsToIds();
@@ -1475,8 +1508,8 @@ function getElementCursorHover() {
         function traverse(element) {
             // Verifica se o elemento é uma folha e tem texto
             // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
-            if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
-                || (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'label')) {
+            if (((!shouldBeRemoved(element) && element.children.length === 0))
+                && element.textContent.trim() !== "") {
 
                 if (!element.closest('.app-window') && !element.closest('.accessibility-button')) {
                     element.addEventListener("mouseover", mostrarBalao);
@@ -1486,6 +1519,14 @@ function getElementCursorHover() {
             }
             //QUANDO POSSUIR FILHOS
             else {
+
+                //POSSUI CONTEUDO
+                if (element.textContent.trim() !== "" && !element.classList.contains('app-window') && element.id !== 'appWindow'
+                    && (tagsQueDevemMostrarBalaoMesmoComMaisDeUmItem.includes(element.tagName.toLowerCase()))) {
+                    element.addEventListener("mouseover", mostrarBalao);
+                    element.addEventListener("mouseout", esconderBalao);
+                }
+
                 for (let child of element.children) {
                     traverse(child);
                 }
@@ -1568,26 +1609,35 @@ function criarBalao() {
 function estilizarBalao(balao) {
     // Estilização do balão
     balao.style.padding = "10px";
-    balao.style.backgroundColor = "rgba(0, 0, 0, 0.8)"; /* Fundo escurecido */
+    balao.style.backgroundColor = "rgba(51, 51, 51, 0.8)"; /* Fundo escurecido */
     balao.style.color = "white"; /* Texto branco */
     balao.style.borderRadius = "5px";
     balao.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.2)";
     balao.style.fontSize = "40px"; /* Tamanho da fonte aumentado (ajuste conforme necessário) */
     balao.style.position = "absolute";
     balao.style.zIndex = 999999;
+    balao.style.maxWidth = '700px';
 }
 
 // Função para atualizar a posição do balão
 function atualizarPosicaoBalao(event, balao) {
-
     // Leva em consideração a posição do scroll
     const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     const scrollY = window.pageYOffset || document.documentElement.scrollTop;
 
-    // Define a posição do balão perto do cursor do mouse considerando o scroll
-    balao.style.left = (event.clientX + scrollX + 10) + "px";
-    balao.style.top = (event.clientY + scrollY + 10) + "px";
+    // Calcula a posição horizontal do cursor do mouse em relação ao centro da tela
+    const cursorXFromCenter = event.clientX - window.innerWidth / 2;
 
+    // Define a posição do balão perto do cursor do mouse considerando o scroll
+    if (cursorXFromCenter >= 0) {
+        // Cursor à direita do centro da tela, posicione o balão à esquerda do cursor
+        balao.style.left = (event.clientX + scrollX - balao.offsetWidth - 10) + "px";
+    } else {
+        // Cursor à esquerda do centro da tela, posicione o balão à direita do cursor
+        balao.style.left = (event.clientX + scrollX + 10) + "px";
+    }
+
+    balao.style.top = (event.clientY + scrollY + 10) + "px";
 }
 
 // Função para mostrar o balão com o texto maior
@@ -1607,7 +1657,7 @@ function mostrarBalao(event) {
 
     // Obtém o conteúdo com base no tipo de tag
     let conteudo;
-    conteudo = event.target.innerHTML;
+    conteudo = event.target.textContent;
 
     // Define o conteúdo no balão
     balao.innerHTML = conteudo;
