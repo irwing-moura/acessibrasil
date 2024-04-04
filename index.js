@@ -1234,7 +1234,7 @@ function calculateZoomPercentageInPixels(percentage) {
 
 function calculateLetterSpacingInPixels(percentage) {
     let letterSpacing = percentage * 2;
-    letterSpacing = 1 + (letterSpacing / 100);
+    letterSpacing = (letterSpacing / 100);
     return letterSpacing;
 }
 
@@ -1385,7 +1385,7 @@ function updateLetterSpacingSlide(percentage) {
             let letterSpacingFormated = isNaN(letterSpacingVal) ? 0 : letterSpacingVal;
 
             let attName = txtTag.getAttribute('original-letter-spacing');
-            let initialSize = parseInt(attName);
+            let initialSize = parseFloat(attName);
 
             if(initialSize !== null) {
                 letterSpacingFormated = initialSize;
