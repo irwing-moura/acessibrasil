@@ -23,6 +23,9 @@ let hightlightLinks = getItemFromLocalStorageWithExpiry(HIGHLIGHT_LINKS_KEY);
 let hightlightButtons = getItemFromLocalStorageWithExpiry(HIGHLIGHT_BUTTONS_KEY);
 let fontFamily = getItemFromLocalStorageWithExpiry(FONT_FAMILY_KEY);
 
+//botao abrir
+let expandButton;
+
 //header buttons
 let closeButton;
 let resetButton;
@@ -45,6 +48,8 @@ let fontSizeSlide;
 let zoomSlide;
 let lineHeightSlide;
 let letterSpacingSlide;
+
+let shadowR;
 
 //FONT FAMILY
 let fontes = ['', 'Arial, sans-serif', 'OpenDyslexic'];
@@ -278,7 +283,13 @@ const tagsQueDevemMostrarBalaoMesmoComMaisDeUmItem = [
 ];
 
 window.acessiBrasil.init = function init() {
-    createIcon();
+    createWidget();
+}
+
+window.addEventListener("load", (event) => {
+
+    shadowR = document.getElementById("shadow").shadowRoot;
+
     assignFunctionsToIds();
     loadFontSize();
     loadZoom();
@@ -291,190 +302,23 @@ window.acessiBrasil.init = function init() {
     setFontFamily();
     setAlignText();
 
-}
-
-function assignFunctionsToIds() {
-
-    const rangeButtons = document.querySelectorAll('.minus-button, .plus-button');
-
-    rangeButtons.forEach(elemento => {
-        elemento.addEventListener('click', () => {
-
-            //elemento que deve se trocar o texto
-            // let percentageElement = elemento.offsetParent.children[1];
-            let percentAcrescentar;
-
-            if(elemento.className.includes('minus-button')) {
-                percentAcrescentar = -10;
-
-            } else if(elemento.className.includes('plus-button')) {
-                percentAcrescentar = 10;
-            }
-
-            const elementoPai = elemento.parentNode.parentNode;
-            let func = elementoPai.getAttribute('func');
-
-            if(func === FONT_SIZE_KEY) {
-                percentAcrescentar = currentFontSize != null ? currentFontSize.percentage + percentAcrescentar : percentAcrescentar;
-                updateFontSizeSlide(percentAcrescentar);
-            }
-            else if(func === ZOOM_KEY) {
-                percentAcrescentar = currentZoom != null ? currentZoom.percentage + percentAcrescentar : percentAcrescentar;
-                updateZoomSlide(percentAcrescentar);
-            }
-            else if(func === LINE_HEIGHT_KEY) {
-                percentAcrescentar = currentLineHeight != null ? currentLineHeight.percentage + percentAcrescentar : percentAcrescentar;
-                updateLineHeightSlide(percentAcrescentar);
-            }
-            else if(func === LETTER_SPACING_KEY) {
-                percentAcrescentar = currentLetterSpacing != null ? currentLetterSpacing.percentage + percentAcrescentar : percentAcrescentar;
-                updateLetterSpacingSlide(percentAcrescentar);
-            }
-
-        });
-    });
-
-
-
-    //HEADER
-
-    closeButton = document.getElementById("closeButton");
-    closeButton.addEventListener('click', toggleExpandWindow);
-
-    resetButton = document.getElementById("resetButton");
-    resetButton.addEventListener('click', clearLocalStorage);
-
-    createshortcutsButton = document.getElementById("createshortcuts");
-    createshortcutsButton.addEventListener('click', ()=>{
-        alert('Não esta pronto ainda, meu chapinha!');
-    });
-
-    hideButton = document.getElementById("hideButton");
-    hideButton.addEventListener('click', ()=>{
-        alert('Não esta pronto ainda, meu chapinha!');
-    });
-
-    //TITLE
-
-    contentButton = document.getElementById("contentButton");
-    contentButton.addEventListener('click', ()=>{
-
-        let content = document.getElementsByClassName('content-buttons')[0];
-        let arrow = document.getElementById('contentButton');
-
-        if(content.classList.contains('active')) {
-            content.classList.remove('active')
-            arrow.style.setProperty('transform', 'rotate(90deg)', 'important');
-        } else {
-            content.classList.toggle('active');
-            arrow.style.setProperty('transform', 'rotate(0deg)', 'important');
+    shadowR.addEventListener('click', (event)=> {
+        if (event.target.id === 'appWindow') {
+            toggleExpandWindow();
         }
-
-
     });
 
-
-    //FUNCIONALIDADES
-
-    textEnlargeButton = document.getElementById("textEnlargeButton");
-    textEnlargeButton.addEventListener('click', updateTextMagnifier);
-
-    hlHeading = document.getElementById("highlightTitlesButton");
-    hlHeading.addEventListener('click', highlightHeading);
-
-    highlightLinksButton = document.getElementById("highlightLinksButton");
-    highlightLinksButton.addEventListener('click', highlightLinks);
-
-    highlightButtonsButton = document.getElementById("highlightButtonsButton");
-    highlightButtonsButton.addEventListener('click', highlightButtons);
-
-    readableFontButton = document.getElementById("readableFontButton");
-    readableFontButton.addEventListener('click', ()=> {
-        changeFontFamily(1);
-    });
-
-    friendlyDyslexiaButton = document.getElementById("friendlyDyslexiaButton");
-    friendlyDyslexiaButton.addEventListener('click', ()=> {
-        changeFontFamily(2);
-    });
-
-    alignLeft = document.getElementById("alignLeft");
-    alignLeft.addEventListener('click', ()=> {
-       changeAlignText(1);
-    });
-
-    alignCenter = document.getElementById("alignCenter");
-    alignCenter.addEventListener('click', ()=> {
-        changeAlignText(2);
-    });
-
-    alignRight = document.getElementById("alignRight");
-    alignRight.addEventListener('click', ()=> {
-        changeAlignText(3);
-    });
-
-}
-
-
-function changeTextAndColorRangeValue(percentAcrescentar, percentageElement){
-    if(percentAcrescentar === 0) {
-        percentageElement.style.setProperty('color', '#686868', 'important');
-        percentageElement.textContent = 'Default';
-    } else {
-        percentageElement.style.setProperty('color', '#1A6EFF', 'important');
-        percentageElement.textContent = percentAcrescentar + '%';
-    }
-}
-
-function changeStyleButtonSelected(id) {
-
-
-    if(id.style.background === 'rgb(26, 110, 255)') {
-        id.style.background = '#ffffff';
-        // id.style.borderColor = 'transparent';
-        id.style.color = '#000';
-    }else {
-        id.style.background = '#1a6eff'; //#ffffff
-        // id.style.borderColor = '#1a6eff'; //#8e8e8e
-        id.style.color = '#fff'; //#000
-    }
-
-
-}
-
-function changeStyleButtonSelectedAndDeselectOthers(idActivate, idsDisable) {
-
-
-    if(idActivate !== null) {
-        idActivate.style.setProperty('background', '#1a6eff', 'important');
-        idActivate.style.setProperty('borderColor', '#1a6eff', 'important');
-        idActivate.style.setProperty('color', '#fff', 'important');
-    }
-
-    idsDisable.forEach(function (index) {
-
-        index.style.setProperty('background', '#ffffff', 'important');
-        index.style.setProperty('borderColor', '#8e8e8e', 'important');
-        index.style.setProperty('color', '#000', 'important');
-
-    });
-
-}
+});
 
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
 
-function createIcon() {
 
-    // Criar o ícone arredondado dinamicamente
-    let expandIcon = document.createElement('button');
-    expandIcon.id = 'accessibilityButton';
-    expandIcon.className = 'accessibility-button'
-    expandIcon.innerHTML = '<span class="material-icons">accessibility_new</span>';
-    expandIcon.addEventListener('click', toggleExpandWindow);
+function createWidget() {
 
-    document.body.appendChild(expandIcon);
-
+    let host = document.createElement('div');
+    host.id = 'shadow';
+    let shadowRoot = host.attachShadow({mode: 'open'});
 
     // Criar a janela expansível dinamicamente
     let expandWindow = document.createElement('div');
@@ -715,7 +559,7 @@ button {
   align-items: center;
   justify-content: center;
   text-align: center;
-
+  gap:5px;
 }
 
 .content-button:hover {
@@ -735,7 +579,7 @@ button {
 
 /* Estilos para o ícone dentro de cada botão da seção de ajustes de conteúdo */
 .content-button span {
-  font-size: 30px;
+  font-size: 16px;
   margin-bottom: 5px;
 }
 
@@ -931,31 +775,51 @@ button {
     } 
   }
   
+  .icon {
+    height: 24px;
+    width: 24px;
+  }
+  
+  .button-modal {
+    border: none;
+    background: #cccccc70;
+    padding: 10px;
+    border-radius: 4px;
+    color: black;
+    cursor: pointer;
+  }
+  
+  .button-modal:hover {
+    transform: scale(1.1);
+  }
+  
+  .button-submit-modal {
+    background: #1A6EFF;
+    color: #fff;
+  }
+  
   
   </style>
-
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   
-  
-  <div id="appWindow" class="app-window" role="application" aria-label="Janela do Aplicativo">
+  <div id="widget" class="app-window" role="application" aria-label="Janela do Aplicativo">
   
         <div class="toolbar">
             <button id="closeButton" class="toolbar-button" role="button" aria-label="Fechar" tabindex="0"
                     title="Fechar Janela">
-                <span class="material-icons">close</span>
+                <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20.7457 3.32851C20.3552 2.93798 19.722 2.93798 19.3315 3.32851L12.0371 10.6229L4.74275 3.32851C4.35223 2.93798 3.71906 2.93798 3.32854 3.32851C2.93801 3.71903 2.93801 4.3522 3.32854 4.74272L10.6229 12.0371L3.32856 19.3314C2.93803 19.722 2.93803 20.3551 3.32856 20.7457C3.71908 21.1362 4.35225 21.1362 4.74277 20.7457L12.0371 13.4513L19.3315 20.7457C19.722 21.1362 20.3552 21.1362 20.7457 20.7457C21.1362 20.3551 21.1362 19.722 20.7457 19.3315L13.4513 12.0371L20.7457 4.74272C21.1362 4.3522 21.1362 3.71903 20.7457 3.32851Z" fill="#ffffff"></path> </g></svg>
             </button>
             <div class="toolbar-actions">
                 <button id="createshortcuts" class="toolbar-button" role="button" aria-label="Criar atalhos" tabindex="0"
                         title="Criar Atalhos">
-                    <span class="material-icons">add_circle_outline</span>
+                    <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#fff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" stroke-width="4.8"> <circle opacity="0.5" cx="12" cy="12" r="10" stroke="#fff" stroke-width="1.5"></circle> <path d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15" stroke="#fff" stroke-width="1.5" stroke-linecap="round"></path> </g><g id="SVGRepo_iconCarrier"> <circle opacity="0.5" cx="12" cy="12" r="10" stroke="#fff" stroke-width="1.5"></circle> <path d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15" stroke="#fff" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
                 </button>
                 <button id="resetButton" class="toolbar-button" role="button" aria-label="Restaurar" tabindex="0"
                         title="Reiniciar Configurações">
-                    <span class="material-icons">cached</span>
+                    <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#fff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.144"></g><g id="SVGRepo_iconCarrier"> <path d="M3 12C3 16.9706 7.02944 21 12 21C14.3051 21 16.4077 20.1334 18 18.7083L21 16M21 12C21 7.02944 16.9706 3 12 3C9.69494 3 7.59227 3.86656 6 5.29168L3 8M21 21V16M21 16H16M3 3V8M3 8H8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
                 </button>
                 <button id="hideButton" class="toolbar-button" role="button" aria-label="Ocultar" tabindex="0"
                         title="Ocultar Interface">
-                    <span class="material-icons">visibility_off</span>
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#fff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.144"></g><g id="SVGRepo_iconCarrier"> <path d="M2.99902 3L20.999 21M9.8433 9.91364C9.32066 10.4536 8.99902 11.1892 8.99902 12C8.99902 13.6569 10.3422 15 11.999 15C12.8215 15 13.5667 14.669 14.1086 14.133M6.49902 6.64715C4.59972 7.90034 3.15305 9.78394 2.45703 12C3.73128 16.0571 7.52159 19 11.9992 19C13.9881 19 15.8414 18.4194 17.3988 17.4184M10.999 5.04939C11.328 5.01673 11.6617 5 11.9992 5C16.4769 5 20.2672 7.94291 21.5414 12C21.2607 12.894 20.8577 13.7338 20.3522 14.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
                 </button>
             </div>
         </div>
@@ -973,7 +837,7 @@ button {
 
                     <div class="title">
                         <span>Content</span>
-                        <span id="contentButton" class="material-icons">arrow_drop_down</span>
+                        <span id="contentButton"><svg width="15px" height="15px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.048"></g><g id="SVGRepo_iconCarrier"> <title>drop-down</title> <desc>Created with sketchtool.</desc> <g id="directional" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="drop-down" fill="#000000"> <polygon id="Shape" points="5 8 12 16 19 8"> </polygon> </g> </g> </g></svg></span>
                     </div>
 
                     <div class="content-buttons active">
@@ -982,33 +846,35 @@ button {
 
                         <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
                                 title="Ampliador de Texto" tabindex="0">
-                            <span class="material-icons" aria-hidden="true">add_comment</span>
-                            Text Magnifier
+                            <div class="icon">
+                            </div>
+                            <span>Text Magnifier</span>
                         </button>
                         <button id="highlightTitlesButton" class="content-button" role="button" aria-label="Highlight Titles"
                                 title="Highlight Titles" tabindex="0">
-                            <span class="material-icons" aria-hidden="true">format_color_text</span>
-                            Highlight Titles
+                            <div class="icon">
+                            </div>
+                            <span>Highlight Titles</span>
                         </button>
                         <button id="highlightLinksButton" class="content-button" role="button" aria-label="Highlight Links"
                                 title="Highlight Links" tabindex="0">
-                            <span class="material-icons" aria-hidden="true">link</span>
-                            Highlight Links
+                            <div class="icon">
+                            </div>
+                            <span>Highlight Links</span>
                         </button>
                     </div>
                     
                         <div class="range-container" func="${FONT_SIZE_KEY}">
                             <div class="title-container">
                                 <label for="letterSpacingSlide" class="slider-icon-title">
-                                    <span class="material-icons">text_increase</span>
                                     <span class="slider-title">Font Size</span>
                                 </label>
                             </div>
                             
                             <div class="range">
-                                <button class="material-icons arrow left minus-button">expand_more</button>
+                                <button class="material-icons arrow left minus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
                                 <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button">expand_less</button>
+                                <button class="material-icons arrow right plus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
                             </div>
                             
                         </div>
@@ -1017,20 +883,20 @@ button {
                         <div class="container-buttons">
                             <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
                                     title="Highlight Buttons" tabindex="0">
-                                <span class="material-icons" aria-hidden="true">smart_button</span>
-                                Highlight Buttons
+                                <div class="icon"></div>
+                                <span>Highlight Buttons</span>
                             </button>
             
             
                             <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
                                     title="Readable Font" tabindex="0">
-                                <span class="material-icons" aria-hidden="true">format_clear</span>
-                                Readable Font
+                                <div class="icon"></div>
+                                <span>Readable Font</span>
                             </button>
                             <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
                                     title="Friendly Dyslexia" tabindex="0">
-                                <span class="material-icons" aria-hidden="true">psychology</span>
-                                Friendly Dyslexia
+                                <div class="icon"></div>
+                                <span>Friendly Dyslexia</span>
                             </button>
                         </div>
                         
@@ -1038,20 +904,20 @@ button {
         
                         <button id="alignLeft" class="content-button" role="button" aria-label="align left" title="align left"
                                 tabindex="0">
-                            <span class="material-icons" aria-hidden="true">format_align_left</span>
-                            Align Left
+                            <div class="icon"></div>
+                            <span>Align Left</span>
                         </button>
         
                         <button id="alignCenter" class="content-button" role="button" aria-label="format align center"
                                 title="format align center" tabindex="0">
-                            <span class="material-icons" aria-hidden="true">format_align_center</span>
-                            Align Center
+                            <div class="icon"></div>
+                            <span>Align Center</span>
                         </button>
         
                         <button id="alignRight" class="content-button" role="button" aria-label="format align right"
                                 title="format align right" tabindex="0">
-                            <span class="material-icons" aria-hidden="true">format_align_right</span>
-                            Align Right
+                            <div class="icon"></div>
+                            <span>Align Right</span>
                         </button>
                         
                         </div>
@@ -1059,15 +925,15 @@ button {
                         <div class="range-container" func="${ZOOM_KEY}">
                             <div class="title-container">
                                 <label for="letterSpacingSlide" class="slider-icon-title">
-                                    <span class="material-icons">zoom_in</span>
+                                    <span class="material-icons"></span>
                                     <span class="slider-title">Content Scaling</span>
                                 </label>
                             </div>
                             
                             <div class="range">
-                                <button class="material-icons arrow left minus-button">expand_more</button>
+                                <button class="material-icons arrow left minus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
                                 <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button">expand_less</button>
+                                <button class="material-icons arrow right plus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
                             </div>
                             
                         </div>
@@ -1076,15 +942,15 @@ button {
                         <div class="range-container" func="${LINE_HEIGHT_KEY}">
                             <div class="title-container">
                                 <label for="letterSpacingSlide" class="slider-icon-title">
-                                    <span class="material-icons">format_line_spacing</span>
+                                    <span class="material-icons"></span>
                                     <span class="slider-title">Line Height</span>
                                 </label>
                             </div>
                             
                             <div class="range">
-                                <button class="material-icons arrow left minus-button">expand_more</button>
+                                <button class="material-icons arrow left minus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
                                 <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button">expand_less</button>
+                                <button class="material-icons arrow right plus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
                             </div>
                             
                         </div>
@@ -1092,15 +958,15 @@ button {
                         <div class="range-container" func="${LETTER_SPACING_KEY}">
                             <div class="title-container">
                                 <label for="letterSpacingSlide" class="slider-icon-title">
-                                    <span class="material-icons">format_size</span>
+                                    <span class="material-icons"></span>
                                     <span class="slider-title">Letter Spacing</span>
                                 </label>
                             </div>
                             
                             <div class="range">
-                                <button class="material-icons arrow left minus-button">expand_more</button>
+                                <button class="material-icons arrow left minus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
                                 <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button">expand_less</button>
+                                <button class="material-icons arrow right plus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
                             </div>
                             
                         </div>
@@ -1108,6 +974,48 @@ button {
                 </div>
             </div>
     </div>
+
+
+  <div style="display: none; transform: translate(-50%, -20%); height: 250px; top: 20%; left:50%; height: fit-content;" id="modal-hide" class="app-window" role="application" aria-label="Janela do Aplicativo">
+  
+        <div style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;">
+        
+            <div style="
+                width: 60px;
+                height: 60px;
+            ">
+                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="#000000" fill-rule="evenodd" d="M10 3a7 7 0 100 14 7 7 0 000-14zm-9 7a9 9 0 1118 0 9 9 0 01-18 0zm10.01 4a1 1 0 01-1 1H10a1 1 0 110-2h.01a1 1 0 011 1zM11 6a1 1 0 10-2 0v5a1 1 0 102 0V6z"></path> </g></svg>
+            </div>
+        
+        
+            <h3 style="text-align: center; margin-top: 7px;">Tem certeza que deseja ocultar a interface de usabilidade?</h3>
+                    
+            <span style="
+                border-bottom: 1px solid #ccc;
+                padding-bottom: 15px;
+                color: #909090;
+                font-size: 13px;
+            ">Optar por ocultar a interface de acessibilidade implica que você não será mais capaz de visualizá-la, a menos que limpe seu histórico de navegação.</span>
+    
+            <div style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 20px;
+                gap: 1rem;
+                ">
+                <button type="button" class="button-modal">Não, quero manter</button>
+                <button type="button" class="button-modal button-submit-modal">Sim, quero desativar</button>
+            </div>
+
+    
+        </div>
+  </div>
 
     `;
 
@@ -1124,21 +1032,205 @@ button {
     expandWindow.style.transition = 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out';
     expandWindow.style.transform = 'translateY(50%)';
 
-    window.onclick = function (event) {
-        if (event.target == expandWindow) {
-            toggleExpandWindow();
-        }
-    }
+    shadowRoot.innerHTML = '<button id="accessibilityButton" class="accessibility-button">' +
+        '<svg fill="#FFF" width="64px" height="64px" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" stroke="#FFF" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.288"></g><g id="SVGRepo_iconCarrier"><path d="M9.5,3.5A2.5,2.5,0,1,1,12,6,2.5,2.5,0,0,1,9.5,3.5ZM20,7H4A1,1,0,0,0,4,9H9V22a1,1,0,0,0,2,0V15h2v7a1,1,0,0,0,2,0V9h5a1,1,0,0,0,0-2Z"></path></g></svg>' +
+        '</button>';
 
-    // expandWindow.style.zIndex = 99999;
-    document.body.appendChild(expandWindow);
+
+    shadowRoot.appendChild(expandWindow);
+    document.body.appendChild(host);
+
+}
+
+
+
+function assignFunctionsToIds() {
+
+    let shadowR = document.getElementById("shadow").shadowRoot;
+    const rangeButtons = shadowR.querySelectorAll('.minus-button, .plus-button');
+
+    rangeButtons.forEach(elemento => {
+        elemento.addEventListener('click', () => {
+
+            //elemento que deve se trocar o texto
+            // let percentageElement = elemento.offsetParent.children[1];
+            let percentAcrescentar;
+
+            if(elemento.className.includes('minus-button')) {
+                percentAcrescentar = -10;
+
+            } else if(elemento.className.includes('plus-button')) {
+                percentAcrescentar = 10;
+            }
+
+            const elementoPai = elemento.parentNode.parentNode;
+            let func = elementoPai.getAttribute('func');
+
+            if(func === FONT_SIZE_KEY) {
+                percentAcrescentar = currentFontSize != null ? currentFontSize.percentage + percentAcrescentar : percentAcrescentar;
+                updateFontSizeSlide(percentAcrescentar);
+            }
+            else if(func === ZOOM_KEY) {
+                percentAcrescentar = currentZoom != null ? currentZoom.percentage + percentAcrescentar : percentAcrescentar;
+                updateZoomSlide(percentAcrescentar);
+            }
+            else if(func === LINE_HEIGHT_KEY) {
+                percentAcrescentar = currentLineHeight != null ? currentLineHeight.percentage + percentAcrescentar : percentAcrescentar;
+                updateLineHeightSlide(percentAcrescentar);
+            }
+            else if(func === LETTER_SPACING_KEY) {
+                percentAcrescentar = currentLetterSpacing != null ? currentLetterSpacing.percentage + percentAcrescentar : percentAcrescentar;
+                updateLetterSpacingSlide(percentAcrescentar);
+            }
+
+        });
+    });
+
+
+//    BOTÃO ABRIR WIDGET
+
+    expandButton = shadowR.querySelector("#accessibilityButton");
+    expandButton.addEventListener('click', toggleExpandWindow);
+
+//
+//     //HEADER
+//
+
+    closeButton = shadowR.querySelector("#closeButton");
+    closeButton.addEventListener('click', toggleExpandWindow);
+
+    resetButton = shadowR.querySelector("#resetButton");
+    resetButton.addEventListener('click', clearLocalStorage);
+
+    createshortcutsButton = shadowR.querySelector("#createshortcuts");
+    createshortcutsButton.addEventListener('click', ()=>{
+        alert('Não esta pronto ainda, meu chapinha!');
+    });
+
+    hideButton = shadowR.querySelector("#hideButton");
+    hideButton.addEventListener('click', ()=>{
+
+        toggleExpandWindow();
+
+        const appWindow = shadowR.querySelector("#appWindow");
+        appWindow.style.setProperty('background', 'rgb(0 0 0 / 30%)', 'important');
+
+        const modal = shadowR.querySelector("#modal-hide");
+        modal.style.setProperty('display', 'block', 'important');
+
+    });
+//
+//     //TITLE
+//
+    contentButton = shadowR.querySelector("#contentButton");
+    contentButton.addEventListener('click', ()=>{
+
+        let content = shadowR.querySelectorAll('.content-buttons')[0];
+        let arrow = shadowR.querySelector('#contentButton');
+
+        if(content.classList.contains('active')) {
+            content.classList.remove('active')
+            arrow.style.setProperty('transform', 'rotate(90deg)', 'important');
+        } else {
+            content.classList.toggle('active');
+            arrow.style.setProperty('transform', 'rotate(0deg)', 'important');
+        }
+
+
+    });
+
+
+    //FUNCIONALIDADES
+
+    textEnlargeButton = shadowR.querySelector("#textEnlargeButton");
+    textEnlargeButton.addEventListener('click', updateTextMagnifier);
+
+    hlHeading = shadowR.querySelector("#highlightTitlesButton");
+    hlHeading.addEventListener('click', highlightHeading);
+
+    highlightLinksButton = shadowR.querySelector("#highlightLinksButton");
+    highlightLinksButton.addEventListener('click', highlightLinks);
+
+    highlightButtonsButton = shadowR.querySelector("#highlightButtonsButton");
+    highlightButtonsButton.addEventListener('click', highlightButtons);
+
+    readableFontButton = shadowR.querySelector("#readableFontButton");
+    readableFontButton.addEventListener('click', ()=> {
+        changeFontFamily(1);
+    });
+
+    friendlyDyslexiaButton = shadowR.querySelector("#friendlyDyslexiaButton");
+    friendlyDyslexiaButton.addEventListener('click', ()=> {
+        changeFontFamily(2);
+    });
+
+    alignLeft = shadowR.querySelector("#alignLeft");
+    alignLeft.addEventListener('click', ()=> {
+       changeAlignText(1);
+    });
+
+    alignCenter = shadowR.querySelector("#alignCenter");
+    alignCenter.addEventListener('click', ()=> {
+        changeAlignText(2);
+    });
+
+    alignRight = shadowR.querySelector("#alignRight");
+    alignRight.addEventListener('click', ()=> {
+        changeAlignText(3);
+    });
+
+}
+
+
+function changeTextAndColorRangeValue(percentAcrescentar, percentageElement){
+    if(percentAcrescentar === 0) {
+        percentageElement.style.setProperty('color', '#686868', 'important');
+        percentageElement.textContent = 'Default';
+    } else {
+        percentageElement.style.setProperty('color', '#1A6EFF', 'important');
+        percentageElement.textContent = percentAcrescentar + '%';
+    }
+}
+
+function changeStyleButtonSelected(id) {
+
+
+    if(id.style.background === 'rgb(26, 110, 255)') {
+        id.style.background = '#ffffff';
+        // id.style.borderColor = 'transparent';
+        id.style.color = '#000';
+    }else {
+        id.style.background = '#1a6eff'; //#ffffff
+        // id.style.borderColor = '#1a6eff'; //#8e8e8e
+        id.style.color = '#fff'; //#000
+    }
 
 
 }
 
+function changeStyleButtonSelectedAndDeselectOthers(idActivate, idsDisable) {
+
+
+    if(idActivate !== null) {
+        idActivate.style.setProperty('background', '#1a6eff', 'important');
+        idActivate.style.setProperty('borderColor', '#1a6eff', 'important');
+        idActivate.style.setProperty('color', '#fff', 'important');
+    }
+
+    idsDisable.forEach(function (index) {
+
+        index.style.setProperty('background', '#ffffff', 'important');
+        index.style.setProperty('borderColor', '#8e8e8e', 'important');
+        index.style.setProperty('color', '#000', 'important');
+
+    });
+
+}
+
+
 function toggleExpandWindow() {
-    let appWindow = document.getElementById('appWindow');
-    let button = document.getElementById('accessibilityButton');
+    let appWindow = shadowR.querySelector('#appWindow');
+    let button = shadowR.querySelector('#accessibilityButton');
 
     if(appWindow.style.opacity === '0' || appWindow.style.opacity === '') {
         appWindow.style.setProperty('opacity', '1', 'important');
@@ -1151,14 +1243,15 @@ function toggleExpandWindow() {
         appWindow.style.setProperty('opacity', '0', 'important');
         appWindow.style.setProperty('visibility', 'hidden', 'important');
         button.style.setProperty('display', 'flex', 'important');
-        document.getElementsByClassName("content-container")[0].scrollTo({ top: 0});
+        shadowR.querySelector(".content-container").scrollTo({ top: 0});
     }
-
 
 }
 
-// ******************** FONT SIZE ********************//
 
+//
+// // ******************** FONT SIZE ********************//
+//
 function updateFontSizeSlide(defaultPercentage) {
 
 
@@ -1193,7 +1286,7 @@ function updateFontSizeSlide(defaultPercentage) {
         currentFontSize.value,
         currentFontSize.percentage);
 
-    const percentageElement = document.querySelector(`[func="${FONT_SIZE_KEY}"]`).children[1]
+    const percentageElement = shadowR.querySelector(`[func="${FONT_SIZE_KEY}"]`).children[1]
         .getElementsByClassName('base-range')[0];
     changeTextAndColorRangeValue(defaultPercentage, percentageElement);
 
@@ -1249,7 +1342,9 @@ function updateZoomSlide(percentage) {
     let tagsDoPrimeiroNivel = getFirstChildElementsBelowBody();
     tagsDoPrimeiroNivel.forEach(function(txtTag) {
 
-        if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button') && txtTag.id !== 'appWindow') {
+        if (!txtTag.closest('.app-window')
+            && !txtTag.closest('.accessibility-button') && txtTag.id !== 'appWindow'
+            && txtTag.id !== 'shadow') {
             txtTag.style.zoom = zoom;
         }
 
@@ -1267,7 +1362,7 @@ function updateZoomSlide(percentage) {
         currentZoom.percentage);
 
 
-    const percentageElement = document.querySelector(`[func="${ZOOM_KEY}"]`).children[1]
+    const percentageElement = shadowR.querySelector(`[func="${ZOOM_KEY}"]`).children[1]
         .getElementsByClassName('base-range')[0];
     changeTextAndColorRangeValue(percentage, percentageElement);
 
@@ -1328,7 +1423,7 @@ function updateLineHeightSlide(percentage) {
         percentage);
 
 
-    const percentageElement = document.querySelector(`[func="${LINE_HEIGHT_KEY}"]`).children[1]
+    const percentageElement = shadowR.querySelector(`[func="${LINE_HEIGHT_KEY}"]`).children[1]
         .getElementsByClassName('base-range')[0];
     changeTextAndColorRangeValue(percentage, percentageElement);
 
@@ -1410,7 +1505,7 @@ function updateLetterSpacingSlide(percentage) {
         percentage);
 
 
-    const percentageElement = document.querySelector(`[func="${LETTER_SPACING_KEY}"]`).children[1]
+    const percentageElement = shadowR.querySelector(`[func="${LETTER_SPACING_KEY}"]`).children[1]
         .getElementsByClassName('base-range')[0];
     changeTextAndColorRangeValue(percentage, percentageElement);
 
