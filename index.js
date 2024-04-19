@@ -1,5 +1,7 @@
 window.acessiBrasil = window.acessiBrasil || {};
 
+const WIDGET_STATUS = "widget-status";
+
 const FONT_SIZE_KEY = "font-size";
 const ZOOM_KEY = "zoom";
 const LINE_HEIGHT_KEY = "line-height";
@@ -10,6 +12,9 @@ const HIGHLIGHT_HEADINGS_KEY = "highlight-headings";
 const HIGHLIGHT_LINKS_KEY = "highlight-links";
 const HIGHLIGHT_BUTTONS_KEY = "highlight-buttons";
 const FONT_FAMILY_KEY = "font-family";
+
+
+let widgetStatus = getItemFromLocalStorageWithExpiry(WIDGET_STATUS);
 
 let currentFontSize = getItemFromLocalStorageWithExpiry(FONT_SIZE_KEY);
 let currentZoom = getItemFromLocalStorageWithExpiry(ZOOM_KEY);
@@ -44,6 +49,8 @@ let friendlyDyslexiaButton;
 let alignLeft;
 let alignCenter;
 let alignRight;
+let cancelHide;
+let submitHide;
 let fontSizeSlide;
 let zoomSlide;
 let lineHeightSlide;
@@ -283,32 +290,37 @@ const tagsQueDevemMostrarBalaoMesmoComMaisDeUmItem = [
 ];
 
 window.acessiBrasil.init = function init() {
-    createWidget();
+    if(widgetStatus === null) {
+        createWidget();
+    }
 }
 
-window.addEventListener("load", (event) => {
+if(widgetStatus == null)  {
+    window.addEventListener("load", (event) => {
 
-    shadowR = document.getElementById("shadow").shadowRoot;
+        shadowR = document.getElementById("shadow").shadowRoot;
 
-    assignFunctionsToIds();
-    loadFontSize();
-    loadZoom();
-    loadLineHeight();
-    loadLetterSpacing();
-    loadTextMagnifier()
-    loadHighlightHeading();
-    loadHighlightLinks();
-    loadHighlightButtons();
-    setFontFamily();
-    setAlignText();
+        assignFunctionsToIds();
+        loadFontSize();
+        loadZoom();
+        loadLineHeight();
+        loadLetterSpacing();
+        loadTextMagnifier()
+        loadHighlightHeading();
+        loadHighlightLinks();
+        loadHighlightButtons();
+        setFontFamily();
+        setAlignText();
 
-    shadowR.addEventListener('click', (event)=> {
-        if (event.target.id === 'appWindow') {
-            toggleExpandWindow();
-        }
+        shadowR.addEventListener('click', (event)=> {
+            if (event.target.id === 'appWindow') {
+                toggleExpandWindow();
+            }
+        });
+
     });
+}
 
-});
 
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
@@ -327,6 +339,28 @@ function createWidget() {
 
   <style>
   /* Estilos para o botão de acessibilidade */
+  
+ @media (max-width: 980px) {
+  
+    #textEnlargeButton {
+        display: none;
+    }
+    
+  }
+  
+   @media (max-width: 700px) {
+    #widget {
+      position: fixed; /* ou 'absolute', dependendo do layout */
+      transform: translateY(50%) !important;
+      width: 90%;      
+      left: 0;
+      right: 0;
+      margin-left: auto;
+      margin-right: auto;
+    } 
+  }  
+  
+  
 .accessibility-button {
   position: fixed;
   bottom: 20px;
@@ -372,7 +406,7 @@ function createWidget() {
   /*max-width: 100%; !* Garante que a largura não ultrapasse a largura total do navegador *!*/
   background-color: #eff1f5;
   border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Aplica uma sombra em torno da janela */
+  box-shadow: 0 10px 30px rgb(26 110 255 / 10%);
   overflow: hidden; /* Impede rolagem na .app-window */
   user-select: none;
   
@@ -413,7 +447,7 @@ function createWidget() {
 /* Estilos para a barra de ferramentas superior */
 .toolbar {
   background-color: #1A6EFF;
-  padding: 15px;
+  padding: 15px 10px;
   border-top-left-radius: 0; /* Para preencher totalmente o topo, você pode querer remover o arredondamento */
   border-top-right-radius: 0; /* Para preencher totalmente o topo, você pode querer remover o arredondamento */
   display: flex;
@@ -425,6 +459,7 @@ function createWidget() {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 5px;
 }
 
 button {
@@ -462,21 +497,30 @@ button {
 /* Estilos para os botões da barra de ferramentas superior */
 .toolbar-button {
   background-color: rgba(255, 255, 255, 0.213);
-  border: none;
+  border: 2px solid transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
   border-radius: 7px;
   width: 30px;
   height: 30px;
-
+  padding: 3px;
   /* Adicione atributos ARIA */
   bleed: button;
   initial-letter: "Descrição do botão";
   /* Adicione feedback visual */
   outline: none; /* Adicione um contorno ao focar */
+ 
+  transition: border-color .15s ease;
+}
+
+#closeButton:hover {
+  border:2px solid transparent;
+}
+
+.toolbar-button:hover {
+    border-color: #FFF;
 }
 
 /* Estilos para os ícones dos botões da barra de ferramentas superior */
@@ -696,6 +740,7 @@ button {
     border-radius: 50%;
     width: 100%;
     height: 100%;
+    padding: 4px;
     max-width: 32px;
     max-height: 32px;
     display: flex !important;
@@ -742,8 +787,7 @@ button {
     transition: max-height 0.5s ease 0s;
     /*height: 100%;*/
     max-height: 0;
-    padding-left: 7px;
-    padding-right: 4px;
+    padding: 0 8px;
    }
    
    .content-buttons.active {
@@ -756,25 +800,7 @@ button {
        cursor: pointer;
        transition: transform 0.5s ease 0s;
    }
-
-   @media (max-width: 980px) {
-  
-    #textEnlargeButton {
-        display: none;
-    }
-    
-  }
-  
-   @media (max-width: 700px) {
-    #appWindow {
-      position: fixed; /* ou 'absolute', dependendo do layout */
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%; /* Ajuste a largura conforme necessário */
-      /* Certifique-se de que a altura e outras propriedades estejam configuradas conforme desejado */
-    } 
-  }
-  
+ 
   .icon {
     height: 24px;
     width: 24px;
@@ -798,30 +824,87 @@ button {
     color: #fff;
   }
   
+  #widget {
+    transform:translate(0, 50%);
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  }
+  
+  #modal-hide {
+    display: block;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -100%);
+    top: 20%;
+    left:50%;
+    height: fit-content;
+    background: #fff;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  }
+  
+  
+    /* SPINNER */
+ 
+    #loading-bar-spinner.spinner {
+       animation: loading-bar-spinner 400ms linear infinite;
+       display: none;
+    }
+
+    #loading-bar-spinner.spinner .spinner-icon {
+        width: 20px;
+        height: 20px;
+        border:  solid 2px transparent;
+        border-top-color:  #FFF !important;
+        border-left-color: #FFF !important;
+        border-radius: 50%;
+    }
+    
+    @keyframes loading-bar-spinner {
+      0%   { transform: rotate(0deg);   transform: rotate(0deg); }
+      100% { transform: rotate(360deg); transform: rotate(360deg); }
+    }
+
+  
   
   </style>
   
-  <div id="widget" class="app-window" role="application" aria-label="Janela do Aplicativo">
+  <div id="widget" class="app-window" role="application" aria-label="Janela do Widget">
   
         <div class="toolbar">
-            <button id="closeButton" class="toolbar-button" role="button" aria-label="Fechar" tabindex="0"
-                    title="Fechar Janela">
-                <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20.7457 3.32851C20.3552 2.93798 19.722 2.93798 19.3315 3.32851L12.0371 10.6229L4.74275 3.32851C4.35223 2.93798 3.71906 2.93798 3.32854 3.32851C2.93801 3.71903 2.93801 4.3522 3.32854 4.74272L10.6229 12.0371L3.32856 19.3314C2.93803 19.722 2.93803 20.3551 3.32856 20.7457C3.71908 21.1362 4.35225 21.1362 4.74277 20.7457L12.0371 13.4513L19.3315 20.7457C19.722 21.1362 20.3552 21.1362 20.7457 20.7457C21.1362 20.3551 21.1362 19.722 20.7457 19.3315L13.4513 12.0371L20.7457 4.74272C21.1362 4.3522 21.1362 3.71903 20.7457 3.32851Z" fill="#ffffff"></path> </g></svg>
-            </button>
             <div class="toolbar-actions">
                 <button id="createshortcuts" class="toolbar-button" role="button" aria-label="Criar atalhos" tabindex="0"
                         title="Criar Atalhos">
-                    <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#fff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" stroke-width="4.8"> <circle opacity="0.5" cx="12" cy="12" r="10" stroke="#fff" stroke-width="1.5"></circle> <path d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15" stroke="#fff" stroke-width="1.5" stroke-linecap="round"></path> </g><g id="SVGRepo_iconCarrier"> <circle opacity="0.5" cx="12" cy="12" r="10" stroke="#fff" stroke-width="1.5"></circle> <path d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15" stroke="#fff" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus">
+                           <path d="M5 12h14"></path>
+                           <path d="M12 5v14"></path>
+                        </svg>
                 </button>
                 <button id="resetButton" class="toolbar-button" role="button" aria-label="Restaurar" tabindex="0"
                         title="Reiniciar Configurações">
-                    <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#fff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.144"></g><g id="SVGRepo_iconCarrier"> <path d="M3 12C3 16.9706 7.02944 21 12 21C14.3051 21 16.4077 20.1334 18 18.7083L21 16M21 12C21 7.02944 16.9706 3 12 3C9.69494 3 7.59227 3.86656 6 5.29168L3 8M21 21V16M21 16H16M3 3V8M3 8H8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-ccw">
+                           <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                           <path d="M3 3v5h5"></path>
+                           <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                           <path d="M16 16h5v5"></path>
+                        </svg>
                 </button>
                 <button id="hideButton" class="toolbar-button" role="button" aria-label="Ocultar" tabindex="0"
                         title="Ocultar Interface">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#fff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.144"></g><g id="SVGRepo_iconCarrier"> <path d="M2.99902 3L20.999 21M9.8433 9.91364C9.32066 10.4536 8.99902 11.1892 8.99902 12C8.99902 13.6569 10.3422 15 11.999 15C12.8215 15 13.5667 14.669 14.1086 14.133M6.49902 6.64715C4.59972 7.90034 3.15305 9.78394 2.45703 12C3.73128 16.0571 7.52159 19 11.9992 19C13.9881 19 15.8414 18.4194 17.3988 17.4184M10.999 5.04939C11.328 5.01673 11.6617 5 11.9992 5C16.4769 5 20.2672 7.94291 21.5414 12C21.2607 12.894 20.8577 13.7338 20.3522 14.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off">
+                           <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                           <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                           <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                           <line x1="2" x2="22" y1="2" y2="22"></line>
+                        </svg>
                 </button>
             </div>
+            <button id="closeButton" class="toolbar-button" role="button" aria-label="Fechar" tabindex="0"
+                    title="Fechar Janela">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                     </svg>
+            </button>
         </div>
 
 
@@ -837,7 +920,11 @@ button {
 
                     <div class="title">
                         <span>Content</span>
-                        <span id="contentButton"><svg width="15px" height="15px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.048"></g><g id="SVGRepo_iconCarrier"> <title>drop-down</title> <desc>Created with sketchtool.</desc> <g id="directional" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="drop-down" fill="#000000"> <polygon id="Shape" points="5 8 12 16 19 8"> </polygon> </g> </g> </g></svg></span>
+                        <span id="contentButton">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                              <path d="m6 9 6 6 6-6"></path>
+                            </svg>
+                        </span>
                     </div>
 
                     <div class="content-buttons active">
@@ -847,18 +934,46 @@ button {
                         <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
                                 title="Ampliador de Texto" tabindex="0">
                             <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-in">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+                                <line x1="11" x2="11" y1="8" y2="14"></line>
+                                <line x1="8" x2="14" y1="11" y2="11"></line>
+                             </svg>
                             </div>
                             <span>Text Magnifier</span>
                         </button>
                         <button id="highlightTitlesButton" class="content-button" role="button" aria-label="Highlight Titles"
                                 title="Highlight Titles" tabindex="0">
                             <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-select">
+                                <path d="M5 3a2 2 0 0 0-2 2"></path>
+                                <path d="M19 3a2 2 0 0 1 2 2"></path>
+                                <path d="M21 19a2 2 0 0 1-2 2"></path>
+                                <path d="M5 21a2 2 0 0 1-2-2"></path>
+                                <path d="M9 3h1"></path>
+                                <path d="M9 21h1"></path>
+                                <path d="M14 3h1"></path>
+                                <path d="M14 21h1"></path>
+                                <path d="M3 9v1"></path>
+                                <path d="M21 9v1"></path>
+                                <path d="M3 14v1"></path>
+                                <path d="M21 14v1"></path>
+                                <line x1="7" x2="15" y1="8" y2="8"></line>
+                                <line x1="7" x2="17" y1="12" y2="12"></line>
+                                <line x1="7" x2="13" y1="16" y2="16"></line>
+                             </svg>
                             </div>
                             <span>Highlight Titles</span>
                         </button>
                         <button id="highlightLinksButton" class="content-button" role="button" aria-label="Highlight Links"
                                 title="Highlight Links" tabindex="0">
                             <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link-2">
+                                <path d="M9 17H7A5 5 0 0 1 7 7h2"></path>
+                                <path d="M15 7h2a5 5 0 1 1 0 10h-2"></path>
+                                <line x1="8" x2="16" y1="12" y2="12"></line>
+                             </svg>
                             </div>
                             <span>Highlight Links</span>
                         </button>
@@ -867,14 +982,28 @@ button {
                         <div class="range-container" func="${FONT_SIZE_KEY}">
                             <div class="title-container">
                                 <label for="letterSpacingSlide" class="slider-icon-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-a-large-small">
+                                    <path d="M21 14h-5"></path>
+                                    <path d="M16 16v-3.5a2.5 2.5 0 0 1 5 0V16"></path>
+                                    <path d="M4.5 13h6"></path>
+                                    <path d="m3 16 4.5-9 4.5 9"></path>
+                                 </svg>
                                     <span class="slider-title">Font Size</span>
                                 </label>
                             </div>
                             
                             <div class="range">
-                                <button class="material-icons arrow left minus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
+                                <button class="material-icons arrow left minus-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                                    <path d="m6 9 6 6 6-6"></path>
+                                </svg>
+                                </button>
                                 <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
+                                <button class="material-icons arrow right plus-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
+                                        <path d="m18 15-6-6-6 6"></path>
+                                    </svg>
+                                </button>
                             </div>
                             
                         </div>
@@ -883,19 +1012,44 @@ button {
                         <div class="container-buttons">
                             <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
                                     title="Highlight Buttons" tabindex="0">
-                                <div class="icon"></div>
+                                <div class="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed-mouse-pointer">
+                                        <path d="M5 3a2 2 0 0 0-2 2"></path>
+                                        <path d="M19 3a2 2 0 0 1 2 2"></path>
+                                        <path d="m12 12 4 10 1.7-4.3L22 16Z"></path>
+                                        <path d="M5 21a2 2 0 0 1-2-2"></path>
+                                        <path d="M9 3h1"></path>
+                                        <path d="M9 21h2"></path>
+                                        <path d="M14 3h1"></path>
+                                        <path d="M3 9v1"></path>
+                                        <path d="M21 9v2"></path>
+                                        <path d="M3 14v1"></path>
+                                     </svg>
+                                </div>
                                 <span>Highlight Buttons</span>
                             </button>
             
             
                             <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
                                     title="Readable Font" tabindex="0">
-                                <div class="icon"></div>
+                                <div class="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-spell-check">
+                                        <path d="m6 16 6-12 6 12"></path>
+                                        <path d="M8 12h8"></path>
+                                        <path d="m16 20 2 2 4-4"></path>
+                                    </svg>
+                                </div>
                                 <span>Readable Font</span>
                             </button>
                             <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
                                     title="Friendly Dyslexia" tabindex="0">
-                                <div class="icon"></div>
+                                <div class="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-check">
+                                        <path d="M8 3H2v15h7c1.7 0 3 1.3 3 3V7c0-2.2-1.8-4-4-4Z"></path>
+                                        <path d="m16 12 2 2 4-4"></path>
+                                        <path d="M22 6V3h-6c-2.2 0-4 1.8-4 4v14c0-1.7 1.3-3 3-3h7v-2.3"></path>
+                                    </svg>
+                                </div>
                                 <span>Friendly Dyslexia</span>
                             </button>
                         </div>
@@ -904,19 +1058,37 @@ button {
         
                         <button id="alignLeft" class="content-button" role="button" aria-label="align left" title="align left"
                                 tabindex="0">
-                            <div class="icon"></div>
+                            <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-left">
+                        <line x1="21" x2="3" y1="6" y2="6"></line>
+                        <line x1="15" x2="3" y1="12" y2="12"></line>
+                        <line x1="17" x2="3" y1="18" y2="18"></line>
+                     </svg>
+</div>
                             <span>Align Left</span>
                         </button>
         
                         <button id="alignCenter" class="content-button" role="button" aria-label="format align center"
                                 title="format align center" tabindex="0">
-                            <div class="icon"></div>
+                            <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-center">
+                        <line x1="21" x2="3" y1="6" y2="6"></line>
+                        <line x1="17" x2="7" y1="12" y2="12"></line>
+                        <line x1="19" x2="5" y1="18" y2="18"></line>
+                     </svg>
+</div>
                             <span>Align Center</span>
                         </button>
         
                         <button id="alignRight" class="content-button" role="button" aria-label="format align right"
                                 title="format align right" tabindex="0">
-                            <div class="icon"></div>
+                            <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-right">
+                        <line x1="21" x2="3" y1="6" y2="6"></line>
+                        <line x1="21" x2="9" y1="12" y2="12"></line>
+                        <line x1="21" x2="7" y1="18" y2="18"></line>
+                     </svg>
+</div>
                             <span>Align Right</span>
                         </button>
                         
@@ -925,15 +1097,28 @@ button {
                         <div class="range-container" func="${ZOOM_KEY}">
                             <div class="title-container">
                                 <label for="letterSpacingSlide" class="slider-icon-title">
-                                    <span class="material-icons"></span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-expand">
+                        <path d="m21 21-6-6m6 6v-4.8m0 4.8h-4.8"></path>
+                        <path d="M3 16.2V21m0 0h4.8M3 21l6-6"></path>
+                        <path d="M21 7.8V3m0 0h-4.8M21 3l-6 6"></path>
+                        <path d="M3 7.8V3m0 0h4.8M3 3l6 6"></path>
+                     </svg>
                                     <span class="slider-title">Content Scaling</span>
                                 </label>
                             </div>
                             
                             <div class="range">
-                                <button class="material-icons arrow left minus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
+                                <button class="material-icons arrow left minus-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                                    <path d="m6 9 6 6 6-6"></path>
+                                </svg>
+                                </button>
                                 <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
+                                <button class="material-icons arrow right plus-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
+                                        <path d="m18 15-6-6-6 6"></path>
+                                    </svg>
+                                </button>
                             </div>
                             
                         </div>
@@ -942,15 +1127,26 @@ button {
                         <div class="range-container" func="${LINE_HEIGHT_KEY}">
                             <div class="title-container">
                                 <label for="letterSpacingSlide" class="slider-icon-title">
-                                    <span class="material-icons"></span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down">
+                        <path d="m7 15 5 5 5-5"></path>
+                        <path d="m7 9 5-5 5 5"></path>
+                     </svg>
                                     <span class="slider-title">Line Height</span>
                                 </label>
                             </div>
                             
                             <div class="range">
-                                <button class="material-icons arrow left minus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
+                                <button class="material-icons arrow left minus-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                                    <path d="m6 9 6 6 6-6"></path>
+                                </svg>
+                                </button>
                                 <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
+                                <button class="material-icons arrow right plus-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
+                                        <path d="m18 15-6-6-6 6"></path>
+                                    </svg>
+                                </button>
                             </div>
                             
                         </div>
@@ -958,15 +1154,26 @@ button {
                         <div class="range-container" func="${LETTER_SPACING_KEY}">
                             <div class="title-container">
                                 <label for="letterSpacingSlide" class="slider-icon-title">
-                                    <span class="material-icons"></span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-left-right">
+                        <path d="m9 7-5 5 5 5"></path>
+                        <path d="m15 7 5 5-5 5"></path>
+                     </svg>
                                     <span class="slider-title">Letter Spacing</span>
                                 </label>
                             </div>
                             
                             <div class="range">
-                                <button class="material-icons arrow left minus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
+                                <button class="material-icons arrow left minus-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                                    <path d="m6 9 6 6 6-6"></path>
+                                </svg>
+                                </button>
                                 <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button"><svg width="64px" height="64px" viewBox="0 0 16 16" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg2" version="1.1" fill="#ffffff" stroke="#ffffff" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata id="metadata7"> <rdf:rdf> <cc:work> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> <dc:title></dc:title> <dc:date>2021</dc:date> <dc:creator> <cc:agent> <dc:title>Timothée Giet</dc:title> </cc:agent> </dc:creator> <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"></cc:license> </cc:work> <cc:license rdf:about="http://creativecommons.org/licenses/by-sa/4.0/"> <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits> <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires> <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires> <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits> <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires> </cc:license> </rdf:rdf> </metadata> <g id="layer1" transform="rotate(45 1254.793 524.438)"> <path style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M.536 1044.409v-1.997h9v-9h2v11z" id="path4179"></path> </g> </g></svg></button>
+                                <button class="material-icons arrow right plus-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
+                                        <path d="m18 15-6-6-6 6"></path>
+                                    </svg>
+                                </button>
                             </div>
                             
                         </div>
@@ -976,7 +1183,7 @@ button {
     </div>
 
 
-  <div style="display: none; transform: translate(-50%, -20%); height: 250px; top: 20%; left:50%; height: fit-content;" id="modal-hide" class="app-window" role="application" aria-label="Janela do Aplicativo">
+  <div id="modal-hide" class="app-window" role="application" aria-label="Modal para esconder Widget">
   
         <div style="
             display: flex;
@@ -1009,8 +1216,11 @@ button {
                 margin-top: 20px;
                 gap: 1rem;
                 ">
-                <button type="button" class="button-modal">Não, quero manter</button>
-                <button type="button" class="button-modal button-submit-modal">Sim, quero desativar</button>
+                <button id="cancelHide" type="button" class="button-modal">Não, quero manter</button>
+                <button id="submitHide" type="button" class="button-modal button-submit-modal">
+                    <span id="msgBtnDisable">Sim, quero desativar</span>
+                    <div id="loading-bar-spinner" class="spinner"><div class="spinner-icon"></div></div>
+                </button>
             </div>
 
     
@@ -1028,9 +1238,7 @@ button {
     expandWindow.style.zIndex = '9999';
     expandWindow.style.width = '100%';
     expandWindow.style.height = '100%';
-    expandWindow.style.overflow = 'auto';
-    expandWindow.style.transition = 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out';
-    expandWindow.style.transform = 'translateY(50%)';
+
 
     shadowRoot.innerHTML = '<button id="accessibilityButton" class="accessibility-button">' +
         '<svg fill="#FFF" width="64px" height="64px" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" stroke="#FFF" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.288"></g><g id="SVGRepo_iconCarrier"><path d="M9.5,3.5A2.5,2.5,0,1,1,12,6,2.5,2.5,0,0,1,9.5,3.5ZM20,7H4A1,1,0,0,0,4,9H9V22a1,1,0,0,0,2,0V15h2v7a1,1,0,0,0,2,0V9h5a1,1,0,0,0,0-2Z"></path></g></svg>' +
@@ -1110,14 +1318,13 @@ function assignFunctionsToIds() {
     hideButton = shadowR.querySelector("#hideButton");
     hideButton.addEventListener('click', ()=>{
 
-        toggleExpandWindow();
-
         const appWindow = shadowR.querySelector("#appWindow");
         appWindow.style.setProperty('background', 'rgb(0 0 0 / 30%)', 'important');
 
         const modal = shadowR.querySelector("#modal-hide");
-        modal.style.setProperty('display', 'block', 'important');
-
+        modal.style.setProperty('opacity', '1', 'important');
+        modal.style.setProperty('visibility', 'visible', 'important');
+        modal.style.setProperty('transform', 'translate(-50%, -20%)', 'important');
     });
 //
 //     //TITLE
@@ -1179,8 +1386,30 @@ function assignFunctionsToIds() {
         changeAlignText(3);
     });
 
+//    MODAL HIDE
+
+    cancelHide = shadowR.querySelector("#cancelHide");
+    cancelHide.addEventListener('click', toggleExpandWindow);
+
+    submitHide = shadowR.querySelector("#submitHide");
+    submitHide.addEventListener('click', hideWidget);
+
 }
 
+function hideWidget() {
+
+    let msg = shadowR.querySelector('#msgBtnDisable');
+    let spinner = shadowR.querySelector('#loading-bar-spinner');
+
+    msg.style.setProperty('display', 'none');
+    spinner.style.setProperty('display', 'block');
+
+    setTimeout(function() {
+        clearLocalStorage();
+        setItemToLocalStorageWithExpiry("widget-status", 'hide', null);
+    }, 1500);
+
+}
 
 function changeTextAndColorRangeValue(percentAcrescentar, percentageElement){
     if(percentAcrescentar === 0) {
@@ -1229,21 +1458,40 @@ function changeStyleButtonSelectedAndDeselectOthers(idActivate, idsDisable) {
 
 
 function toggleExpandWindow() {
+
+
     let appWindow = shadowR.querySelector('#appWindow');
+    let widget = shadowR.querySelector('#widget');
     let button = shadowR.querySelector('#accessibilityButton');
+    let modal = shadowR.querySelector('#modal-hide');
+
+    let screenWidth = window.innerWidth;
 
     if(appWindow.style.opacity === '0' || appWindow.style.opacity === '') {
+
+
+        widget.style.setProperty('transform', 'translate(0, 0)', 'important');
+
+
         appWindow.style.setProperty('opacity', '1', 'important');
         appWindow.style.setProperty('visibility', 'visible', 'important');
-        appWindow.style.setProperty('transform', 'translateY(0)', 'important');
-        // expandWindow.style.transform = 'translateY(100%)'
         button.style.setProperty('display', 'none', 'important');
-    }else if(appWindow.style.opacity === '1') {
-        appWindow.style.setProperty('transform', 'translateY(50%)', 'important');
+
+        appWindow.style.setProperty('background', 'transparent', 'important');
+        modal.style.setProperty('opacity', '0', 'important');
+        modal.style.setProperty('visibility', 'hidden', 'important');
+        modal.style.setProperty('transform', 'translate(-50%, -100%)', 'important');
+
+    } else if(appWindow.style.opacity === '1') {
+
+
+        widget.style.setProperty('transform', 'translate(0, 50%)', 'important');
+
         appWindow.style.setProperty('opacity', '0', 'important');
         appWindow.style.setProperty('visibility', 'hidden', 'important');
         button.style.setProperty('display', 'flex', 'important');
         shadowR.querySelector(".content-container").scrollTo({ top: 0});
+
     }
 
 }
