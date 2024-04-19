@@ -566,11 +566,6 @@ button {
     width: 100%;
 }
 
-/* width */
-.content-container::-webkit-scrollbar {
-    width: 5px;
-}
-
 /* Track */
 .content-container::-webkit-scrollbar-track {
   box-shadow: inset 0 0 5px #f1f1f1;
