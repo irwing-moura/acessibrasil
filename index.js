@@ -312,7 +312,17 @@ if(widgetStatus == null)  {
         setFontFamily();
         setAlignText();
 
-        shadowR.addEventListener('click', (event)=> {
+        console.log = function() {
+            // Obtém o elemento onde as mensagens serão exibidas
+            var consoleLog = document.getElementById('consoleLog');
+            // Concatena todas as mensagens de log com um espaço entre elas
+            var logMessage = Array.from(arguments).join(' ');
+            // Adiciona a nova mensagem ao conteúdo existente
+            consoleLog.innerHTML += logMessage + '<br>';
+        };
+
+        let modalAppWindow = shadowR.querySelector('#appWindow');
+        modalAppWindow.addEventListener('click', (event)=> {
             if (event.target.id === 'appWindow') {
                 toggleExpandWindow();
             }
@@ -346,6 +356,10 @@ function createWidget() {
         display: none;
     }
     
+    #highlightTitlesButton {
+      margin-left: 0 !important;    
+    }
+    
   }
   
    @media (max-width: 700px) {
@@ -375,16 +389,30 @@ function createWidget() {
   justify-content: center;
   cursor: pointer;
   z-index: 1000;
-  transition: background-color 0.3s, transform 0.3s;
-  user-select: none;
+  /*transition: background-color 0.3s, transform 0.3s;*/
+  -webkit-user-select: none; /* Para Safari e Chrome */
+  -moz-user-select: none;    /* Para Firefox */
+  -ms-user-select: none;     /* Para Internet Explorer/Edge */
+  user-select: none;         /* Para navegadores modernos */
+  transition: all 0.3s;
 }
 
-.accessibility-button:focus,
 .accessibility-button:hover {
-  background-color: #1038bd; /* Altere a cor de fundo quando o botão estiver em foco ou hover, se desejar */
-  transform: scale(1.1); /* Aumenta o botão em 10% ao passar o mouse ou focar */
-  outline: 2px solid #ffffff; /* Contorno branco para indicar foco */
-  outline-offset: 2px;
+  transform: scale(1.1);
+  background-color: #1038bd;
+}
+
+.accessibility-button:hover::before {
+  /* Altere a cor de fundo quando o botão estiver em foco ou hover, se desejar */
+  content: '';  /* Adiciona um pseudo-elemento para o efeito do outline */
+  position: absolute;
+  top: -6px;  /* Offset ajustado para o contorno */
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border: 2px solid #ffffff;  /* Cor do contorno branco */
+  border-radius: 50%;  /* Border-radius ajustado para corresponder ao botão */
+  pointer-events: none;  /* Para evitar interferência no comportamento do botão */
 }
 
 /* Adiciona estilos específicos para o ícone no botão de acessibilidade */
@@ -408,7 +436,10 @@ function createWidget() {
   border-radius: 15px;
   box-shadow: 0 10px 30px rgb(26 110 255 / 10%);
   overflow: hidden; /* Impede rolagem na .app-window */
-  user-select: none;
+  -webkit-user-select: none; /* Para Safari e Chrome */
+  -moz-user-select: none;    /* Para Firefox */
+  -ms-user-select: none;     /* Para Internet Explorer/Edge */
+  user-select: none;    
   
   font-family: Arial, Helvetica, sans-serif;
    
@@ -459,8 +490,9 @@ function createWidget() {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 5px;
 }
+
+.toolbar-actions > * + * { margin-left: 5px;}
 
 button {
     /*transition: all 0.15s ease-in 0s;*/
@@ -529,6 +561,10 @@ button {
   color: rgb(255, 255, 255);
 }
 
+.content-container::-webkit-scrollbar {
+    width: 4px;
+}
+
 /* Adicione estados visuais para foco com contorno */
 /*.toolbar-button:focus {*/
 /*  outline: 2px solid #ffffff; !* Adicione um contorno ao focar *!*/
@@ -558,11 +594,13 @@ button {
     flex-direction: column;
 }
 
+.content-buttons > * + * { margin-top: 10px;}
+.container-buttons > * + * { margin-left: 10px;}
+
 .container-buttons {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
     width: 100%;
 }
 
@@ -598,7 +636,6 @@ button {
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap:5px;
 }
 
 .content-button:hover {
@@ -645,6 +682,7 @@ button {
   justify-content: center; /* Alinha o título/ícone e o valor nas extremidades */
   align-items: center;
   margin-bottom: 8px; /* Espaço entre o título/ícone e o controle deslizante */
+  min-height: 34px;
 }
 
 /* Ícone e título do slider */
@@ -735,7 +773,7 @@ button {
     border-radius: 50%;
     width: 100%;
     height: 100%;
-    padding: 4px;
+    padding: 0 4px;
     max-width: 32px;
     max-height: 32px;
     display: flex !important;
@@ -777,10 +815,8 @@ button {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
     overflow: auto hidden;
     transition: max-height 0.5s ease 0s;
-    /*height: 100%;*/
     max-height: 0;
     padding: 0 8px;
    }
@@ -799,6 +835,7 @@ button {
   .icon {
     height: 24px;
     width: 24px;
+    margin-bottom: 5px;
   }
   
   .button-modal {
@@ -1236,7 +1273,7 @@ button {
 
 
     shadowRoot.innerHTML = '<button id="accessibilityButton" class="accessibility-button">' +
-        '<svg fill="#FFF" width="64px" height="64px" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" stroke="#FFF" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.288"></g><g id="SVGRepo_iconCarrier"><path d="M9.5,3.5A2.5,2.5,0,1,1,12,6,2.5,2.5,0,0,1,9.5,3.5ZM20,7H4A1,1,0,0,0,4,9H9V22a1,1,0,0,0,2,0V15h2v7a1,1,0,0,0,2,0V9h5a1,1,0,0,0,0-2Z"></path></g></svg>' +
+        '<svg fill="#FFF" width="50px" height="50px" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" stroke="#FFF" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.288"></g><g id="SVGRepo_iconCarrier"><path d="M9.5,3.5A2.5,2.5,0,1,1,12,6,2.5,2.5,0,0,1,9.5,3.5ZM20,7H4A1,1,0,0,0,4,9H9V22a1,1,0,0,0,2,0V15h2v7a1,1,0,0,0,2,0V9h5a1,1,0,0,0,0-2Z"></path></g></svg>' +
         '</button>';
 
 
@@ -1939,13 +1976,6 @@ function clearLocalStorage() {
 function criarBalao() {
     let balao = document.createElement("div");
     balao.className = "balao";
-    document.body.appendChild(balao);
-    return balao;
-}
-
-// Função para estilizar o balão
-function estilizarBalao(balao) {
-    // Estilização do balão
     balao.style.padding = "10px";
     balao.style.backgroundColor = "rgba(51, 51, 51, 0.8)"; /* Fundo escurecido */
     balao.style.color = "white"; /* Texto branco */
@@ -1955,7 +1985,12 @@ function estilizarBalao(balao) {
     balao.style.position = "absolute";
     balao.style.zIndex = 999999;
     balao.style.maxWidth = '700px';
+    balao.style.visibility = 'hidden';
+    balao.style.display = 'none';
+    document.body.appendChild(balao);
+    return balao;
 }
+
 
 // Função para atualizar a posição do balão
 function atualizarPosicaoBalao(event, balao) {
@@ -1988,10 +2023,7 @@ function mostrarBalao(event) {
     }
 
     // Obtém ou cria o elemento do balão
-    let balao = document.querySelector(".balao") || criarBalao();
-
-    // Estiliza o balão
-    estilizarBalao(balao);
+    let balao = document.querySelector(".balao");
 
     // Obtém o conteúdo com base no tipo de tag
     let conteudo;
@@ -2004,7 +2036,7 @@ function mostrarBalao(event) {
     atualizarPosicaoBalao(event, balao);
 
     // Exibe o balão
-    balao.style.display = "block";
+    balao.style.visibility = "visible";
 
     // Adiciona o evento de movimento do mouse para atualizar a posição do balão
     document.addEventListener("mousemove", function (event) {
@@ -2016,8 +2048,7 @@ function mostrarBalao(event) {
 function esconderBalao() {
     let balao = document.querySelector(".balao");
     if (balao) {
-        balao.style.display = "none";
-
+        balao.style.visibility = "hidden";
         // Remove o evento de movimento do mouse
         document.removeEventListener("mousemove", atualizarPosicaoBalao);
     }
@@ -2025,23 +2056,25 @@ function esconderBalao() {
 
 function updateTextMagnifier() {
 
-    // Se a funcionalidade for desativada, esconde o balão
-    let balao = document.querySelector(".balao");
-    if (balao) {
-        balao.style.setProperty('display', 'none', 'important');
-        removeItemFromLocalStorage("text-magnifier");
+        // Se a funcionalidade for desativada, esconde o balão
+        let balao = document.querySelector(".balao");
+        if (balao.style.display === 'block') {
+            balao.style.setProperty('display', 'none', 'important');
+            removeItemFromLocalStorage("text-magnifier");
 
-    } else {
-        setItemToLocalStorageWithExpiry("text-magnifier",
-            true,
-            null);
-        getElementCursorHover();
-    }
-
-    changeStyleButtonSelected(textEnlargeButton);
+        } else {
+            balao.style.setProperty('display', 'block', 'important');
+            setItemToLocalStorageWithExpiry("text-magnifier",
+                true,
+                null);
+            getElementCursorHover();
+        }
+        changeStyleButtonSelected(textEnlargeButton);
 }
 
 function loadTextMagnifier() {
+
+    criarBalao();
 
     if (textMagnifier !== null) {
         updateTextMagnifier();

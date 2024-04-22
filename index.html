@@ -104,6 +104,7 @@
     <footer id="myFooter">
         <div class="w3-container w3-theme-l2 w3-padding-32">
             <h4>Footer</h4>
+            <strong id="consoleLog"></strong>
         </div>
 
         <div class="w3-container w3-theme-l1">
@@ -144,7 +145,7 @@
         var s = document.createElement('script');
         var body = document.querySelector('head') || document.body;
         s.src = 'index.js';
-        // s.src = 'https://raw.githack.com/irwing-moura/acessibrasil/develop/index.js';
+        // s.src = 'https://raw.githack.com/irwing-moura/acessibrasil/feature/shadow-root/index.js';
         s.async = true;
         s.onload = function () {
             acessiBrasil.init();
