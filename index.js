@@ -12,6 +12,9 @@ const HIGHLIGHT_HEADINGS_KEY = "highlight-headings";
 const HIGHLIGHT_LINKS_KEY = "highlight-links";
 const HIGHLIGHT_BUTTONS_KEY = "highlight-buttons";
 const FONT_FAMILY_KEY = "font-family";
+const INVERTED_COLORS_KEY = "inverted-colors";
+const COLORS_CONTRAST_KEY = "colors-contrast";
+const COLORS_SATURATION_KEY = "colors-saturation";
 
 
 let widgetStatus = getItemFromLocalStorageWithExpiry(WIDGET_STATUS);
@@ -27,6 +30,12 @@ let hightlightHeadings = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HEADINGS_KE
 let hightlightLinks = getItemFromLocalStorageWithExpiry(HIGHLIGHT_LINKS_KEY);
 let hightlightButtons = getItemFromLocalStorageWithExpiry(HIGHLIGHT_BUTTONS_KEY);
 let fontFamily = getItemFromLocalStorageWithExpiry(FONT_FAMILY_KEY);
+
+//COLORS CONTRAST
+let colorsContrast = getItemFromLocalStorageWithExpiry(COLORS_CONTRAST_KEY);
+
+//COLORS SATURATION
+let colorsSaturation = getItemFromLocalStorageWithExpiry(COLORS_SATURATION_KEY);
 
 //botao abrir
 let expandButton;
@@ -46,6 +55,14 @@ let highlightLinksButton;
 let highlightButtonsButton;
 let readableFontButton;
 let friendlyDyslexiaButton;
+let invertedColorsButton;
+let intelligentInvertedColorsButton;
+let lightContrastColorsButton;
+let darkContrastColorsButton;
+let highContrastColorsButton;
+let monochromaticColorsButton;
+let highSaturationColorsButton
+let lowSaturationColorsButton
 let alignLeft;
 let alignCenter;
 let alignRight;
@@ -65,6 +82,14 @@ let indexActualFontFamily = fontFamily != null ? fontFamily.value : fontFamily; 
 //TEXT-ALIGN
 let aligns = ['', 'left', 'center', 'right'];
 let indexActualTextAlign = textAlign != null ? textAlign.value : textAlign;
+
+//COLORS CONTRAST
+let contrasts = ['', 'inverted', 'int-inverted', 'light', 'dark', 'high'];
+let indexActualColorContrast = colorsContrast != null ? colorsContrast.value : colorsContrast;
+
+//COLORS CONTRAST
+let saturations = ['', 'high', 'low', 'mono'];
+let indexActualColorSaturation = colorsSaturation != null ? colorsSaturation.value : colorsSaturation;
 
 let yellowColors  = {
     "cor1": {
@@ -300,6 +325,7 @@ if(widgetStatus == null)  {
 
         shadowR = document.getElementById("shadow").shadowRoot;
 
+        createStyleGlobal();
         assignFunctionsToIds();
         loadFontSize();
         loadZoom();
@@ -311,6 +337,8 @@ if(widgetStatus == null)  {
         loadHighlightButtons();
         setFontFamily();
         setAlignText();
+        loadContrastColors();
+        loadSaturationColors();
 
         console.log = function() {
             // Obtém o elemento onde as mensagens serão exibidas
@@ -592,6 +620,7 @@ button {
 .scrollable-content {
     display:flex;
     flex-direction: column;
+    border-bottom: 1px solid #ccc;
 }
 
 .content-buttons > * + * { margin-top: 10px;}
@@ -683,6 +712,7 @@ button {
   align-items: center;
   margin-bottom: 8px; /* Espaço entre o título/ícone e o controle deslizante */
   min-height: 34px;
+  color: #000;
 }
 
 /* Ícone e título do slider */
@@ -816,7 +846,7 @@ button {
     align-items: center;
     flex-wrap: wrap;
     overflow: auto hidden;
-    transition: max-height 0.5s ease 0s;
+    transition: max-height 0.4s ease 0s;
     max-height: 0;
     padding: 0 8px;
    }
@@ -829,7 +859,7 @@ button {
    
    #contentButton {
        cursor: pointer;
-       transition: transform 0.5s ease 0s;
+       transition: transform 0.4s ease 0s;
    }
  
   .icon {
@@ -901,364 +931,404 @@ button {
   </style>
   
   <div id="widget" class="app-window" role="application" aria-label="Janela do Widget">
-  
-        <div class="toolbar">
-            <div class="toolbar-actions">
-                <button id="createshortcuts" class="toolbar-button" role="button" aria-label="Criar atalhos" tabindex="0"
-                        title="Criar Atalhos">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus">
-                           <path d="M5 12h14"></path>
-                           <path d="M12 5v14"></path>
-                        </svg>
-                </button>
-                <button id="resetButton" class="toolbar-button" role="button" aria-label="Restaurar" tabindex="0"
-                        title="Reiniciar Configurações">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-ccw">
-                           <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                           <path d="M3 3v5h5"></path>
-                           <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
-                           <path d="M16 16h5v5"></path>
-                        </svg>
-                </button>
-                <button id="hideButton" class="toolbar-button" role="button" aria-label="Ocultar" tabindex="0"
-                        title="Ocultar Interface">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off">
-                           <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
-                           <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
-                           <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
-                           <line x1="2" x2="22" y1="2" y2="22"></line>
-                        </svg>
-                </button>
-            </div>
-            <button id="closeButton" class="toolbar-button" role="button" aria-label="Fechar" tabindex="0"
-                    title="Fechar Janela">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
-                        <path d="M18 6 6 18"></path>
-                        <path d="m6 6 12 12"></path>
+   <div class="toolbar">
+      <div class="toolbar-actions">
+         <button id="createshortcuts" class="toolbar-button" role="button" aria-label="Criar atalhos" tabindex="0"
+            title="Criar Atalhos">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus">
+               <path d="M5 12h14"></path>
+               <path d="M12 5v14"></path>
+            </svg>
+         </button>
+         <button id="resetButton" class="toolbar-button" role="button" aria-label="Restaurar" tabindex="0"
+            title="Reiniciar Configurações">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-ccw">
+               <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+               <path d="M3 3v5h5"></path>
+               <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+               <path d="M16 16h5v5"></path>
+            </svg>
+         </button>
+         <button id="hideButton" class="toolbar-button" role="button" aria-label="Ocultar" tabindex="0"
+            title="Ocultar Interface">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off">
+               <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+               <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+               <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+               <line x1="2" x2="22" y1="2" y2="22"></line>
+            </svg>
+         </button>
+      </div>
+      <button id="closeButton" class="toolbar-button" role="button" aria-label="Fechar" tabindex="0"
+         title="Fechar Janela">
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+         </svg>
+      </button>
+   </div>
+   <!-- Conteúdo do aplicativo aqui -->
+   <div class="content-container">
+      <div class="scrollable-content">
+         <!-- ... Outros botões de configuração ... -->
+         <div class="title">
+            <span>Content</span>
+            <span class="contentButton">
+               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                  <path d="m6 9 6 6 6-6"></path>
+               </svg>
+            </span>
+         </div>
+         <div class="content-buttons active">
+            <div class="container-buttons">
+               <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
+                  title="Ampliador de Texto" tabindex="0">
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-in">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+                        <line x1="11" x2="11" y1="8" y2="14"></line>
+                        <line x1="8" x2="14" y1="11" y2="11"></line>
                      </svg>
-            </button>
-        </div>
-
-
-        <!-- Conteúdo do aplicativo aqui -->
-
-            <div class="content-container">
-                
-
-                <div class="scrollable-content">
-            
-                    <!-- ... Outros botões de configuração ... -->
-
-
-                    <div class="title">
-                        <span>Content</span>
-                        <span id="contentButton">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
-                              <path d="m6 9 6 6 6-6"></path>
-                            </svg>
-                        </span>
-                    </div>
-
-                    <div class="content-buttons active">
-
-                    <div class="container-buttons">
-
-                        <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
-                                title="Ampliador de Texto" tabindex="0">
-                            <div class="icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-in">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
-                                <line x1="11" x2="11" y1="8" y2="14"></line>
-                                <line x1="8" x2="14" y1="11" y2="11"></line>
-                             </svg>
-                            </div>
-                            <span>Text Magnifier</span>
-                        </button>
-                        <button id="highlightTitlesButton" class="content-button" role="button" aria-label="Highlight Titles"
-                                title="Highlight Titles" tabindex="0">
-                            <div class="icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-select">
-                                <path d="M5 3a2 2 0 0 0-2 2"></path>
-                                <path d="M19 3a2 2 0 0 1 2 2"></path>
-                                <path d="M21 19a2 2 0 0 1-2 2"></path>
-                                <path d="M5 21a2 2 0 0 1-2-2"></path>
-                                <path d="M9 3h1"></path>
-                                <path d="M9 21h1"></path>
-                                <path d="M14 3h1"></path>
-                                <path d="M14 21h1"></path>
-                                <path d="M3 9v1"></path>
-                                <path d="M21 9v1"></path>
-                                <path d="M3 14v1"></path>
-                                <path d="M21 14v1"></path>
-                                <line x1="7" x2="15" y1="8" y2="8"></line>
-                                <line x1="7" x2="17" y1="12" y2="12"></line>
-                                <line x1="7" x2="13" y1="16" y2="16"></line>
-                             </svg>
-                            </div>
-                            <span>Highlight Titles</span>
-                        </button>
-                        <button id="highlightLinksButton" class="content-button" role="button" aria-label="Highlight Links"
-                                title="Highlight Links" tabindex="0">
-                            <div class="icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link-2">
-                                <path d="M9 17H7A5 5 0 0 1 7 7h2"></path>
-                                <path d="M15 7h2a5 5 0 1 1 0 10h-2"></path>
-                                <line x1="8" x2="16" y1="12" y2="12"></line>
-                             </svg>
-                            </div>
-                            <span>Highlight Links</span>
-                        </button>
-                    </div>
-                    
-                        <div class="range-container" func="${FONT_SIZE_KEY}">
-                            <div class="title-container">
-                                <label for="letterSpacingSlide" class="slider-icon-title">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-a-large-small">
-                                    <path d="M21 14h-5"></path>
-                                    <path d="M16 16v-3.5a2.5 2.5 0 0 1 5 0V16"></path>
-                                    <path d="M4.5 13h6"></path>
-                                    <path d="m3 16 4.5-9 4.5 9"></path>
-                                 </svg>
-                                    <span class="slider-title">Font Size</span>
-                                </label>
-                            </div>
-                            
-                            <div class="range">
-                                <button class="material-icons arrow left minus-button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
-                                    <path d="m6 9 6 6 6-6"></path>
-                                </svg>
-                                </button>
-                                <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
-                                        <path d="m18 15-6-6-6 6"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            
-                        </div>
-                        
-        
-                        <div class="container-buttons">
-                            <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
-                                    title="Highlight Buttons" tabindex="0">
-                                <div class="icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed-mouse-pointer">
-                                        <path d="M5 3a2 2 0 0 0-2 2"></path>
-                                        <path d="M19 3a2 2 0 0 1 2 2"></path>
-                                        <path d="m12 12 4 10 1.7-4.3L22 16Z"></path>
-                                        <path d="M5 21a2 2 0 0 1-2-2"></path>
-                                        <path d="M9 3h1"></path>
-                                        <path d="M9 21h2"></path>
-                                        <path d="M14 3h1"></path>
-                                        <path d="M3 9v1"></path>
-                                        <path d="M21 9v2"></path>
-                                        <path d="M3 14v1"></path>
-                                     </svg>
-                                </div>
-                                <span>Highlight Buttons</span>
-                            </button>
-            
-            
-                            <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
-                                    title="Readable Font" tabindex="0">
-                                <div class="icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-spell-check">
-                                        <path d="m6 16 6-12 6 12"></path>
-                                        <path d="M8 12h8"></path>
-                                        <path d="m16 20 2 2 4-4"></path>
-                                    </svg>
-                                </div>
-                                <span>Readable Font</span>
-                            </button>
-                            <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
-                                    title="Friendly Dyslexia" tabindex="0">
-                                <div class="icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-check">
-                                        <path d="M8 3H2v15h7c1.7 0 3 1.3 3 3V7c0-2.2-1.8-4-4-4Z"></path>
-                                        <path d="m16 12 2 2 4-4"></path>
-                                        <path d="M22 6V3h-6c-2.2 0-4 1.8-4 4v14c0-1.7 1.3-3 3-3h7v-2.3"></path>
-                                    </svg>
-                                </div>
-                                <span>Friendly Dyslexia</span>
-                            </button>
-                        </div>
-                        
-                        <div class="container-buttons">
-        
-                        <button id="alignLeft" class="content-button" role="button" aria-label="align left" title="align left"
-                                tabindex="0">
-                            <div class="icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-left">
+                  </div>
+                  <span>Text Magnifier</span>
+               </button>
+               <button id="highlightTitlesButton" class="content-button" role="button" aria-label="Highlight Titles"
+                  title="Highlight Titles" tabindex="0">
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-select">
+                        <path d="M5 3a2 2 0 0 0-2 2"></path>
+                        <path d="M19 3a2 2 0 0 1 2 2"></path>
+                        <path d="M21 19a2 2 0 0 1-2 2"></path>
+                        <path d="M5 21a2 2 0 0 1-2-2"></path>
+                        <path d="M9 3h1"></path>
+                        <path d="M9 21h1"></path>
+                        <path d="M14 3h1"></path>
+                        <path d="M14 21h1"></path>
+                        <path d="M3 9v1"></path>
+                        <path d="M21 9v1"></path>
+                        <path d="M3 14v1"></path>
+                        <path d="M21 14v1"></path>
+                        <line x1="7" x2="15" y1="8" y2="8"></line>
+                        <line x1="7" x2="17" y1="12" y2="12"></line>
+                        <line x1="7" x2="13" y1="16" y2="16"></line>
+                     </svg>
+                  </div>
+                  <span>Highlight Titles</span>
+               </button>
+               <button id="highlightLinksButton" class="content-button" role="button" aria-label="Highlight Links"
+                  title="Highlight Links" tabindex="0">
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link-2">
+                        <path d="M9 17H7A5 5 0 0 1 7 7h2"></path>
+                        <path d="M15 7h2a5 5 0 1 1 0 10h-2"></path>
+                        <line x1="8" x2="16" y1="12" y2="12"></line>
+                     </svg>
+                  </div>
+                  <span>Highlight Links</span>
+               </button>
+            </div>
+            <div class="range-container" func="${FONT_SIZE_KEY}">
+               <div class="title-container">
+                  <label for="letterSpacingSlide" class="slider-icon-title">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-a-large-small">
+                        <path d="M21 14h-5"></path>
+                        <path d="M16 16v-3.5a2.5 2.5 0 0 1 5 0V16"></path>
+                        <path d="M4.5 13h6"></path>
+                        <path d="m3 16 4.5-9 4.5 9"></path>
+                     </svg>
+                     <span class="slider-title">Font Size</span>
+                  </label>
+               </div>
+               <div class="range">
+                  <button class="material-icons arrow left minus-button">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                        <path d="m6 9 6 6 6-6"></path>
+                     </svg>
+                  </button>
+                  <div class="base-range">Default</div>
+                  <button class="material-icons arrow right plus-button">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
+                        <path d="m18 15-6-6-6 6"></path>
+                     </svg>
+                  </button>
+               </div>
+            </div>
+            <div class="container-buttons">
+               <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
+                  title="Highlight Buttons" tabindex="0">
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed-mouse-pointer">
+                        <path d="M5 3a2 2 0 0 0-2 2"></path>
+                        <path d="M19 3a2 2 0 0 1 2 2"></path>
+                        <path d="m12 12 4 10 1.7-4.3L22 16Z"></path>
+                        <path d="M5 21a2 2 0 0 1-2-2"></path>
+                        <path d="M9 3h1"></path>
+                        <path d="M9 21h2"></path>
+                        <path d="M14 3h1"></path>
+                        <path d="M3 9v1"></path>
+                        <path d="M21 9v2"></path>
+                        <path d="M3 14v1"></path>
+                     </svg>
+                  </div>
+                  <span>Highlight Buttons</span>
+               </button>
+               <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
+                  title="Readable Font" tabindex="0">
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-spell-check">
+                        <path d="m6 16 6-12 6 12"></path>
+                        <path d="M8 12h8"></path>
+                        <path d="m16 20 2 2 4-4"></path>
+                     </svg>
+                  </div>
+                  <span>Readable Font</span>
+               </button>
+               <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
+                  title="Friendly Dyslexia" tabindex="0">
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-check">
+                        <path d="M8 3H2v15h7c1.7 0 3 1.3 3 3V7c0-2.2-1.8-4-4-4Z"></path>
+                        <path d="m16 12 2 2 4-4"></path>
+                        <path d="M22 6V3h-6c-2.2 0-4 1.8-4 4v14c0-1.7 1.3-3 3-3h7v-2.3"></path>
+                     </svg>
+                  </div>
+                  <span>Friendly Dyslexia</span>
+               </button>
+            </div>
+            <div class="container-buttons">
+               <button id="alignLeft" class="content-button" role="button" aria-label="align left" title="align left"
+                  tabindex="0">
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-left">
                         <line x1="21" x2="3" y1="6" y2="6"></line>
                         <line x1="15" x2="3" y1="12" y2="12"></line>
                         <line x1="17" x2="3" y1="18" y2="18"></line>
                      </svg>
-</div>
-                            <span>Align Left</span>
-                        </button>
-        
-                        <button id="alignCenter" class="content-button" role="button" aria-label="format align center"
-                                title="format align center" tabindex="0">
-                            <div class="icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-center">
+                  </div>
+                  <span>Align Left</span>
+               </button>
+               <button id="alignCenter" class="content-button" role="button" aria-label="format align center"
+                  title="format align center" tabindex="0">
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-center">
                         <line x1="21" x2="3" y1="6" y2="6"></line>
                         <line x1="17" x2="7" y1="12" y2="12"></line>
                         <line x1="19" x2="5" y1="18" y2="18"></line>
                      </svg>
-</div>
-                            <span>Align Center</span>
-                        </button>
-        
-                        <button id="alignRight" class="content-button" role="button" aria-label="format align right"
-                                title="format align right" tabindex="0">
-                            <div class="icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-right">
+                  </div>
+                  <span>Align Center</span>
+               </button>
+               <button id="alignRight" class="content-button" role="button" aria-label="format align right"
+                  title="format align right" tabindex="0">
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-right">
                         <line x1="21" x2="3" y1="6" y2="6"></line>
                         <line x1="21" x2="9" y1="12" y2="12"></line>
                         <line x1="21" x2="7" y1="18" y2="18"></line>
                      </svg>
-</div>
-                            <span>Align Right</span>
-                        </button>
-                        
-                        </div>
-                        
-                        <div class="range-container" func="${ZOOM_KEY}">
-                            <div class="title-container">
-                                <label for="letterSpacingSlide" class="slider-icon-title">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-expand">
+                  </div>
+                  <span>Align Right</span>
+               </button>
+            </div>
+            <div class="range-container" func="${ZOOM_KEY}">
+               <div class="title-container">
+                  <label for="letterSpacingSlide" class="slider-icon-title">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-expand">
                         <path d="m21 21-6-6m6 6v-4.8m0 4.8h-4.8"></path>
                         <path d="M3 16.2V21m0 0h4.8M3 21l6-6"></path>
                         <path d="M21 7.8V3m0 0h-4.8M21 3l-6 6"></path>
                         <path d="M3 7.8V3m0 0h4.8M3 3l6 6"></path>
                      </svg>
-                                    <span class="slider-title">Content Scaling</span>
-                                </label>
-                            </div>
-                            
-                            <div class="range">
-                                <button class="material-icons arrow left minus-button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
-                                    <path d="m6 9 6 6 6-6"></path>
-                                </svg>
-                                </button>
-                                <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
-                                        <path d="m18 15-6-6-6 6"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            
-                        </div>
-                        
-                        
-                        <div class="range-container" func="${LINE_HEIGHT_KEY}">
-                            <div class="title-container">
-                                <label for="letterSpacingSlide" class="slider-icon-title">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down">
+                     <span class="slider-title">Content Scaling</span>
+                  </label>
+               </div>
+               <div class="range">
+                  <button class="material-icons arrow left minus-button">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                        <path d="m6 9 6 6 6-6"></path>
+                     </svg>
+                  </button>
+                  <div class="base-range">Default</div>
+                  <button class="material-icons arrow right plus-button">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
+                        <path d="m18 15-6-6-6 6"></path>
+                     </svg>
+                  </button>
+               </div>
+            </div>
+            <div class="range-container" func="${LINE_HEIGHT_KEY}">
+               <div class="title-container">
+                  <label for="letterSpacingSlide" class="slider-icon-title">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down">
                         <path d="m7 15 5 5 5-5"></path>
                         <path d="m7 9 5-5 5 5"></path>
                      </svg>
-                                    <span class="slider-title">Line Height</span>
-                                </label>
-                            </div>
-                            
-                            <div class="range">
-                                <button class="material-icons arrow left minus-button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
-                                    <path d="m6 9 6 6 6-6"></path>
-                                </svg>
-                                </button>
-                                <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
-                                        <path d="m18 15-6-6-6 6"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            
-                        </div>
-                        
-                        <div class="range-container" func="${LETTER_SPACING_KEY}">
-                            <div class="title-container">
-                                <label for="letterSpacingSlide" class="slider-icon-title">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-left-right">
+                     <span class="slider-title">Line Height</span>
+                  </label>
+               </div>
+               <div class="range">
+                  <button class="material-icons arrow left minus-button">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                        <path d="m6 9 6 6 6-6"></path>
+                     </svg>
+                  </button>
+                  <div class="base-range">Default</div>
+                  <button class="material-icons arrow right plus-button">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
+                        <path d="m18 15-6-6-6 6"></path>
+                     </svg>
+                  </button>
+               </div>
+            </div>
+            <div class="range-container" func="${LETTER_SPACING_KEY}">
+               <div class="title-container">
+                  <label for="letterSpacingSlide" class="slider-icon-title">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-left-right">
                         <path d="m9 7-5 5 5 5"></path>
                         <path d="m15 7 5 5-5 5"></path>
                      </svg>
-                                    <span class="slider-title">Letter Spacing</span>
-                                </label>
-                            </div>
-                            
-                            <div class="range">
-                                <button class="material-icons arrow left minus-button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
-                                    <path d="m6 9 6 6 6-6"></path>
-                                </svg>
-                                </button>
-                                <div class="base-range">Default</div>
-                                <button class="material-icons arrow right plus-button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
-                                        <path d="m18 15-6-6-6 6"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
+                     <span class="slider-title">Letter Spacing</span>
+                  </label>
+               </div>
+               <div class="range">
+                  <button class="material-icons arrow left minus-button">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                        <path d="m6 9 6 6 6-6"></path>
+                     </svg>
+                  </button>
+                  <div class="base-range">Default</div>
+                  <button class="material-icons arrow right plus-button">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up">
+                        <path d="m18 15-6-6-6 6"></path>
+                     </svg>
+                  </button>
+               </div>
             </div>
-    </div>
-
-
-  <div id="modal-hide" class="app-window" role="application" aria-label="Modal para esconder Widget">
-  
-        <div style="
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 20px;">
-        
-            <div style="
-                width: 60px;
-                height: 60px;
-            ">
-                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="#000000" fill-rule="evenodd" d="M10 3a7 7 0 100 14 7 7 0 000-14zm-9 7a9 9 0 1118 0 9 9 0 01-18 0zm10.01 4a1 1 0 01-1 1H10a1 1 0 110-2h.01a1 1 0 011 1zM11 6a1 1 0 10-2 0v5a1 1 0 102 0V6z"></path> </g></svg>
+         </div>
+      </div>
+      <div class="scrollable-content">
+         <!-- ... Outros botões de configuração ... -->
+         <div class="title">
+            <span>Color</span>
+            <span class="contentButton">
+               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                  <path d="m6 9 6 6 6-6"></path>
+               </svg>
+            </span>
+         </div>
+         <div class="content-buttons">
+         
+         <div class="container-buttons">
+                        
+               <button id="invertedColorsButton" class="content-button" role="button" aria-label="Inversor de cores"
+                  title="Inversor de cores" tabindex="0">
+                  <div class="icon">
+                  </div>
+                  <span>Inverted Colors</span>
+               </button>    
+               
+               <button id="intelligentInvertedColorsButton" class="content-button" role="button" aria-label="Inversor de cores inteligente"
+                  title="Inversor de cores inteligente" tabindex="0">
+                  <div class="icon">
+                  </div>
+                  <span>Intelligent Inverted Colors</span>
+               </button>     
+                        
             </div>
-        
-        
-            <h3 style="text-align: center; margin-top: 7px;">Tem certeza que deseja ocultar a interface de usabilidade?</h3>
-                    
-            <span style="
-                border-bottom: 1px solid #ccc;
-                padding-bottom: 15px;
-                color: #909090;
-                font-size: 13px;
-            ">Optar por ocultar a interface de acessibilidade implica que você não será mais capaz de visualizá-la, a menos que limpe seu histórico de navegação.</span>
-    
-            <div style="
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-top: 20px;
-                gap: 1rem;
-                ">
-                <button id="cancelHide" type="button" class="button-modal">Não, quero manter</button>
-                <button id="submitHide" type="button" class="button-modal button-submit-modal">
-                    <span id="msgBtnDisable">Sim, quero desativar</span>
-                    <div id="loading-bar-spinner" class="spinner"><div class="spinner-icon"></div></div>
-                </button>
+         
+            <div class="container-buttons">
+               
+               <button id="lightContrastColorsButton" class="content-button" role="button" aria-label="Contraste claro"
+                  title="Contraste claro" tabindex="0">
+                  <div class="icon">
+                  </div>
+                  <span>Light Contrast</span>
+               </button>
+               <button id="darkContrastColorsButton" class="content-button" role="button" aria-label="Contraste escuro"
+                  title="Contraste escuro" tabindex="0">
+                  <div class="icon">
+                  </div>
+                  <span>Dark Contrast</span>
+               </button>
+               <button id="highContrastColorsButton" class="content-button" role="button" aria-label="Contraste alto"
+                  title="Contraste alto" tabindex="0">
+                  <div class="icon">
+                  </div>
+                  <span>High Contrast</span>
+               </button>
+               
             </div>
-
-    
-        </div>
-  </div>
-
+            
+            
+            
+            <div class="container-buttons">
+               <button id="highSaturationColorsButton" class="content-button" role="button" aria-label="Contraste alto"
+                  title="Contraste alto" tabindex="0">
+                  <div class="icon">
+                  </div>
+                  <span>High Saturation</span>
+               </button>
+               <button id="lowSaturationColorsButton" class="content-button" role="button" aria-label="Contraste alto"
+                  title="Contraste alto" tabindex="0">
+                  <div class="icon">
+                  </div>
+                  <span>Low Saturation</span>
+               </button>
+                <button id="monochromaticColorsButton" class="content-button" role="button" aria-label="Contraste alto"
+                  title="Monocromatico" tabindex="0" style="line-break: anywhere;">
+                  <div class="icon">
+                  </div>
+                  <span>Monochromatic</span>
+               </button>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+<div id="modal-hide" class="app-window" role="application" aria-label="Modal para esconder Widget">
+   <div style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 20px;">
+      <div style="
+         width: 60px;
+         height: 60px;
+         ">
+         <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier">
+               <path fill="#000000" fill-rule="evenodd" d="M10 3a7 7 0 100 14 7 7 0 000-14zm-9 7a9 9 0 1118 0 9 9 0 01-18 0zm10.01 4a1 1 0 01-1 1H10a1 1 0 110-2h.01a1 1 0 011 1zM11 6a1 1 0 10-2 0v5a1 1 0 102 0V6z"></path>
+            </g>
+         </svg>
+      </div>
+      <h3 style="text-align: center; margin-top: 7px;">Tem certeza que deseja ocultar a interface de usabilidade?</h3>
+      <span style="
+         border-bottom: 1px solid #ccc;
+         padding-bottom: 15px;
+         color: #909090;
+         font-size: 13px;
+         ">Optar por ocultar a interface de acessibilidade implica que você não será mais capaz de visualizá-la, a menos que limpe seu histórico de navegação.</span>
+      <div style="
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         margin-top: 20px;
+         gap: 1rem;
+         ">
+         <button id="cancelHide" type="button" class="button-modal">Não, quero manter</button>
+         <button id="submitHide" type="button" class="button-modal button-submit-modal">
+            <span id="msgBtnDisable">Sim, quero desativar</span>
+            <div id="loading-bar-spinner" class="spinner">
+               <div class="spinner-icon"></div>
+            </div>
+         </button>
+      </div>
+   </div>
+</div>
     `;
 
     // expandWindow.style.display = 'none';
@@ -1358,24 +1428,24 @@ function assignFunctionsToIds() {
         modal.style.setProperty('visibility', 'visible', 'important');
         modal.style.setProperty('transform', 'translate(-50%, -20%)', 'important');
     });
+
 //
 //     //TITLE
 //
-    contentButton = shadowR.querySelector("#contentButton");
-    contentButton.addEventListener('click', ()=>{
+    contentButton = shadowR.querySelectorAll('.contentButton');
+    contentButton.forEach(elemento => {
+        elemento.addEventListener('click', () => {
 
-        let content = shadowR.querySelectorAll('.content-buttons')[0];
-        let arrow = shadowR.querySelector('#contentButton');
+            let content = elemento.parentElement.parentElement.children[1];
+            if(content.classList.contains('active')) {
+                content.classList.remove('active')
+                elemento.style.setProperty('transform', 'rotate(90deg)', 'important');
+            } else {
+                content.classList.toggle('active');
+                elemento.style.setProperty('transform', 'rotate(0deg)', 'important');
+            }
 
-        if(content.classList.contains('active')) {
-            content.classList.remove('active')
-            arrow.style.setProperty('transform', 'rotate(90deg)', 'important');
-        } else {
-            content.classList.toggle('active');
-            arrow.style.setProperty('transform', 'rotate(0deg)', 'important');
-        }
-
-
+        });
     });
 
 
@@ -1417,6 +1487,51 @@ function assignFunctionsToIds() {
     alignRight.addEventListener('click', ()=> {
         changeAlignText(3);
     });
+
+
+//    COLORS
+    invertedColorsButton = shadowR.querySelector("#invertedColorsButton");
+    invertedColorsButton.addEventListener('click', ()=> {
+        changeColorContrast(1, document.activeElement.parentElement.parentElement)
+    });
+
+    intelligentInvertedColorsButton = shadowR.querySelector("#intelligentInvertedColorsButton");
+    intelligentInvertedColorsButton.addEventListener('click', ()=> {
+        changeColorContrast(2, document.activeElement.parentElement.parentElement)
+    });
+
+
+    lightContrastColorsButton = shadowR.querySelector("#lightContrastColorsButton");
+    lightContrastColorsButton.addEventListener('click', ()=> {
+        changeColorContrast(3, document.activeElement.parentElement.parentElement)
+    });
+
+    darkContrastColorsButton = shadowR.querySelector("#darkContrastColorsButton");
+    darkContrastColorsButton.addEventListener('click', ()=> {
+        changeColorContrast(4, document.activeElement.parentElement.parentElement)
+    });
+
+    highContrastColorsButton = shadowR.querySelector("#highContrastColorsButton");
+    highContrastColorsButton.addEventListener('click', ()=> {
+        changeColorContrast(5, document.activeElement.parentElement.parentElement)
+    });
+
+
+    highSaturationColorsButton = shadowR.querySelector("#highSaturationColorsButton");
+    highSaturationColorsButton.addEventListener('click', ()=> {
+        changeColorSaturation(1, document.activeElement.parentElement.parentElement)
+    });
+
+    lowSaturationColorsButton = shadowR.querySelector("#lowSaturationColorsButton");
+    lowSaturationColorsButton.addEventListener('click', ()=> {
+        changeColorSaturation(2, document.activeElement.parentElement.parentElement)
+    });
+
+    monochromaticColorsButton = shadowR.querySelector("#monochromaticColorsButton");
+    monochromaticColorsButton.addEventListener('click', ()=> {
+        changeColorSaturation(3, document.activeElement.parentElement.parentElement)
+    });
+
 
 //    MODAL HIDE
 
@@ -2173,16 +2288,16 @@ function highlightHeading() {
 
 
                 if (buscaYellow) {
-                    txtTag.style.background = yellowColors[buscaYellow].outroAtributo;
+                    txtTag.style.setProperty('background', yellowColors[buscaYellow].outroAtributo, 'important');
 
                 } else {
-                    txtTag.style.background = '#FFFF00';
+                    txtTag.style.setProperty('background', '#FFFF00', 'important');
                 }
 
                 if (buscaBlack) {
-                    txtTag.style.color = blackColors[buscaBlack].outroAtributo;
+                    txtTag.style.setProperty('color', blackColors[buscaBlack].outroAtributo, 'important');
                 } else {
-                    txtTag.style.color = '#000';
+                    txtTag.style.setProperty('color', '#000', 'important');
                 }
 
                 txtTag.setAttribute('data-inclowee-hlh-styled', 'true');
@@ -2248,16 +2363,16 @@ function highlightLinks() {
 
 
             if (buscaYellow) {
-                txtTag.style.background = yellowColors[buscaYellow].outroAtributo;
-
+                txtTag.style.setProperty('background', yellowColors[buscaYellow].outroAtributo, 'important');
             } else {
-                txtTag.style.background = '#FFFF00';
+                txtTag.style.setProperty('background', '#FFFF00', 'important');
             }
 
             if (buscaBlack) {
-                txtTag.style.color = blackColors[buscaBlack].outroAtributo;
+                txtTag.style.setProperty('color', blackColors[buscaBlack].outroAtributo, 'important');
+
             } else {
-                txtTag.style.color = '#000';
+                txtTag.style.setProperty('color', '#000', 'important');
             }
 
             txtTag.setAttribute('data-inclowee-hll-styled', 'true');
@@ -2307,15 +2422,17 @@ function highlightButtons() {
 
             if(!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
                 if (buscaYellow) {
-                    txtTag.style.background = yellowColors[buscaYellow].outroAtributo;
+                    txtTag.style.setProperty('background', yellowColors[buscaYellow].outroAtributo, 'important');
+
                 } else {
-                    txtTag.style.background = '#FFFF00';
+                    txtTag.style.setProperty('background', '#FFFF00', 'important');
                 }
 
                 if (buscaBlack) {
-                    txtTag.style.color = blackColors[buscaBlack].outroAtributo;
+                    txtTag.style.setProperty('color', blackColors[buscaBlack].outroAtributo, 'important');
+
                 } else {
-                    txtTag.style.color = '#000';
+                    txtTag.style.setProperty('color', '#000', 'important');
                 }
 
                 txtTag.setAttribute('data-inclowee-hlb-styled', 'true');
@@ -2374,11 +2491,6 @@ function setFontFamily() {
 
     if (indexActualFontFamily !== null) {
 
-        let styleDyslexic = document.getElementById("dyslexic-font");
-
-        if ((indexActualFontFamily === 1 || indexActualFontFamily === 2) && styleDyslexic == null) {
-            createStyleFontDyslexic();
-        }
 
         let selectedFontFamily = fontes[indexActualFontFamily];
         let elements = document
@@ -2394,14 +2506,6 @@ function setFontFamily() {
 
             if (selectedFontFamily === '') {
                 removeItemFromLocalStorage("font-family");
-
-                if (styleDyslexic) {
-                    let dadStyleDyslexic = styleDyslexic.parentNode;
-                    if(dadStyleDyslexic !== null) {
-                        dadStyleDyslexic.removeChild(styleDyslexic);
-                    }
-                }
-
             }
 
         }
@@ -2425,19 +2529,203 @@ function setFontFamily() {
 
 }
 
-
-function createStyleFontDyslexic() {
+function createStyleGlobal() {
     // Cria um elemento <style>
     let estiloGlobal = document.createElement('style');
-    estiloGlobal.setAttribute("id", "dyslexic-font")
+    estiloGlobal.setAttribute("id", "incloowe-style")
     let estilo = document.createTextNode(' @font-face {\n' +
         '            font-family: \'OpenDyslexic\';\n' +
         '            src: url("https://raw.githack.com/irwing-moura/acessibrasil/main/OpenDyslexic-Regular.woff");,\n' +
         '            url("OpenDyslexic-Regular.woff");\n' +
         '            font-weight: normal;\n' +
         '            font-style: normal;\n' +
-        '        }');
+        '        } ' +
+        '.inverted { filter: invert(100%) !important; background: #fff !important; } ' +
+
+        '.light-contrast { background-color: #fff !important; color: #181818 !important; } ' +
+        'h1.light-contrast, h2.light-contrast, h3.light-contrast, h4.light-contrast, h5.light-contrast, h6.light-contrast { background-color: #fff !important; color: #075f39 !important; } ' +
+        'button.light-contrast { background-color: #fff !important; color: #000 !important; border-color: #000 !important; } ' +
+        'a.light-contrast { color: #181818 !important; border-color: #181818; background-color:#fff !important; } ' +
+        'a.light-contrast:hover { color: #181818 !important; outline: aqua solid 2px !important; outline-offset: 1px !important; background-color:#fff !important; } ' +
+
+        '.dark-contrast { background-color: #181818 !important; color: #fff !important;} ' +
+        'h1.dark-contrast, h2.dark-contrast, h3.dark-contrast, h4.dark-contrast, h5.dark-contrast, h6.dark-contrast { color: #50d0a0 !important; } ' +
+        'a.dark-contrast { background-color: #181818 !important; color: #fcff3c !important; border-color: #fff; } ' +
+        'a.dark-contrast:hover { background-color: #181818 !important; color: #fcff3c !important; outline: rgb(242, 167, 98) solid 2px !important; outline-offset: 1px !important; } ' +
+        'button.dark-contrast { background-color: #181818 !important; border-color: #fff !important; outline: rgb(242, 167, 98) solid 2px !important; outline-offset: 1px !important;} ' +
+
+        '.high-saturation { filter: saturate(3) !important; } ' +
+        '.low-saturation { filter: saturate(0.5) !important; } ' +
+        '.mono-saturation { filter: grayscale(100%) !important; } '
+    );
+
 
     estiloGlobal.appendChild(estilo);
-    document.body.appendChild(estiloGlobal)
+
+    const estiloFilter = document.createElement('style');
+    estiloFilter.setAttribute("id", "filter-incloowe");
+
+    document.head.appendChild(estiloGlobal);
+    document.head.appendChild(estiloFilter);
+}
+
+
+//COLORS
+function loadContrastColors() {
+    if(colorsContrast != null) {
+        setColorContrast(document.activeElement.parentElement);
+    }
+}
+
+function changeColorContrast(contrast, html) {
+
+    let colorContrastSaved = getItemFromLocalStorageWithExpiry("colors-contrast");
+
+    if(colorContrastSaved !== null && colorContrastSaved.value === contrast) {
+        indexActualColorContrast = 0;
+    }else {
+        indexActualColorContrast = contrast;
+    }
+
+    setColorContrast(html);
+
+    if(indexActualColorContrast === 0) {
+        removeItemFromLocalStorage("colors-contrast");
+    } else {
+        setItemToLocalStorageWithExpiry("colors-contrast",
+            indexActualColorContrast,
+            null);
+    }
+
+}
+
+
+function setColorContrast(html) {
+    const filterStyle = document.getElementById('filter-incloowe');
+
+    if (indexActualColorContrast !== null) {
+        const selectedColorContrast = contrasts[indexActualColorContrast];
+        const txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, h6, a, span, blockquote, code, dd, dt, input, label, legend, li, p, pre, select, textarea');
+        const buttons = document.querySelectorAll('button');
+
+        const removeContrastClasses = () => {
+
+            filterStyle.innerHTML = '';
+
+            txtTags.forEach(txtTag => {
+                txtTag.classList.remove("light-contrast", "dark-contrast");
+            });
+            buttons.forEach(button => {
+                button.classList.remove("light-contrast", "dark-contrast");
+            });
+        };
+
+
+        html.classList.remove("inverted", "dark-contrast", "light-contrast");
+        removeContrastClasses();
+
+        switch (selectedColorContrast) {
+            case 'inverted':
+                filterStyle.innerHTML = 'body > *:not(#shadow) { filter: invert(100%) !important; background: #fff !important; }';
+                // filterStyle.innerHTML = '';
+                break;
+            case 'int-inverted':
+                filterStyle.innerHTML = 'body > *:not(#shadow) { filter: invert(100%) !important; background: #fff !important; }' +
+                    ' img, video, iframe, picture, svg { filter: invert(1); }';
+                // filterStyle.innerHTML = '';
+                break;
+            case 'light':
+                filterStyle.innerHTML = 'body > *:not(#shadow) { background-color: #fff !important; color: #181818 !important; }';
+                txtTags.forEach(txtTag => txtTag.classList.add("light-contrast"));
+                buttons.forEach(button => button.classList.add("light-contrast"));
+
+                break;
+            case 'dark':
+                filterStyle.innerHTML = 'body > *:not(#shadow) { background-color: #181818 !important; color: #fff !important; }';
+                txtTags.forEach(txtTag => txtTag.classList.add("dark-contrast"));
+                buttons.forEach(button => button.classList.add("dark-contrast"));
+                break;
+            case 'high':
+                removeContrastClasses();
+                filterStyle.innerHTML = 'body > *:not(#shadow) { filter: contrast(135%) !important; }';
+                break;
+            default:
+                removeContrastClasses();
+        }
+
+        const buttonsMap = {
+            1: invertedColorsButton,
+            2: intelligentInvertedColorsButton,
+            3: lightContrastColorsButton,
+            4: darkContrastColorsButton,
+            5: highContrastColorsButton,
+        };
+        const selectedButton = buttonsMap[indexActualColorContrast] || null;
+        const otherButtons = Object.values(buttonsMap).filter(button => button !== selectedButton);
+        changeStyleButtonSelectedAndDeselectOthers(selectedButton, otherButtons);
+    }
+}
+
+function loadSaturationColors() {
+    if(colorsSaturation != null) {
+        setColorSaturation(document.activeElement.parentElement);
+    }
+}
+
+function changeColorSaturation(saturation, html) {
+
+    let colorSaturationSaved = getItemFromLocalStorageWithExpiry("colors-saturation");
+
+    if(colorSaturationSaved !== null && colorSaturationSaved.value === saturation) {
+        indexActualColorSaturation = 0;
+    }else {
+        indexActualColorSaturation = saturation;
+    }
+
+    setColorSaturation(html);
+
+    if(indexActualColorSaturation === 0) {
+        removeItemFromLocalStorage("colors-saturation");
+    } else {
+        setItemToLocalStorageWithExpiry("colors-saturation",
+            indexActualColorSaturation,
+            null);
+    }
+
+}
+
+function setColorSaturation(html) {
+
+    const filterStyle = document.getElementById('filter-incloowe');
+
+    if (indexActualColorSaturation !== null) {
+        const selectedColorSaturation = saturations[indexActualColorSaturation];
+        html.classList.remove("high-saturation", "low-saturation", "mono-saturation");
+
+        switch (selectedColorSaturation) {
+            case 'high':
+                html.classList.add("high-saturation");
+                // filterStyle.innerHTML = 'body > *:not(#shadow) { filter: saturate(3) !important; }';
+                break;
+            case 'low':
+                html.classList.add("low-saturation");
+                // filterStyle.innerHTML = 'body > *:not(#shadow) { filter: saturate(0.5) !important; }';
+                break;
+            case 'mono':
+                html.classList.add("mono-saturation");
+                // filterStyle.innerHTML = 'body > *:not(#shadow) { filter: grayscale(100%) !important; }';
+                break;
+            default:
+                html.classList.remove("high", "low", "mono");
+        }
+
+        const buttonsMap = {
+            1: highSaturationColorsButton,
+            2: lowSaturationColorsButton,
+            3: monochromaticColorsButton
+        };
+        const selectedButton = buttonsMap[indexActualColorSaturation] || null;
+        const otherButtons = Object.values(buttonsMap).filter(button => button !== selectedButton);
+        changeStyleButtonSelectedAndDeselectOthers(selectedButton, otherButtons);
+    }
 }
