@@ -16,6 +16,10 @@ const INVERTED_COLORS_KEY = "inverted-colors";
 const COLORS_CONTRAST_KEY = "colors-contrast";
 const COLORS_SATURATION_KEY = "colors-saturation";
 
+const ADJUST_TEXT_COLOR_KEY = "adjust-text-color"
+const ADJUST_TITLE_COLOR_KEY = "adjust-title-color"
+const ADJUST_BACKGROUND_COLOR_KEY = "adjust-background-color"
+
 
 let widgetStatus = getItemFromLocalStorageWithExpiry(WIDGET_STATUS);
 
@@ -36,6 +40,10 @@ let colorsContrast = getItemFromLocalStorageWithExpiry(COLORS_CONTRAST_KEY);
 
 //COLORS SATURATION
 let colorsSaturation = getItemFromLocalStorageWithExpiry(COLORS_SATURATION_KEY);
+
+let adjustTextColor = getItemFromLocalStorageWithExpiry(ADJUST_TEXT_COLOR_KEY);
+let adjustTitleColor = getItemFromLocalStorageWithExpiry(ADJUST_TITLE_COLOR_KEY);
+let adjustBackgroundColor = getItemFromLocalStorageWithExpiry(ADJUST_BACKGROUND_COLOR_KEY);
 
 //botao abrir
 let expandButton;
@@ -91,119 +99,119 @@ let indexActualColorContrast = colorsContrast != null ? colorsContrast.value : c
 let saturations = ['', 'high', 'low', 'mono'];
 let indexActualColorSaturation = colorsSaturation != null ? colorsSaturation.value : colorsSaturation;
 
-let yellowColors  = {
+let yellowColors = {
     "cor1": {
-    "valor": "#FFFFE0",
+        "valor": "#FFFFE0",
         "outroAtributo": "green"
-},
+    },
     "cor2": {
-    "valor": "#FFFACD",
+        "valor": "#FFFACD",
         "outroAtributo": "Valor para a cor 2"
-},
+    },
     "cor3": {
-    "valor": "#FADA5E",
+        "valor": "#FADA5E",
         "outroAtributo": "Valor para a cor 3"
-},
+    },
     "cor4": {
-    "valor": "#FFC30B",
+        "valor": "#FFC30B",
         "outroAtributo": "Valor para a cor 4"
-},
+    },
     "cor5": {
-    "valor": "#FFD700",
+        "valor": "#FFD700",
         "outroAtributo": "Valor para a cor 5"
-},
+    },
     "cor6": {
-    "valor": "#FFDB58",
+        "valor": "#FFDB58",
         "outroAtributo": "Valor para a cor 6"
-},
+    },
     "cor7": {
-    "valor": "#E9D66B",
+        "valor": "#E9D66B",
         "outroAtributo": "Valor para a cor 7"
-},
+    },
     "cor8": {
-    "valor": "#FFEA00",
+        "valor": "#FFEA00",
         "outroAtributo": "Valor para a cor 8"
-},
+    },
     "cor9": {
-    "valor": "#FFF44F",
+        "valor": "#FFF44F",
         "outroAtributo": "Valor para a cor 9"
-},
+    },
     "cor10": {
-    "valor": "#FFC40C",
+        "valor": "#FFC40C",
         "outroAtributo": "Valor para a cor 10"
-},
+    },
     "cor11": {
-    "valor": "#FDDA0D",
+        "valor": "#FDDA0D",
         "outroAtributo": "Valor para a cor 11"
-},
+    },
     "cor12": {
-    "valor": "#FFDA03",
+        "valor": "#FFDA03",
         "outroAtributo": "Valor para a cor 12"
-},
+    },
     "cor13": {
-    "valor": "#CC7722",
+        "valor": "#CC7722",
         "outroAtributo": "Valor para a cor 13"
-},
+    },
     "cor14": {
-    "valor": "#ADFF2F",
+        "valor": "#ADFF2F",
         "outroAtributo": "Valor para a cor 14"
-},
+    },
     "cor15": {
-    "valor": "#FDFD96",
+        "valor": "#FDFD96",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
     "cor16": {
-    "valor": "#FFBF00",
+        "valor": "#FFBF00",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
     "cor17": {
-    "valor": "#F0A804",
+        "valor": "#F0A804",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
     "cor18": {
-    "valor": "#FFD02E",
+        "valor": "#FFD02E",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
     "cor19": {
-    "valor": "#CCFF00",
+        "valor": "#CCFF00",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
     "cor20": {
-    "valor": "#CCEE22",
+        "valor": "#CCEE22",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
     "cor21": {
-    "valor": "#FFFF33",
+        "valor": "#FFFF33",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
 //     "cor22": {
 //     "valor": "#FFFF00",
 //         "outroAtributo": "Valor para a cor 15"
 // },
     "cor23": {
-    "valor": "#CCFF66",
+        "valor": "#CCFF66",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
     "cor24": {
-    "valor": "#CCFF33",
+        "valor": "#CCFF33",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
     "cor25": {
-    "valor": "#DFFF00",
+        "valor": "#DFFF00",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
     "cor26": {
-    "valor": "#FFFF99",
+        "valor": "#FFFF99",
         "outroAtributo": "Valor para a cor 15"
-},
+    },
     "cor27": {
-    "valor": "#FFFF66",
+        "valor": "#FFFF66",
         "outroAtributo": "Valor para a cor 15"
-}
+    }
 
 }
 
-let orangeColors  = {
+let orangeColors = {
     "cor1": {
         "valor": "#FF4500",
         "outroAtributo": "Valor para a cor 1"
@@ -218,7 +226,7 @@ let orangeColors  = {
     }
 }
 
-let blackColors  = {
+let blackColors = {
     "cor1": {
         "valor": "#000000",
         "outroAtributo": "Valor para a cor 1"
@@ -315,18 +323,19 @@ const tagsQueDevemMostrarBalaoMesmoComMaisDeUmItem = [
 ];
 
 window.acessiBrasil.init = function init() {
-    if(widgetStatus === null) {
+    if (widgetStatus === null) {
         createWidget();
     }
 }
 
-if(widgetStatus == null)  {
+if (widgetStatus == null) {
     window.addEventListener("load", (event) => {
 
         shadowR = document.getElementById("shadow").shadowRoot;
 
         createStyleGlobal();
         assignFunctionsToIds();
+        assignAdjustColorsEventListeners();
         loadFontSize();
         loadZoom();
         loadLineHeight();
@@ -339,8 +348,12 @@ if(widgetStatus == null)  {
         setAlignText();
         loadContrastColors();
         loadSaturationColors();
+        loadTextColor();
+        loadTitleColor();
+        loadBackgroundColor();
 
-        console.log = function() {
+
+        console.log = function () {
             // Obtém o elemento onde as mensagens serão exibidas
             var consoleLog = document.getElementById('consoleLog');
             // Concatena todas as mensagens de log com um espaço entre elas
@@ -350,7 +363,7 @@ if(widgetStatus == null)  {
         };
 
         let modalAppWindow = shadowR.querySelector('#appWindow');
-        modalAppWindow.addEventListener('click', (event)=> {
+        modalAppWindow.addEventListener('click', (event) => {
             if (event.target.id === 'appWindow') {
                 toggleExpandWindow();
             }
@@ -358,7 +371,6 @@ if(widgetStatus == null)  {
 
     });
 }
-
 
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
@@ -701,6 +713,7 @@ button {
   justify-content: center;
   padding: 20px;
   box-sizing: border-box; /* Garante que as dimensões incluam a borda e o preenchimento */
+  align-items: center;
 }
 
 
@@ -902,6 +915,42 @@ button {
     background: #fff;
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  }
+  
+  .color-picker {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+  
+  .color-pick {
+   
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    border: solid 0.5px #ccc;
+    cursor: pointer;
+    padding: 0 2px;
+    color: white;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    
+  }
+  
+  .color-pick-selected {
+    outline: 2px solid #1A6EFF;
+  }
+  
+  .link-default-color {
+    font-size: 12px;
+    text-decoration: none;
+    color: #505050;
+  }
+  
+  .link-default-color:hover {
+    text-decoration: underline;
   }
   
   
@@ -1282,6 +1331,144 @@ button {
                   <span>Monochromatic</span>
                </button>
             </div>
+            <div data-test="adjustTextColor" class="range-container">
+                <div class="title-container">
+                  <label for="letterSpacingSlide" class="slider-icon-title">
+                     <span class="slider-title">Adjust Text Colors</span>
+                  </label>
+               </div>
+               <div class="color-picker">
+               
+                   <button class="color-pick" aria-label="Change Color to Blue"
+                    tabindex="0" 
+                    style="background-color: rgb(0, 118, 180)">
+                   
+                    </button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Purple"
+                    tabindex="0" 
+                    style="background-color: rgb(122, 84, 156)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Red"
+                    tabindex="0" 
+                    style="background-color: rgb(200, 55, 51)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Orange"
+                    tabindex="0" 
+                    style="background-color: rgb(208, 112, 33)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Teal"
+                    tabindex="0" 
+                    style="background-color: rgb(38, 153, 159)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Green"
+                    tabindex="0" 
+                    style="background-color: rgb(77, 120, 49)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to White"
+                    tabindex="0" 
+                    style="background-color: rgb(255, 255, 255)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Black"
+                    tabindex="0" 
+                    style="background-color: rgb(0, 0, 0)"></button>
+                
+               </div>
+               
+               <a href="#" class="link-default-color">Default</a>
+               
+            </div>
+            <div data-test="adjustTitleColor" class="range-container">
+                <div class="title-container">
+                  <label for="letterSpacingSlide" class="slider-icon-title">
+                     <span class="slider-title">Adjust Title Colors</span>
+                  </label>
+               </div>
+               <div class="color-picker">
+               
+                   <button class="color-pick" aria-label="Change Color to Blue"
+                    tabindex="0" 
+                    style="background-color: rgb(0, 118, 180)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Purple"
+                    tabindex="0" 
+                    style="background-color: rgb(122, 84, 156)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Red"
+                    tabindex="0" 
+                    style="background-color: rgb(200, 55, 51)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Orange"
+                    tabindex="0" 
+                    style="background-color: rgb(208, 112, 33)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Teal"
+                    tabindex="0" 
+                    style="background-color: rgb(38, 153, 159)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Green"
+                    tabindex="0" 
+                    style="background-color: rgb(77, 120, 49)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to White"
+                    tabindex="0" 
+                    style="background-color: rgb(255, 255, 255)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Black"
+                    tabindex="0" 
+                    style="background-color: rgb(0, 0, 0)"></button>
+                
+               </div>
+               
+               <a href="#" class="link-default-color">Default</a>
+
+               
+            </div>
+            <div data-test="adjustBackgroundColor" class="range-container">
+                <div class="title-container">
+                  <label for="letterSpacingSlide" class="slider-icon-title">
+                     <span class="slider-title">Adjust Background Colors</span>
+                  </label>
+               </div>
+               <div class="color-picker">
+               
+                   <button class="color-pick" aria-label="Change Color to Blue"
+                    tabindex="0" 
+                    style="background-color: rgb(0, 118, 180)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Purple"
+                    tabindex="0" 
+                    style="background-color: rgb(122, 84, 156)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Red"
+                    tabindex="0" 
+                    style="background-color: rgb(200, 55, 51)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Orange"
+                    tabindex="0" 
+                    style="background-color: rgb(208, 112, 33)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Teal"
+                    tabindex="0" 
+                    style="background-color: rgb(38, 153, 159)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Green"
+                    tabindex="0" 
+                    style="background-color: rgb(77, 120, 49)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to White"
+                    tabindex="0" 
+                    style="background-color: rgb(255, 255, 255)"></button>
+                    
+                    <button class="color-pick" aria-label="Change Color to Black"
+                    tabindex="0" 
+                    style="background-color: rgb(0, 0, 0)"></button>
+                
+               </div>
+               
+               <a href="#" class="link-default-color">Default</a>
+               
+            </div>
          </div>
       </div>
    </div>
@@ -1353,7 +1540,6 @@ button {
 }
 
 
-
 function assignFunctionsToIds() {
 
     let shadowR = document.getElementById("shadow").shadowRoot;
@@ -1366,29 +1552,26 @@ function assignFunctionsToIds() {
             // let percentageElement = elemento.offsetParent.children[1];
             let percentAcrescentar;
 
-            if(elemento.className.includes('minus-button')) {
+            if (elemento.className.includes('minus-button')) {
                 percentAcrescentar = -10;
 
-            } else if(elemento.className.includes('plus-button')) {
+            } else if (elemento.className.includes('plus-button')) {
                 percentAcrescentar = 10;
             }
 
             const elementoPai = elemento.parentNode.parentNode;
             let func = elementoPai.getAttribute('func');
 
-            if(func === FONT_SIZE_KEY) {
+            if (func === FONT_SIZE_KEY) {
                 percentAcrescentar = currentFontSize != null ? currentFontSize.percentage + percentAcrescentar : percentAcrescentar;
                 updateFontSizeSlide(percentAcrescentar);
-            }
-            else if(func === ZOOM_KEY) {
+            } else if (func === ZOOM_KEY) {
                 percentAcrescentar = currentZoom != null ? currentZoom.percentage + percentAcrescentar : percentAcrescentar;
                 updateZoomSlide(percentAcrescentar);
-            }
-            else if(func === LINE_HEIGHT_KEY) {
+            } else if (func === LINE_HEIGHT_KEY) {
                 percentAcrescentar = currentLineHeight != null ? currentLineHeight.percentage + percentAcrescentar : percentAcrescentar;
                 updateLineHeightSlide(percentAcrescentar);
-            }
-            else if(func === LETTER_SPACING_KEY) {
+            } else if (func === LETTER_SPACING_KEY) {
                 percentAcrescentar = currentLetterSpacing != null ? currentLetterSpacing.percentage + percentAcrescentar : percentAcrescentar;
                 updateLetterSpacingSlide(percentAcrescentar);
             }
@@ -1413,12 +1596,12 @@ function assignFunctionsToIds() {
     resetButton.addEventListener('click', clearLocalStorage);
 
     createshortcutsButton = shadowR.querySelector("#createshortcuts");
-    createshortcutsButton.addEventListener('click', ()=>{
+    createshortcutsButton.addEventListener('click', () => {
         alert('Não esta pronto ainda, meu chapinha!');
     });
 
     hideButton = shadowR.querySelector("#hideButton");
-    hideButton.addEventListener('click', ()=>{
+    hideButton.addEventListener('click', () => {
 
         const appWindow = shadowR.querySelector("#appWindow");
         appWindow.style.setProperty('background', 'rgb(0 0 0 / 30%)', 'important');
@@ -1437,7 +1620,7 @@ function assignFunctionsToIds() {
         elemento.addEventListener('click', () => {
 
             let content = elemento.parentElement.parentElement.children[1];
-            if(content.classList.contains('active')) {
+            if (content.classList.contains('active')) {
                 content.classList.remove('active')
                 elemento.style.setProperty('transform', 'rotate(90deg)', 'important');
             } else {
@@ -1464,71 +1647,71 @@ function assignFunctionsToIds() {
     highlightButtonsButton.addEventListener('click', highlightButtons);
 
     readableFontButton = shadowR.querySelector("#readableFontButton");
-    readableFontButton.addEventListener('click', ()=> {
+    readableFontButton.addEventListener('click', () => {
         changeFontFamily(1);
     });
 
     friendlyDyslexiaButton = shadowR.querySelector("#friendlyDyslexiaButton");
-    friendlyDyslexiaButton.addEventListener('click', ()=> {
+    friendlyDyslexiaButton.addEventListener('click', () => {
         changeFontFamily(2);
     });
 
     alignLeft = shadowR.querySelector("#alignLeft");
-    alignLeft.addEventListener('click', ()=> {
-       changeAlignText(1);
+    alignLeft.addEventListener('click', () => {
+        changeAlignText(1);
     });
 
     alignCenter = shadowR.querySelector("#alignCenter");
-    alignCenter.addEventListener('click', ()=> {
+    alignCenter.addEventListener('click', () => {
         changeAlignText(2);
     });
 
     alignRight = shadowR.querySelector("#alignRight");
-    alignRight.addEventListener('click', ()=> {
+    alignRight.addEventListener('click', () => {
         changeAlignText(3);
     });
 
 
 //    COLORS
     invertedColorsButton = shadowR.querySelector("#invertedColorsButton");
-    invertedColorsButton.addEventListener('click', ()=> {
+    invertedColorsButton.addEventListener('click', () => {
         changeColorContrast(1, document.activeElement.parentElement.parentElement)
     });
 
     intelligentInvertedColorsButton = shadowR.querySelector("#intelligentInvertedColorsButton");
-    intelligentInvertedColorsButton.addEventListener('click', ()=> {
+    intelligentInvertedColorsButton.addEventListener('click', () => {
         changeColorContrast(2, document.activeElement.parentElement.parentElement)
     });
 
 
     lightContrastColorsButton = shadowR.querySelector("#lightContrastColorsButton");
-    lightContrastColorsButton.addEventListener('click', ()=> {
+    lightContrastColorsButton.addEventListener('click', () => {
         changeColorContrast(3, document.activeElement.parentElement.parentElement)
     });
 
     darkContrastColorsButton = shadowR.querySelector("#darkContrastColorsButton");
-    darkContrastColorsButton.addEventListener('click', ()=> {
+    darkContrastColorsButton.addEventListener('click', () => {
         changeColorContrast(4, document.activeElement.parentElement.parentElement)
     });
 
     highContrastColorsButton = shadowR.querySelector("#highContrastColorsButton");
-    highContrastColorsButton.addEventListener('click', ()=> {
+    highContrastColorsButton.addEventListener('click', () => {
         changeColorContrast(5, document.activeElement.parentElement.parentElement)
     });
 
 
     highSaturationColorsButton = shadowR.querySelector("#highSaturationColorsButton");
-    highSaturationColorsButton.addEventListener('click', ()=> {
+    highSaturationColorsButton.addEventListener('click', () => {
         changeColorSaturation(1, document.activeElement.parentElement.parentElement)
     });
 
     lowSaturationColorsButton = shadowR.querySelector("#lowSaturationColorsButton");
-    lowSaturationColorsButton.addEventListener('click', ()=> {
+    lowSaturationColorsButton.addEventListener('click', () => {
         changeColorSaturation(2, document.activeElement.parentElement.parentElement)
     });
 
     monochromaticColorsButton = shadowR.querySelector("#monochromaticColorsButton");
-    monochromaticColorsButton.addEventListener('click', ()=> {
+    monochromaticColorsButton.addEventListener('click', () => {
         changeColorSaturation(3, document.activeElement.parentElement.parentElement)
     });
 
@@ -1551,15 +1734,15 @@ function hideWidget() {
     msg.style.setProperty('display', 'none');
     spinner.style.setProperty('display', 'block');
 
-    setTimeout(function() {
+    setTimeout(function () {
         clearLocalStorage();
         setItemToLocalStorageWithExpiry("widget-status", 'hide', null);
     }, 1500);
 
 }
 
-function changeTextAndColorRangeValue(percentAcrescentar, percentageElement){
-    if(percentAcrescentar === 0) {
+function changeTextAndColorRangeValue(percentAcrescentar, percentageElement) {
+    if (percentAcrescentar === 0) {
         percentageElement.style.setProperty('color', '#686868', 'important');
         percentageElement.textContent = 'Default';
     } else {
@@ -1571,11 +1754,11 @@ function changeTextAndColorRangeValue(percentAcrescentar, percentageElement){
 function changeStyleButtonSelected(id) {
 
 
-    if(id.style.background === 'rgb(26, 110, 255)') {
+    if (id.style.background === 'rgb(26, 110, 255)') {
         id.style.background = '#ffffff';
         // id.style.borderColor = 'transparent';
         id.style.color = '#000';
-    }else {
+    } else {
         id.style.background = '#1a6eff'; //#ffffff
         // id.style.borderColor = '#1a6eff'; //#8e8e8e
         id.style.color = '#fff'; //#000
@@ -1587,7 +1770,7 @@ function changeStyleButtonSelected(id) {
 function changeStyleButtonSelectedAndDeselectOthers(idActivate, idsDisable) {
 
 
-    if(idActivate !== null) {
+    if (idActivate !== null) {
         idActivate.style.setProperty('background', '#1a6eff', 'important');
         idActivate.style.setProperty('borderColor', '#1a6eff', 'important');
         idActivate.style.setProperty('color', '#fff', 'important');
@@ -1614,7 +1797,7 @@ function toggleExpandWindow() {
 
     let screenWidth = window.innerWidth;
 
-    if(appWindow.style.opacity === '0' || appWindow.style.opacity === '') {
+    if (appWindow.style.opacity === '0' || appWindow.style.opacity === '') {
 
 
         widget.style.setProperty('transform', 'translate(0, 0)', 'important');
@@ -1629,7 +1812,7 @@ function toggleExpandWindow() {
         modal.style.setProperty('visibility', 'hidden', 'important');
         modal.style.setProperty('transform', 'translate(-50%, -100%)', 'important');
 
-    } else if(appWindow.style.opacity === '1') {
+    } else if (appWindow.style.opacity === '1') {
 
 
         widget.style.setProperty('transform', 'translate(0, 50%)', 'important');
@@ -1637,7 +1820,7 @@ function toggleExpandWindow() {
         appWindow.style.setProperty('opacity', '0', 'important');
         appWindow.style.setProperty('visibility', 'hidden', 'important');
         button.style.setProperty('display', 'flex', 'important');
-        shadowR.querySelector(".content-container").scrollTo({ top: 0});
+        shadowR.querySelector(".content-container").scrollTo({top: 0});
 
     }
 
@@ -1650,7 +1833,7 @@ function toggleExpandWindow() {
 function updateFontSizeSlide(defaultPercentage) {
 
 
-    if(defaultPercentage > 200 || defaultPercentage < -200) {
+    if (defaultPercentage > 200 || defaultPercentage < -200) {
         return;
     }
 
@@ -1665,7 +1848,6 @@ function updateFontSizeSlide(defaultPercentage) {
             // txtTag.style.fontSize = newSize + 'px';
             txtTag.style.setProperty('font-size', newSize + 'px', 'important');
         }
-
 
 
     });
@@ -1691,10 +1873,10 @@ function loadFontSize() {
 
     const lastLeafElementsWithText = getLastLeafElementsWithText();
 
-    lastLeafElementsWithText.forEach(function(txtTag) {
+    lastLeafElementsWithText.forEach(function (txtTag) {
 
         let attName = txtTag.getAttribute('original-size');
-        if(attName == null) {
+        if (attName == null) {
             txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
         }
 
@@ -1728,14 +1910,14 @@ function calculateLetterSpacingInPixels(percentage) {
 
 function updateZoomSlide(percentage) {
 
-    if(percentage > 200 || percentage < -200) {
+    if (percentage > 200 || percentage < -200) {
         return;
     }
 
     let zoom = calculateZoomPercentageInPixels(percentage);
 
     let tagsDoPrimeiroNivel = getFirstChildElementsBelowBody();
-    tagsDoPrimeiroNivel.forEach(function(txtTag) {
+    tagsDoPrimeiroNivel.forEach(function (txtTag) {
 
         if (!txtTag.closest('.app-window')
             && !txtTag.closest('.accessibility-button') && txtTag.id !== 'appWindow'
@@ -1765,7 +1947,7 @@ function updateZoomSlide(percentage) {
 }
 
 function loadZoom() {
-    if(currentZoom !== null) {
+    if (currentZoom !== null) {
         updateZoomSlide(currentZoom.percentage);
     }
 }
@@ -1774,7 +1956,7 @@ function loadZoom() {
 
 function updateLineHeightSlide(percentage) {
 
-    if(percentage > 200 || percentage < -200) {
+    if (percentage > 200 || percentage < -200) {
         return;
     }
 
@@ -1783,7 +1965,7 @@ function updateLineHeightSlide(percentage) {
     lastLeafElementsWithText.forEach(function (txtTag) {
 
         let attName = txtTag.getAttribute('original-line-height');
-        if(attName == null) {
+        if (attName == null) {
             txtTag.setAttribute('original-line-height',
                 isNaN(parseInt(window.getComputedStyle(txtTag).lineHeight)) ? getLineHeightInPixelsIfText(txtTag) : window.getComputedStyle(txtTag).lineHeight);
         }
@@ -1796,11 +1978,11 @@ function updateLineHeightSlide(percentage) {
             let attName = txtTag.getAttribute('original-line-height');
             let initialSize = parseInt(attName);
 
-            if(initialSize !== null) {
+            if (initialSize !== null) {
                 lineHeightFormated = initialSize;
             }
 
-            txtTag.style.setProperty('line-height', lineHeightFormated + (lineHeightFormated * percentage / 100)  + 'px', 'important');
+            txtTag.style.setProperty('line-height', lineHeightFormated + (lineHeightFormated * percentage / 100) + 'px', 'important');
         }
 
 
@@ -1826,7 +2008,7 @@ function updateLineHeightSlide(percentage) {
 
 
 function loadLineHeight() {
-    if(currentLineHeight !== null) {
+    if (currentLineHeight !== null) {
         updateLineHeightSlide(currentLineHeight.percentage);
     }
 }
@@ -1855,7 +2037,7 @@ function updateLetterSpacingSlide(percentage) {
 
     //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 0.2PX A CADA 10%
 
-    if(percentage > 200 || percentage < -200) {
+    if (percentage > 200 || percentage < -200) {
         return;
     }
 
@@ -1865,7 +2047,7 @@ function updateLetterSpacingSlide(percentage) {
     lastLeafElementsWithText.forEach(function (txtTag) {
 
         let attName = txtTag.getAttribute('original-letter-spacing');
-        if(attName == null) {
+        if (attName == null) {
             txtTag.setAttribute('original-letter-spacing',
                 isNaN(parseInt(window.getComputedStyle(txtTag).letterSpacing)) ? 0 : window.getComputedStyle(txtTag).letterSpacing);
         }
@@ -1877,7 +2059,7 @@ function updateLetterSpacingSlide(percentage) {
             let attName = txtTag.getAttribute('original-letter-spacing');
             let initialSize = parseFloat(attName);
 
-            if(initialSize !== null) {
+            if (initialSize !== null) {
                 letterSpacingFormated = initialSize;
             }
 
@@ -1908,8 +2090,8 @@ function updateLetterSpacingSlide(percentage) {
 
 
 function loadLetterSpacing() {
-    if(currentLetterSpacing !== null) {
-     updateLetterSpacingSlide(currentLetterSpacing.percentage);
+    if (currentLetterSpacing !== null) {
+        updateLetterSpacingSlide(currentLetterSpacing.percentage);
     }
 }
 
@@ -1962,7 +2144,7 @@ function getLastLeafElementsWithText() {
             }
 
 
-                for (let child of element.children) {
+            for (let child of element.children) {
                 traverse(child);
             }
         }
@@ -2171,20 +2353,20 @@ function esconderBalao() {
 
 function updateTextMagnifier() {
 
-        // Se a funcionalidade for desativada, esconde o balão
-        let balao = document.querySelector(".balao");
-        if (balao.style.display === 'block') {
-            balao.style.setProperty('display', 'none', 'important');
-            removeItemFromLocalStorage("text-magnifier");
+    // Se a funcionalidade for desativada, esconde o balão
+    let balao = document.querySelector(".balao");
+    if (balao.style.display === 'block') {
+        balao.style.setProperty('display', 'none', 'important');
+        removeItemFromLocalStorage("text-magnifier");
 
-        } else {
-            balao.style.setProperty('display', 'block', 'important');
-            setItemToLocalStorageWithExpiry("text-magnifier",
-                true,
-                null);
-            getElementCursorHover();
-        }
-        changeStyleButtonSelected(textEnlargeButton);
+    } else {
+        balao.style.setProperty('display', 'block', 'important');
+        setItemToLocalStorageWithExpiry("text-magnifier",
+            true,
+            null);
+        getElementCursorHover();
+    }
+    changeStyleButtonSelected(textEnlargeButton);
 }
 
 function loadTextMagnifier() {
@@ -2198,20 +2380,19 @@ function loadTextMagnifier() {
 }
 
 
-
 function changeAlignText(direction) {
 
     let textAlignSaved = getItemFromLocalStorageWithExpiry("text-align");
 
-    if(textAlignSaved !== null && textAlignSaved.value === direction) {
+    if (textAlignSaved !== null && textAlignSaved.value === direction) {
         indexActualTextAlign = 0;
-    }else {
+    } else {
         indexActualTextAlign = direction;
     }
 
     setAlignText();
 
-    if(indexActualTextAlign === 0) {
+    if (indexActualTextAlign === 0) {
         removeItemFromLocalStorage("text-align");
     } else {
         setItemToLocalStorageWithExpiry("text-align",
@@ -2250,16 +2431,15 @@ function setAlignText() {
             null);
 
 
-        if(indexActualTextAlign === 1){
+        if (indexActualTextAlign === 1) {
             changeStyleButtonSelectedAndDeselectOthers(alignLeft, [alignCenter, alignRight])
-        }else if(indexActualTextAlign === 2) {
+        } else if (indexActualTextAlign === 2) {
             changeStyleButtonSelectedAndDeselectOthers(alignCenter, [alignLeft, alignRight])
-        }else if (indexActualTextAlign === 3){
+        } else if (indexActualTextAlign === 3) {
             changeStyleButtonSelectedAndDeselectOthers(alignRight, [alignLeft, alignCenter])
-        }else {
+        } else {
             changeStyleButtonSelectedAndDeselectOthers(null, [alignLeft, alignCenter, alignRight])
         }
-
 
 
     }
@@ -2267,61 +2447,59 @@ function setAlignText() {
 }
 
 
-
-
 function highlightHeading() {
 
-        let txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    let txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
 
-        // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
-        txtTags.forEach(function(txtTag) {
+    // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
+    txtTags.forEach(function (txtTag) {
 
-            let attName = txtTag.getAttribute('data-inclowee-hlh-styled');
+        let attName = txtTag.getAttribute('data-inclowee-hlh-styled');
 
-            if(attName == null) {
+        if (attName == null) {
 
-                let background = transformToHex(txtTag.style.background).toUpperCase();
-                let color = transformToHex(txtTag.style.color).toUpperCase();
+            let background = transformToHex(txtTag.style.background).toUpperCase();
+            let color = transformToHex(txtTag.style.color).toUpperCase();
 
-                let buscaYellow = Object.keys(yellowColors).find(chave => yellowColors[chave].valor === background);
-                let buscaBlack = Object.keys(blackColors).find(chave => blackColors[chave].valor === color);
+            let buscaYellow = Object.keys(yellowColors).find(chave => yellowColors[chave].valor === background);
+            let buscaBlack = Object.keys(blackColors).find(chave => blackColors[chave].valor === color);
 
 
-                if (buscaYellow) {
-                    txtTag.style.setProperty('background', yellowColors[buscaYellow].outroAtributo, 'important');
-
-                } else {
-                    txtTag.style.setProperty('background', '#FFFF00', 'important');
-                }
-
-                if (buscaBlack) {
-                    txtTag.style.setProperty('color', blackColors[buscaBlack].outroAtributo, 'important');
-                } else {
-                    txtTag.style.setProperty('color', '#000', 'important');
-                }
-
-                txtTag.setAttribute('data-inclowee-hlh-styled', 'true');
-                setItemToLocalStorageWithExpiry("highlight-headings",
-                    true,
-                    null);
+            if (buscaYellow) {
+                txtTag.style.setProperty('background', yellowColors[buscaYellow].outroAtributo, 'important');
 
             } else {
-                txtTag.style.background = '';
-                txtTag.style.color = '';
-                txtTag.removeAttribute("data-inclowee-hlh-styled");
-                removeItemFromLocalStorage("highlight-headings");
+                txtTag.style.setProperty('background', '#FFFF00', 'important');
             }
 
-        });
+            if (buscaBlack) {
+                txtTag.style.setProperty('color', blackColors[buscaBlack].outroAtributo, 'important');
+            } else {
+                txtTag.style.setProperty('color', '#000', 'important');
+            }
 
-        changeStyleButtonSelected(hlHeading);
+            txtTag.setAttribute('data-inclowee-hlh-styled', 'true');
+            setItemToLocalStorageWithExpiry("highlight-headings",
+                true,
+                null);
+
+        } else {
+            txtTag.style.background = '';
+            txtTag.style.color = '';
+            txtTag.removeAttribute("data-inclowee-hlh-styled");
+            removeItemFromLocalStorage("highlight-headings");
+        }
+
+    });
+
+    changeStyleButtonSelected(hlHeading);
 
 }
 
 
 function loadHighlightHeading() {
 
-    if(hightlightHeadings != null) {
+    if (hightlightHeadings != null) {
         highlightHeading();
     }
 }
@@ -2349,11 +2527,11 @@ function highlightLinks() {
     let txtTags = document.querySelectorAll('a');
 
     // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
-    txtTags.forEach(function(txtTag) {
+    txtTags.forEach(function (txtTag) {
 
         let attName = txtTag.getAttribute('data-inclowee-hll-styled');
 
-        if(attName == null) {
+        if (attName == null) {
 
             let background = transformToHex(txtTag.style.background).toUpperCase();
             let color = transformToHex(txtTag.style.color).toUpperCase();
@@ -2396,7 +2574,7 @@ function highlightLinks() {
 
 function loadHighlightLinks() {
 
-    if(hightlightLinks != null) {
+    if (hightlightLinks != null) {
         highlightLinks();
     }
 
@@ -2407,11 +2585,11 @@ function highlightButtons() {
     let txtTags = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"]');
 
     // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
-    txtTags.forEach(function(txtTag) {
+    txtTags.forEach(function (txtTag) {
 
         let attName = txtTag.getAttribute('data-inclowee-hlb-styled');
 
-        if(attName == null) {
+        if (attName == null) {
 
             let background = transformToHex(txtTag.style.background).toUpperCase();
             let color = transformToHex(txtTag.style.color).toUpperCase();
@@ -2420,7 +2598,7 @@ function highlightButtons() {
             let buscaBlack = Object.keys(blackColors).find(chave => blackColors[chave].valor === color);
 
 
-            if(!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
+            if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
                 if (buscaYellow) {
                     txtTag.style.setProperty('background', yellowColors[buscaYellow].outroAtributo, 'important');
 
@@ -2457,7 +2635,7 @@ function highlightButtons() {
 
 function loadHighlightButtons() {
 
-    if(hightlightButtons != null) {
+    if (hightlightButtons != null) {
         highlightButtons();
     }
 
@@ -2467,22 +2645,21 @@ function changeFontFamily(font) {
 
     let fontFam = getItemFromLocalStorageWithExpiry("font-family");
 
-    if(fontFam !== null && fontFam.value === font) {
+    if (fontFam !== null && fontFam.value === font) {
         indexActualFontFamily = 0;
-    }else {
+    } else {
         indexActualFontFamily = font;
     }
 
     setFontFamily();
 
-    if(indexActualFontFamily === 0) {
+    if (indexActualFontFamily === 0) {
         removeItemFromLocalStorage("font-family");
     } else {
         setItemToLocalStorageWithExpiry("font-family",
             indexActualFontFamily,
             null);
     }
-
 
 
 }
@@ -2515,14 +2692,13 @@ function setFontFamily() {
             null);
 
 
-        if(indexActualFontFamily === 1){
+        if (indexActualFontFamily === 1) {
             changeStyleButtonSelectedAndDeselectOthers(readableFontButton, [friendlyDyslexiaButton])
-        }else if(indexActualFontFamily === 2) {
+        } else if (indexActualFontFamily === 2) {
             changeStyleButtonSelectedAndDeselectOthers(friendlyDyslexiaButton, [readableFontButton])
-        }else {
+        } else {
             changeStyleButtonSelectedAndDeselectOthers(null, [readableFontButton, friendlyDyslexiaButton])
         }
-
 
 
     }
@@ -2533,12 +2709,12 @@ function createStyleGlobal() {
     // Cria um elemento <style>
     let estiloGlobal = document.createElement('style');
     estiloGlobal.setAttribute("id", "incloowe-style")
-    let estilo = document.createTextNode(' @font-face {\n' +
-        '            font-family: \'OpenDyslexic\';\n' +
-        '            src: url("https://raw.githack.com/irwing-moura/acessibrasil/main/OpenDyslexic-Regular.woff");,\n' +
-        '            url("OpenDyslexic-Regular.woff");\n' +
-        '            font-weight: normal;\n' +
-        '            font-style: normal;\n' +
+    let estilo = document.createTextNode(' @font-face { ' +
+        '            font-family: \'OpenDyslexic\'; ' +
+        '            src: url("https://raw.githack.com/irwing-moura/acessibrasil/main/OpenDyslexic-Regular.woff");, ' +
+        '            url("OpenDyslexic-Regular.woff"); ' +
+        '            font-weight: normal; ' +
+        '            font-style: normal; ' +
         '        } ' +
         '.inverted { filter: invert(100%) !important; background: #fff !important; } ' +
 
@@ -2572,7 +2748,7 @@ function createStyleGlobal() {
 
 //COLORS
 function loadContrastColors() {
-    if(colorsContrast != null) {
+    if (colorsContrast != null) {
         setColorContrast(document.activeElement.parentElement);
     }
 }
@@ -2581,15 +2757,15 @@ function changeColorContrast(contrast, html) {
 
     let colorContrastSaved = getItemFromLocalStorageWithExpiry("colors-contrast");
 
-    if(colorContrastSaved !== null && colorContrastSaved.value === contrast) {
+    if (colorContrastSaved !== null && colorContrastSaved.value === contrast) {
         indexActualColorContrast = 0;
-    }else {
+    } else {
         indexActualColorContrast = contrast;
     }
 
     setColorContrast(html);
 
-    if(indexActualColorContrast === 0) {
+    if (indexActualColorContrast === 0) {
         removeItemFromLocalStorage("colors-contrast");
     } else {
         setItemToLocalStorageWithExpiry("colors-contrast",
@@ -2667,7 +2843,7 @@ function setColorContrast(html) {
 }
 
 function loadSaturationColors() {
-    if(colorsSaturation != null) {
+    if (colorsSaturation != null) {
         setColorSaturation(document.activeElement.parentElement);
     }
 }
@@ -2676,15 +2852,15 @@ function changeColorSaturation(saturation, html) {
 
     let colorSaturationSaved = getItemFromLocalStorageWithExpiry("colors-saturation");
 
-    if(colorSaturationSaved !== null && colorSaturationSaved.value === saturation) {
+    if (colorSaturationSaved !== null && colorSaturationSaved.value === saturation) {
         indexActualColorSaturation = 0;
-    }else {
+    } else {
         indexActualColorSaturation = saturation;
     }
 
     setColorSaturation(html);
 
-    if(indexActualColorSaturation === 0) {
+    if (indexActualColorSaturation === 0) {
         removeItemFromLocalStorage("colors-saturation");
     } else {
         setItemToLocalStorageWithExpiry("colors-saturation",
@@ -2727,5 +2903,207 @@ function setColorSaturation(html) {
         const selectedButton = buttonsMap[indexActualColorSaturation] || null;
         const otherButtons = Object.values(buttonsMap).filter(button => button !== selectedButton);
         changeStyleButtonSelectedAndDeselectOthers(selectedButton, otherButtons);
+    }
+}
+
+function loadTextColor() {
+
+    if (adjustTextColor != null) {
+
+        let buttons = shadowR.querySelectorAll('div[data-test="adjustTextColor"]')[0]
+            .querySelectorAll('.color-pick');
+
+        buttons.forEach(button => {
+            if(button.style.backgroundColor === adjustTextColor.value) {
+                setAdjustColor(button, "adjustTextColor");
+            }
+        });
+    }
+
+}
+
+function loadTitleColor() {
+
+    if (adjustTitleColor != null) {
+
+        let buttons = shadowR.querySelectorAll('div[data-test="adjustTitleColor"]')[0]
+            .querySelectorAll('.color-pick');
+
+        buttons.forEach(button => {
+            if(button.style.backgroundColor === adjustTitleColor.value) {
+                setAdjustColor(button, "adjustTitleColor");
+            }
+        });
+    }
+
+}
+
+function loadBackgroundColor() {
+
+    if (adjustBackgroundColor != null) {
+
+        let buttons = shadowR.querySelectorAll('div[data-test="adjustBackgroundColor"]')[0]
+            .querySelectorAll('.color-pick');
+
+        buttons.forEach(button => {
+            if(button.style.backgroundColor === adjustBackgroundColor.value) {
+                setAdjustColor(button, "adjustBackgroundColor");
+            }
+        });
+    }
+
+}
+
+
+function assignDefaultButtonsAdjustColor() {
+
+    // let colorPickButtons  = shadowR.querySelectorAll('.color-pick');
+    let defaultButtons = shadowR.querySelectorAll('.link-default-color')
+    defaultButtons.forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            let dataTest = button.parentElement.getAttribute('data-test');
+            setAdjustColor(button, dataTest);
+        });
+    });
+
+}
+
+function assignAdjustColorsEventListeners() {
+    assignAdjustTextColor();
+    assignAdjustTitleColor();
+    assignAdjustBackgroundColor();
+    assignDefaultButtonsAdjustColor();
+}
+
+function assignAdjustTextColor() {
+
+    // let colorPickButtons  = shadowR.querySelectorAll('.color-pick');
+    let colorPickButtons = shadowR.querySelectorAll('div[data-test="adjustTextColor"]')[0]
+        .querySelectorAll('.color-pick');
+    colorPickButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            setAdjustColor(button, "adjustTextColor");
+        });
+    });
+
+}
+
+function assignAdjustTitleColor() {
+
+    // let colorPickButtons  = shadowR.querySelectorAll('.color-pick');
+    let colorPickButtons = shadowR.querySelectorAll('div[data-test="adjustTitleColor"]')[0]
+        .querySelectorAll('.color-pick');
+    colorPickButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            setAdjustColor(button, "adjustTitleColor");
+        });
+    });
+
+}
+
+function assignAdjustBackgroundColor() {
+
+    // let colorPickButtons  = shadowR.querySelectorAll('.color-pick');
+    let colorPickButtons = shadowR.querySelectorAll('div[data-test="adjustBackgroundColor"]')[0]
+        .querySelectorAll('.color-pick');
+    colorPickButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            setAdjustColor(button, "adjustBackgroundColor");
+        });
+    });
+
+}
+
+let lastSelectedTextColor;
+let lastSelectedTitleColor;
+let lastSelectedBackgroundColor;
+
+function setAdjustColor(button, fila) {
+    const isDefault = button.classList.contains('link-default-color');
+
+    const updateSelectedButton = (lastSelectedButton, button) => {
+        if (lastSelectedButton && lastSelectedButton !== button) {
+            lastSelectedButton.innerHTML = ''; // Remove o SVG
+            lastSelectedButton.classList.remove('color-pick-selected');
+        }
+        return button;
+    };
+
+    const setSVG = (button, selectedColor) => {
+        button.innerHTML = selectedColor === 'rgb(255, 255, 255)' ?
+            `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-chevron-down">
+                <path d="m6 9 6 6 6-6"/>
+            </svg>` :
+            `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                <path d="m6 9 6 6 6-6"></path>
+            </svg>`;
+    };
+
+    const adjustColor = (fila, selectedColor) => {
+        if (fila === 'adjustTitleColor') {
+            document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(txtTag => {
+                const attName = txtTag.getAttribute('data-inclowee-atc-styled');
+                if (!attName || selectedColor !== txtTag.style.color) {
+                    txtTag.style.setProperty('color', selectedColor, 'important');
+                    txtTag.setAttribute('data-inclowee-atc-styled', 'true');
+                    setItemToLocalStorageWithExpiry("adjust-title-color", selectedColor, null);
+                }
+            });
+        } else if (fila === 'adjustTextColor') {
+            let textColorStyle = document.getElementById('text-color-incloowe') || document.createElement('style');
+            textColorStyle.id = 'text-color-incloowe';
+            textColorStyle.innerHTML = `body :not(#shadow) a, body :not(#shadow) p, body :not(#shadow) li, body :not(#shadow) label,
+                body :not(#shadow) input, body :not(#shadow) select, body :not(#shadow) textarea, body :not(#shadow) legend,
+                body :not(#shadow) code, body :not(#shadow) pre, body :not(#shadow) dd, body :not(#shadow) dt, body :not(#shadow) span,
+                body :not(#shadow) blockquote { color: ${selectedColor} }`;
+            document.head.appendChild(textColorStyle);
+            setItemToLocalStorageWithExpiry("adjust-text-color", selectedColor, null);
+        } else if (fila === 'adjustBackgroundColor') {
+            document.body.style.setProperty('background-color', selectedColor, 'important');
+            setItemToLocalStorageWithExpiry("adjust-background-color", selectedColor, null);
+        }
+    };
+
+    const removeAdjustColor = (fila) => {
+        if (fila === 'adjustTitleColor') {
+            document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(txtTag => {
+                txtTag.style.color = '';
+                txtTag.removeAttribute('data-inclowee-atc-styled');
+                removeItemFromLocalStorage("adjust-title-color");
+            });
+        } else if (fila === 'adjustTextColor') {
+            const textColorStyle = document.getElementById('text-color-incloowe');
+            textColorStyle.innerHTML = '';
+            removeItemFromLocalStorage("adjust-text-color");
+        } else if (fila === 'adjustBackgroundColor') {
+            document.body.style.backgroundColor = '';
+            removeItemFromLocalStorage("adjust-background-color");
+        }
+    };
+
+    if (!isDefault) {
+        if (fila === 'adjustTitleColor') {
+            lastSelectedTitleColor = updateSelectedButton(lastSelectedTitleColor, button);
+        } else if (fila === 'adjustTextColor') {
+            lastSelectedTextColor = updateSelectedButton(lastSelectedTextColor, button);
+        } else if (fila === 'adjustBackgroundColor') {
+            lastSelectedBackgroundColor = updateSelectedButton(lastSelectedBackgroundColor, button);
+        }
+
+        button.classList.add('color-pick-selected');
+        const currentSelected = shadowR.querySelector(`div[data-test=${fila}] .color-pick-selected`);
+        const selectedColor = window.getComputedStyle(currentSelected).backgroundColor;
+
+        setSVG(button, selectedColor);
+        adjustColor(fila, selectedColor);
+
+    } else {
+        const currentSelected = shadowR.querySelector(`div[data-test=${fila}] .color-pick-selected`);
+        currentSelected.innerHTML = '';
+        currentSelected.classList.remove('color-pick-selected');
+        removeAdjustColor(fila);
     }
 }
