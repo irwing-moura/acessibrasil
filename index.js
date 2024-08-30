@@ -16,10 +16,12 @@ const INVERTED_COLORS_KEY = "inverted-colors";
 const COLORS_CONTRAST_KEY = "colors-contrast";
 const COLORS_SATURATION_KEY = "colors-saturation";
 
+
 const ADJUST_TEXT_COLOR_KEY = "adjust-text-color"
 const ADJUST_TITLE_COLOR_KEY = "adjust-title-color"
 const ADJUST_BACKGROUND_COLOR_KEY = "adjust-background-color"
 
+const DALTONISM_FILTER_KEY = "daltonism-filter";
 
 let widgetStatus = getItemFromLocalStorageWithExpiry(WIDGET_STATUS);
 
@@ -44,6 +46,9 @@ let colorsSaturation = getItemFromLocalStorageWithExpiry(COLORS_SATURATION_KEY);
 let adjustTextColor = getItemFromLocalStorageWithExpiry(ADJUST_TEXT_COLOR_KEY);
 let adjustTitleColor = getItemFromLocalStorageWithExpiry(ADJUST_TITLE_COLOR_KEY);
 let adjustBackgroundColor = getItemFromLocalStorageWithExpiry(ADJUST_BACKGROUND_COLOR_KEY);
+
+//COLORS SATURATION
+let daltonismFilter = getItemFromLocalStorageWithExpiry(DALTONISM_FILTER_KEY);
 
 //botao abrir
 let expandButton;
@@ -71,6 +76,10 @@ let highContrastColorsButton;
 let monochromaticColorsButton;
 let highSaturationColorsButton
 let lowSaturationColorsButton
+let redDefButton;
+let greenDefButton;
+let blueDefButton;
+
 let alignLeft;
 let alignCenter;
 let alignRight;
@@ -99,195 +108,9 @@ let indexActualColorContrast = colorsContrast != null ? colorsContrast.value : c
 let saturations = ['', 'high', 'low', 'mono'];
 let indexActualColorSaturation = colorsSaturation != null ? colorsSaturation.value : colorsSaturation;
 
-let yellowColors = {
-    "cor1": {
-        "valor": "#FFFFE0",
-        "outroAtributo": "green"
-    },
-    "cor2": {
-        "valor": "#FFFACD",
-        "outroAtributo": "Valor para a cor 2"
-    },
-    "cor3": {
-        "valor": "#FADA5E",
-        "outroAtributo": "Valor para a cor 3"
-    },
-    "cor4": {
-        "valor": "#FFC30B",
-        "outroAtributo": "Valor para a cor 4"
-    },
-    "cor5": {
-        "valor": "#FFD700",
-        "outroAtributo": "Valor para a cor 5"
-    },
-    "cor6": {
-        "valor": "#FFDB58",
-        "outroAtributo": "Valor para a cor 6"
-    },
-    "cor7": {
-        "valor": "#E9D66B",
-        "outroAtributo": "Valor para a cor 7"
-    },
-    "cor8": {
-        "valor": "#FFEA00",
-        "outroAtributo": "Valor para a cor 8"
-    },
-    "cor9": {
-        "valor": "#FFF44F",
-        "outroAtributo": "Valor para a cor 9"
-    },
-    "cor10": {
-        "valor": "#FFC40C",
-        "outroAtributo": "Valor para a cor 10"
-    },
-    "cor11": {
-        "valor": "#FDDA0D",
-        "outroAtributo": "Valor para a cor 11"
-    },
-    "cor12": {
-        "valor": "#FFDA03",
-        "outroAtributo": "Valor para a cor 12"
-    },
-    "cor13": {
-        "valor": "#CC7722",
-        "outroAtributo": "Valor para a cor 13"
-    },
-    "cor14": {
-        "valor": "#ADFF2F",
-        "outroAtributo": "Valor para a cor 14"
-    },
-    "cor15": {
-        "valor": "#FDFD96",
-        "outroAtributo": "Valor para a cor 15"
-    },
-    "cor16": {
-        "valor": "#FFBF00",
-        "outroAtributo": "Valor para a cor 15"
-    },
-    "cor17": {
-        "valor": "#F0A804",
-        "outroAtributo": "Valor para a cor 15"
-    },
-    "cor18": {
-        "valor": "#FFD02E",
-        "outroAtributo": "Valor para a cor 15"
-    },
-    "cor19": {
-        "valor": "#CCFF00",
-        "outroAtributo": "Valor para a cor 15"
-    },
-    "cor20": {
-        "valor": "#CCEE22",
-        "outroAtributo": "Valor para a cor 15"
-    },
-    "cor21": {
-        "valor": "#FFFF33",
-        "outroAtributo": "Valor para a cor 15"
-    },
-//     "cor22": {
-//     "valor": "#FFFF00",
-//         "outroAtributo": "Valor para a cor 15"
-// },
-    "cor23": {
-        "valor": "#CCFF66",
-        "outroAtributo": "Valor para a cor 15"
-    },
-    "cor24": {
-        "valor": "#CCFF33",
-        "outroAtributo": "Valor para a cor 15"
-    },
-    "cor25": {
-        "valor": "#DFFF00",
-        "outroAtributo": "Valor para a cor 15"
-    },
-    "cor26": {
-        "valor": "#FFFF99",
-        "outroAtributo": "Valor para a cor 15"
-    },
-    "cor27": {
-        "valor": "#FFFF66",
-        "outroAtributo": "Valor para a cor 15"
-    }
-
-}
-
-let orangeColors = {
-    "cor1": {
-        "valor": "#FF4500",
-        "outroAtributo": "Valor para a cor 1"
-    },
-    "cor2": {
-        "valor": "#FF8C00",
-        "outroAtributo": "Valor para a cor 2"
-    },
-    "cor3": {
-        "valor": "#FFA500",
-        "outroAtributo": "Valor para a cor 3"
-    }
-}
-
-let blackColors = {
-    "cor1": {
-        "valor": "#000000",
-        "outroAtributo": "Valor para a cor 1"
-    },
-    "cor2": {
-        "valor": "#1C1C1C",
-        "outroAtributo": "Valor para a cor 2"
-    },
-    "cor3": {
-        "valor": "#363636",
-        "outroAtributo": "Valor para a cor 3"
-    },
-    "cor4": {
-        "valor": "#4F4F4F",
-        "outroAtributo": "Valor para a cor 4"
-    },
-    "cor5": {
-        "valor": "#696969",
-        "outroAtributo": "Valor para a cor 5"
-    },
-    "cor6": {
-        "valor": "#1C1C1C",
-        "outroAtributo": "Valor para a cor 6"
-    },
-    "cor7": {
-        "valor": "#333333",
-        "outroAtributo": "Valor para a cor 7"
-    },
-    "cor8": {
-        "valor": "#555555",
-        "outroAtributo": "Valor para a cor 8"
-    },
-    "cor9": {
-        "valor": "#666666",
-        "outroAtributo": "Valor para a cor 9"
-    },
-    "cor10": {
-        "valor": "#999999",
-        "outroAtributo": "Valor para a cor 10"
-    },
-    "cor11": {
-        "valor": "#333333",
-        "outroAtributo": "Valor para a cor 11"
-    },
-    "cor12": {
-        "valor": "#595959",
-        "outroAtributo": "Valor para a cor 12"
-    },
-    "cor13": {
-        "valor": "#1A1A1A",
-        "outroAtributo": "Valor para a cor 13"
-    },
-    "cor14": {
-        "valor": "#2C2C2C",
-        "outroAtributo": "Valor para a cor 14"
-    },
-    "cor15": {
-        "valor": "#1E1E1E",
-        "outroAtributo": "Valor para a cor 15"
-    }
-}
+//DALTONISM FILTERS
+let daltonisms = ['', 'protanomaly', 'deuteranomaly', 'tritanomaly'];
+let indexActualDaltonismFilter = daltonismFilter != null ? daltonismFilter.value : daltonismFilter;
 
 const tagsQueDevemMostrarBalaoMesmoComMaisDeUmItem = [
     "select",
@@ -351,6 +174,7 @@ if (widgetStatus == null) {
         loadTextColor();
         loadTitleColor();
         loadBackgroundColor();
+        loadDaltonismFilter();
 
 
         console.log = function () {
@@ -952,8 +776,6 @@ button {
   .link-default-color:hover {
     text-decoration: underline;
   }
-  
-  
     /* SPINNER */
  
     #loading-bar-spinner.spinner {
@@ -1331,6 +1153,28 @@ button {
                   <span>Monochromatic</span>
                </button>
             </div>
+            
+            <div class="container-buttons">
+               <button id="redDefButton" class="content-button" role="button" aria-label="Deficiencia de vermelho"
+                  title="Deficiencia de vermelho" tabindex="0" style="line-break: anywhere;">
+                  <div class="icon">
+                  </div>
+                  <span>Protanomaly</span>
+               </button>
+               <button id="greenDefButton" class="content-button" role="button" aria-label="Deficiencia de verde"
+                  title="Deficiencia de verde" tabindex="0" style="line-break: anywhere;">
+                  <div class="icon">
+                  </div>
+                  <span>Deuteranomaly</span>
+               </button>
+                <button id="blueDefButton" class="content-button" role="button" aria-label="Deficiencia de azul"
+                  title="Deficiencia de azul" tabindex="0" style="line-break: anywhere;">
+                  <div class="icon">
+                  </div>
+                  <span>Tritanomaly</span>
+               </button>
+            </div>
+            
             <div data-test="adjustTextColor" class="range-container">
                 <div class="title-container">
                   <label for="letterSpacingSlide" class="slider-icon-title">
@@ -1713,6 +1557,21 @@ function assignFunctionsToIds() {
     monochromaticColorsButton = shadowR.querySelector("#monochromaticColorsButton");
     monochromaticColorsButton.addEventListener('click', () => {
         changeColorSaturation(3, document.activeElement.parentElement.parentElement)
+    });
+
+    redDefButton = shadowR.querySelector("#redDefButton");
+    redDefButton.addEventListener('click', () => {
+       changeDaltonismFilter(1, document.activeElement.parentElement.parentElement);
+    });
+
+    greenDefButton = shadowR.querySelector("#greenDefButton");
+    greenDefButton.addEventListener('click', () => {
+        changeDaltonismFilter(2, document.activeElement.parentElement.parentElement);
+    });
+
+    blueDefButton = shadowR.querySelector("#blueDefButton");
+    blueDefButton.addEventListener('click', () => {
+        changeDaltonismFilter(3, document.activeElement.parentElement.parentElement);
     });
 
 
@@ -2458,25 +2317,9 @@ function highlightHeading() {
 
         if (attName == null) {
 
-            let background = transformToHex(txtTag.style.background).toUpperCase();
-            let color = transformToHex(txtTag.style.color).toUpperCase();
-
-            let buscaYellow = Object.keys(yellowColors).find(chave => yellowColors[chave].valor === background);
-            let buscaBlack = Object.keys(blackColors).find(chave => blackColors[chave].valor === color);
-
-
-            if (buscaYellow) {
-                txtTag.style.setProperty('background', yellowColors[buscaYellow].outroAtributo, 'important');
-
-            } else {
-                txtTag.style.setProperty('background', '#FFFF00', 'important');
-            }
-
-            if (buscaBlack) {
-                txtTag.style.setProperty('color', blackColors[buscaBlack].outroAtributo, 'important');
-            } else {
-                txtTag.style.setProperty('color', '#000', 'important');
-            }
+            // txtTag.style.setProperty('outline', '2px solid rgba(255, 114, 22, 0.5)', 'important');
+            txtTag.style.setProperty('outline', 'rgb(20, 111, 248) solid 2px', 'important');
+            txtTag.style.setProperty('outline-offset', '2px', 'important');
 
             txtTag.setAttribute('data-inclowee-hlh-styled', 'true');
             setItemToLocalStorageWithExpiry("highlight-headings",
@@ -2484,8 +2327,10 @@ function highlightHeading() {
                 null);
 
         } else {
-            txtTag.style.background = '';
-            txtTag.style.color = '';
+
+            txtTag.style.outline = '';
+            txtTag.style.outlineOffset = '';
+
             txtTag.removeAttribute("data-inclowee-hlh-styled");
             removeItemFromLocalStorage("highlight-headings");
         }
@@ -2533,25 +2378,8 @@ function highlightLinks() {
 
         if (attName == null) {
 
-            let background = transformToHex(txtTag.style.background).toUpperCase();
-            let color = transformToHex(txtTag.style.color).toUpperCase();
-
-            let buscaYellow = Object.keys(yellowColors).find(chave => yellowColors[chave].valor === background);
-            let buscaBlack = Object.keys(blackColors).find(chave => blackColors[chave].valor === color);
-
-
-            if (buscaYellow) {
-                txtTag.style.setProperty('background', yellowColors[buscaYellow].outroAtributo, 'important');
-            } else {
-                txtTag.style.setProperty('background', '#FFFF00', 'important');
-            }
-
-            if (buscaBlack) {
-                txtTag.style.setProperty('color', blackColors[buscaBlack].outroAtributo, 'important');
-
-            } else {
-                txtTag.style.setProperty('color', '#000', 'important');
-            }
+            txtTag.style.setProperty('outline', '2px solid rgba(255, 114, 22, 0.5)', 'important');
+            txtTag.style.setProperty('outline-offset', '2px', 'important');
 
             txtTag.setAttribute('data-inclowee-hll-styled', 'true');
             setItemToLocalStorageWithExpiry("highlight-links",
@@ -2559,8 +2387,10 @@ function highlightLinks() {
                 null);
 
         } else {
-            txtTag.style.background = '';
-            txtTag.style.color = '';
+
+            txtTag.style.outline = '';
+            txtTag.style.outlineOffset = '';
+
             txtTag.removeAttribute("data-inclowee-hll-styled");
             removeItemFromLocalStorage("highlight-links");
         }
@@ -2591,27 +2421,11 @@ function highlightButtons() {
 
         if (attName == null) {
 
-            let background = transformToHex(txtTag.style.background).toUpperCase();
-            let color = transformToHex(txtTag.style.color).toUpperCase();
-
-            let buscaYellow = Object.keys(yellowColors).find(chave => yellowColors[chave].valor === background);
-            let buscaBlack = Object.keys(blackColors).find(chave => blackColors[chave].valor === color);
-
-
             if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
-                if (buscaYellow) {
-                    txtTag.style.setProperty('background', yellowColors[buscaYellow].outroAtributo, 'important');
 
-                } else {
-                    txtTag.style.setProperty('background', '#FFFF00', 'important');
-                }
+                txtTag.style.setProperty('outline', '2px solid rgba(255, 114, 22, 0.5)', 'important');
+                txtTag.style.setProperty('outline-offset', '2px', 'important');
 
-                if (buscaBlack) {
-                    txtTag.style.setProperty('color', blackColors[buscaBlack].outroAtributo, 'important');
-
-                } else {
-                    txtTag.style.setProperty('color', '#000', 'important');
-                }
 
                 txtTag.setAttribute('data-inclowee-hlb-styled', 'true');
                 setItemToLocalStorageWithExpiry("highlight-buttons",
@@ -2621,8 +2435,10 @@ function highlightButtons() {
             }
 
         } else {
-            txtTag.style.background = '';
-            txtTag.style.color = '';
+
+            txtTag.style.outline = '';
+            txtTag.style.outlineOffset = '';
+
             txtTag.removeAttribute("data-inclowee-hlb-styled");
             removeItemFromLocalStorage("highlight-buttons");
         }
@@ -2732,7 +2548,10 @@ function createStyleGlobal() {
 
         '.high-saturation { filter: saturate(3) !important; } ' +
         '.low-saturation { filter: saturate(0.5) !important; } ' +
-        '.mono-saturation { filter: grayscale(100%) !important; } '
+        '.mono-saturation { filter: grayscale(100%) !important; } ' +
+        '.protanomaly { filter: url(#protanomaly-filter)}' +
+        '.deuteranomaly { filter: url(#deuteranomaly-filter)}' +
+        '.tritanomaly { filter: url(#tritanomaly-filter)}'
     );
 
 
@@ -3020,6 +2839,9 @@ let lastSelectedTitleColor;
 let lastSelectedBackgroundColor;
 
 function setAdjustColor(button, fila) {
+
+    // todo:: VERIFICAR FUNCIONAMENTO JUNTO AS FUNCOES DE HIGHLIGHT
+
     const isDefault = button.classList.contains('link-default-color');
 
     const updateSelectedButton = (lastSelectedButton, button) => {
@@ -3044,21 +2866,30 @@ function setAdjustColor(button, fila) {
 
     const adjustColor = (fila, selectedColor) => {
         if (fila === 'adjustTitleColor') {
-            document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(txtTag => {
-                const attName = txtTag.getAttribute('data-inclowee-atc-styled');
-                if (!attName || selectedColor !== txtTag.style.color) {
-                    txtTag.style.setProperty('color', selectedColor, 'important');
-                    txtTag.setAttribute('data-inclowee-atc-styled', 'true');
-                    setItemToLocalStorageWithExpiry("adjust-title-color", selectedColor, null);
-                }
-            });
+            // document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(txtTag => {
+            //     const attName = txtTag.getAttribute('data-inclowee-atc-styled');
+            //     if (!attName || selectedColor !== txtTag.style.color) {
+            //         txtTag.style.setProperty('color', selectedColor, 'important');
+            //         txtTag.setAttribute('data-inclowee-atc-styled', 'true');
+            //         setItemToLocalStorageWithExpiry("adjust-title-color", selectedColor, null);
+            //     }
+            // });
+
+            let titleColorStyle = document.getElementById('title-color-incloowe') || document.createElement('style');
+            titleColorStyle.id = 'title-color-incloowe';
+            titleColorStyle.innerHTML = `body :not(#shadow) h1, body :not(#shadow) h2, body :not(#shadow) h3, body :not(#shadow) h4,
+                body :not(#shadow) h5, body :not(#shadow) h6 { color: ${selectedColor} !important }`;
+
+            document.head.appendChild(titleColorStyle);
+            setItemToLocalStorageWithExpiry("adjust-title-color", selectedColor, null);
+
         } else if (fila === 'adjustTextColor') {
             let textColorStyle = document.getElementById('text-color-incloowe') || document.createElement('style');
             textColorStyle.id = 'text-color-incloowe';
             textColorStyle.innerHTML = `body :not(#shadow) a, body :not(#shadow) p, body :not(#shadow) li, body :not(#shadow) label,
                 body :not(#shadow) input, body :not(#shadow) select, body :not(#shadow) textarea, body :not(#shadow) legend,
                 body :not(#shadow) code, body :not(#shadow) pre, body :not(#shadow) dd, body :not(#shadow) dt, body :not(#shadow) span,
-                body :not(#shadow) blockquote { color: ${selectedColor} }`;
+                body :not(#shadow) blockquote { color: ${selectedColor} !important }`;
             document.head.appendChild(textColorStyle);
             setItemToLocalStorageWithExpiry("adjust-text-color", selectedColor, null);
         } else if (fila === 'adjustBackgroundColor') {
@@ -3069,11 +2900,15 @@ function setAdjustColor(button, fila) {
 
     const removeAdjustColor = (fila) => {
         if (fila === 'adjustTitleColor') {
-            document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(txtTag => {
-                txtTag.style.color = '';
-                txtTag.removeAttribute('data-inclowee-atc-styled');
-                removeItemFromLocalStorage("adjust-title-color");
-            });
+            // document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(txtTag => {
+            //     txtTag.style.color = '';
+            //     txtTag.removeAttribute('data-inclowee-atc-styled');
+            //     removeItemFromLocalStorage("adjust-title-color");
+            // });
+            const titleColorStyle = document.getElementById('title-color-incloowe');
+            titleColorStyle.innerHTML = '';
+            removeItemFromLocalStorage("adjust-title-color");
+
         } else if (fila === 'adjustTextColor') {
             const textColorStyle = document.getElementById('text-color-incloowe');
             textColorStyle.innerHTML = '';
@@ -3105,5 +2940,116 @@ function setAdjustColor(button, fila) {
         currentSelected.innerHTML = '';
         currentSelected.classList.remove('color-pick-selected');
         removeAdjustColor(fila);
+    }
+}
+
+
+function loadDaltonismFilter() {
+    if (daltonismFilter != null) {
+        setDaltonismFilter(document.activeElement.parentElement);
+    }
+}
+
+
+function changeDaltonismFilter(daltonismFilter, html) {
+
+    let daltonismFilterSaved = getItemFromLocalStorageWithExpiry("daltonism-filter");
+
+    if (daltonismFilterSaved !== null && daltonismFilterSaved.value === daltonismFilter) {
+        indexActualDaltonismFilter = 0;
+    } else {
+        indexActualDaltonismFilter = daltonismFilter;
+    }
+
+    setDaltonismFilter(html);
+
+    if (indexActualDaltonismFilter === 0) {
+        removeItemFromLocalStorage("daltonism-filter");
+    } else {
+        setItemToLocalStorageWithExpiry("daltonism-filter",
+            indexActualDaltonismFilter,
+            null);
+    }
+
+}
+
+function setDaltonismFilter(html) {
+
+    const prot =  "0.817, 0.183, 0, 0, 0," +
+        "0.333, 0.667, 0, 0, 0," +
+        "0, 0.125, 0.875, 0, 0," +
+        "0, 0, 0, 1, 0";
+
+    const deut = "0.8, 0.2, 0, 0, 0," +
+        "0.258, 0.742, 0, 0, 0," +
+        "0, 0.142, 0.858, 0, 0," +
+        "0, 0, 0, 1, 0";
+
+    const trit = "0.967, 0.033, 0, 0, 0," +
+        "0, 0.733, 0.267, 0, 0," +
+        "0, 0.183, 0.817, 0, 0," +
+        "0, 0, 0, 1, 0";
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    let svg = document.getElementById("daltonism-svg");
+
+    if (!svg) {
+        svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("id", "daltonism-svg");
+        svg.setAttribute("xmlns", svgNS);
+        svg.setAttribute("version", "1.1");
+        svg.style.display = "none";
+
+        const defs = document.createElementNS(svgNS, "defs");
+        svg.appendChild(defs);
+        document.body.appendChild(svg);
+    } else {
+        // Limpar filtros existentes ao mudar de opção
+        svg.querySelector("defs").innerHTML = "";
+    }
+
+    const defs = svg.querySelector("defs");
+    const filter = document.createElementNS(svgNS, "filter");
+    const feColorMatrix = document.createElementNS(svgNS, "feColorMatrix");
+    feColorMatrix.setAttribute("type", "matrix");
+
+    if (indexActualDaltonismFilter !== null) {
+        const selectedDaltonismFilter = daltonisms[indexActualDaltonismFilter];
+        html.classList.remove("protanomaly", "deuteranomaly", "tritanomaly");
+
+        switch (selectedDaltonismFilter) {
+            case 'protanomaly':
+                filter.setAttribute("id", "protanomaly-filter");
+                feColorMatrix.setAttribute("values", prot);
+                html.classList.add("protanomaly");
+                break;
+            case 'deuteranomaly':
+                filter.setAttribute("id", "deuteranomaly-filter");
+                feColorMatrix.setAttribute("values", deut);
+                html.classList.add("deuteranomaly");
+                break;
+            case 'tritanomaly':
+                filter.setAttribute("id", "tritanomaly-filter");
+                feColorMatrix.setAttribute("values", trit);
+                html.classList.add("tritanomaly");
+                break;
+            default:
+                if (svg) {
+                    svg.parentNode.removeChild(svg);
+                }
+                html.classList.remove("protanomaly", "deuteranomaly", "tritanomaly");
+        }
+
+        filter.appendChild(feColorMatrix);
+        defs.appendChild(filter);
+
+        const buttonsMap = {
+            1: redDefButton,
+            2: greenDefButton,
+            3: blueDefButton
+        };
+        const selectedButton = buttonsMap[indexActualDaltonismFilter] || null;
+        const otherButtons = Object.values(buttonsMap).filter(button => button !== selectedButton);
+        changeStyleButtonSelectedAndDeselectOthers(selectedButton, otherButtons);
     }
 }
