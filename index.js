@@ -11,6 +11,8 @@ const TEXT_ALIGN_KEY = "text-align";
 const HIGHLIGHT_HEADINGS_KEY = "highlight-headings";
 const HIGHLIGHT_LINKS_KEY = "highlight-links";
 const HIGHLIGHT_BUTTONS_KEY = "highlight-buttons";
+const HIGHLIGHT_HOVER_KEY = "highlight-hover";
+const HIGHLIGHT_FOCUS_KEY = "highlight-focus";
 const FONT_FAMILY_KEY = "font-family";
 const INVERTED_COLORS_KEY = "inverted-colors";
 const COLORS_CONTRAST_KEY = "colors-contrast";
@@ -35,6 +37,7 @@ let textAlign = getItemFromLocalStorageWithExpiry(TEXT_ALIGN_KEY);
 let hightlightHeadings = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HEADINGS_KEY);
 let hightlightLinks = getItemFromLocalStorageWithExpiry(HIGHLIGHT_LINKS_KEY);
 let hightlightButtons = getItemFromLocalStorageWithExpiry(HIGHLIGHT_BUTTONS_KEY);
+let hightlightHover = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
 let fontFamily = getItemFromLocalStorageWithExpiry(FONT_FAMILY_KEY);
 
 //COLORS CONTRAST
@@ -66,6 +69,8 @@ let textEnlargeButton;
 let hlHeading;
 let highlightLinksButton;
 let highlightButtonsButton;
+let highlightHoverButton;
+let highlightFocusButton;
 let readableFontButton;
 let friendlyDyslexiaButton;
 let invertedColorsButton;
@@ -79,6 +84,8 @@ let lowSaturationColorsButton
 let redDefButton;
 let greenDefButton;
 let blueDefButton;
+
+let initVlibrasButton;
 
 let alignLeft;
 let alignCenter;
@@ -147,6 +154,7 @@ const tagsQueDevemMostrarBalaoMesmoComMaisDeUmItem = [
 
 window.acessiBrasil.init = function init() {
     if (widgetStatus === null) {
+        initializeVlibras();
         createWidget();
     }
 }
@@ -167,6 +175,8 @@ if (widgetStatus == null) {
         loadHighlightHeading();
         loadHighlightLinks();
         loadHighlightButtons();
+        loadHighlightHover();
+        loadHighlightFocus();
         setFontFamily();
         setAlignText();
         loadContrastColors();
@@ -176,15 +186,14 @@ if (widgetStatus == null) {
         loadBackgroundColor();
         loadDaltonismFilter();
 
-
-        console.log = function () {
-            // Obtém o elemento onde as mensagens serão exibidas
-            var consoleLog = document.getElementById('consoleLog');
-            // Concatena todas as mensagens de log com um espaço entre elas
-            var logMessage = Array.from(arguments).join(' ');
-            // Adiciona a nova mensagem ao conteúdo existente
-            consoleLog.innerHTML += logMessage + '<br>';
-        };
+        // console.log = function () {
+        //     // Obtém o elemento onde as mensagens serão exibidas
+        //     var consoleLog = document.getElementById('consoleLog');
+        //     // Concatena todas as mensagens de log com um espaço entre elas
+        //     var logMessage = Array.from(arguments).join(' ');
+        //     // Adiciona a nova mensagem ao conteúdo existente
+        //     consoleLog.innerHTML += logMessage + '<br>';
+        // };
 
         let modalAppWindow = shadowR.querySelector('#appWindow');
         modalAppWindow.addEventListener('click', (event) => {
@@ -501,6 +510,9 @@ button {
   align-items: center;
   justify-content: center;
   text-align: center;
+  
+  position: relative;
+  
 }
 
 .content-button:hover {
@@ -538,6 +550,9 @@ button {
   padding: 20px;
   box-sizing: border-box; /* Garante que as dimensões incluam a borda e o preenchimento */
   align-items: center;
+  
+  position: relative;
+  
 }
 
 
@@ -698,6 +713,14 @@ button {
        cursor: pointer;
        transition: transform 0.4s ease 0s;
    }
+   
+   .contentButton {
+     transform: rotate(90deg);
+   }
+   
+   .contentButton.active {
+     transform: rotate(0deg);
+   }
  
   .icon {
     height: 24px;
@@ -797,6 +820,39 @@ button {
       100% { transform: rotate(360deg); transform: rotate(360deg); }
     }
 
+
+.tooltip-content {
+    visibility: hidden;
+    opacity: 0;
+    width: 90%;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 10px 2px; /* Aumentando a altura */
+    border-radius: 4px;
+    position: absolute;
+    top:33px;
+    left: 8px;
+    z-index: 2147483647;
+    transition: opacity 0.3s;
+}
+
+.tooltip-arrow {
+    position: absolute;
+    top: -6px; /* Posiciona a "cauda" no topo */
+    left: 4px; /* Move a cauda mais para a esquerda */
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #555; /* Define a cor da "cauda" */
+}
+  
+  .btn-active {
+    background: #1a6eff !important;
+    border-color: #1a6eff !important;
+    color: #fff !important;
+  }
   
   
   </style>
@@ -844,62 +900,22 @@ button {
          <!-- ... Outros botões de configuração ... -->
          <div class="title">
             <span>Content</span>
-            <span class="contentButton">
+            <span class="contentButton active">
                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
                   <path d="m6 9 6 6 6-6"></path>
                </svg>
             </span>
          </div>
          <div class="content-buttons active">
-            <div class="container-buttons">
-               <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
-                  title="Ampliador de Texto" tabindex="0">
-                  <div class="icon">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-in">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
-                        <line x1="11" x2="11" y1="8" y2="14"></line>
-                        <line x1="8" x2="14" y1="11" y2="11"></line>
-                     </svg>
-                  </div>
-                  <span>Text Magnifier</span>
-               </button>
-               <button id="highlightTitlesButton" class="content-button" role="button" aria-label="Highlight Titles"
-                  title="Highlight Titles" tabindex="0">
-                  <div class="icon">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-select">
-                        <path d="M5 3a2 2 0 0 0-2 2"></path>
-                        <path d="M19 3a2 2 0 0 1 2 2"></path>
-                        <path d="M21 19a2 2 0 0 1-2 2"></path>
-                        <path d="M5 21a2 2 0 0 1-2-2"></path>
-                        <path d="M9 3h1"></path>
-                        <path d="M9 21h1"></path>
-                        <path d="M14 3h1"></path>
-                        <path d="M14 21h1"></path>
-                        <path d="M3 9v1"></path>
-                        <path d="M21 9v1"></path>
-                        <path d="M3 14v1"></path>
-                        <path d="M21 14v1"></path>
-                        <line x1="7" x2="15" y1="8" y2="8"></line>
-                        <line x1="7" x2="17" y1="12" y2="12"></line>
-                        <line x1="7" x2="13" y1="16" y2="16"></line>
-                     </svg>
-                  </div>
-                  <span>Highlight Titles</span>
-               </button>
-               <button id="highlightLinksButton" class="content-button" role="button" aria-label="Highlight Links"
-                  title="Highlight Links" tabindex="0">
-                  <div class="icon">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link-2">
-                        <path d="M9 17H7A5 5 0 0 1 7 7h2"></path>
-                        <path d="M15 7h2a5 5 0 1 1 0 10h-2"></path>
-                        <line x1="8" x2="16" y1="12" y2="12"></line>
-                     </svg>
-                  </div>
-                  <span>Highlight Links</span>
-               </button>
-            </div>
+            
             <div class="range-container" func="${FONT_SIZE_KEY}">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            
                <div class="title-container">
                   <label for="letterSpacingSlide" class="slider-icon-title">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-a-large-small">
@@ -924,28 +940,23 @@ button {
                      </svg>
                   </button>
                </div>
+               
+               <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+               
             </div>
             <div class="container-buttons">
-               <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
-                  title="Highlight Buttons" tabindex="0">
-                  <div class="icon">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed-mouse-pointer">
-                        <path d="M5 3a2 2 0 0 0-2 2"></path>
-                        <path d="M19 3a2 2 0 0 1 2 2"></path>
-                        <path d="m12 12 4 10 1.7-4.3L22 16Z"></path>
-                        <path d="M5 21a2 2 0 0 1-2-2"></path>
-                        <path d="M9 3h1"></path>
-                        <path d="M9 21h2"></path>
-                        <path d="M14 3h1"></path>
-                        <path d="M3 9v1"></path>
-                        <path d="M21 9v2"></path>
-                        <path d="M3 14v1"></path>
-                     </svg>
-                  </div>
-                  <span>Highlight Buttons</span>
-               </button>
                <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
                   title="Readable Font" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-spell-check">
                         <path d="m6 16 6-12 6 12"></path>
@@ -954,9 +965,22 @@ button {
                      </svg>
                   </div>
                   <span>Readable Font</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
                <button id="friendlyDyslexiaButton" class="content-button" role="button" aria-label="Friendly Dyslexia"
                   title="Friendly Dyslexia" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-check">
                         <path d="M8 3H2v15h7c1.7 0 3 1.3 3 3V7c0-2.2-1.8-4-4-4Z"></path>
@@ -965,11 +989,24 @@ button {
                      </svg>
                   </div>
                   <span>Friendly Dyslexia</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
             </div>
             <div class="container-buttons">
                <button id="alignLeft" class="content-button" role="button" aria-label="align left" title="align left"
                   tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-left">
                         <line x1="21" x2="3" y1="6" y2="6"></line>
@@ -978,9 +1015,22 @@ button {
                      </svg>
                   </div>
                   <span>Align Left</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
                <button id="alignCenter" class="content-button" role="button" aria-label="format align center"
                   title="format align center" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-center">
                         <line x1="21" x2="3" y1="6" y2="6"></line>
@@ -989,9 +1039,22 @@ button {
                      </svg>
                   </div>
                   <span>Align Center</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
                <button id="alignRight" class="content-button" role="button" aria-label="format align right"
                   title="format align right" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-align-right">
                         <line x1="21" x2="3" y1="6" y2="6"></line>
@@ -1000,9 +1063,22 @@ button {
                      </svg>
                   </div>
                   <span>Align Right</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
             </div>
             <div class="range-container" func="${ZOOM_KEY}">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            
                <div class="title-container">
                   <label for="letterSpacingSlide" class="slider-icon-title">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-expand">
@@ -1027,8 +1103,19 @@ button {
                      </svg>
                   </button>
                </div>
+               <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
             </div>
             <div class="range-container" func="${LINE_HEIGHT_KEY}">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            
                <div class="title-container">
                   <label for="letterSpacingSlide" class="slider-icon-title">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-up-down">
@@ -1051,8 +1138,21 @@ button {
                      </svg>
                   </button>
                </div>
+               
+               <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+               
             </div>
             <div class="range-container" func="${LETTER_SPACING_KEY}">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            
                <div class="title-container">
                   <label for="letterSpacingSlide" class="slider-icon-title">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-left-right">
@@ -1075,6 +1175,12 @@ button {
                      </svg>
                   </button>
                </div>
+               
+               <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+               
             </div>
          </div>
       </div>
@@ -1094,16 +1200,42 @@ button {
                         
                <button id="invertedColorsButton" class="content-button" role="button" aria-label="Inversor de cores"
                   title="Inversor de cores" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>Inverted Colors</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>    
                
                <button id="intelligentInvertedColorsButton" class="content-button" role="button" aria-label="Inversor de cores inteligente"
                   title="Inversor de cores inteligente" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>Intelligent Inverted Colors</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>     
                         
             </div>
@@ -1112,21 +1244,60 @@ button {
                
                <button id="lightContrastColorsButton" class="content-button" role="button" aria-label="Contraste claro"
                   title="Contraste claro" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>Light Contrast</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
                <button id="darkContrastColorsButton" class="content-button" role="button" aria-label="Contraste escuro"
                   title="Contraste escuro" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>Dark Contrast</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
                <button id="highContrastColorsButton" class="content-button" role="button" aria-label="Contraste alto"
                   title="Contraste alto" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>High Contrast</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
                
             </div>
@@ -1136,46 +1307,131 @@ button {
             <div class="container-buttons">
                <button id="highSaturationColorsButton" class="content-button" role="button" aria-label="Contraste alto"
                   title="Contraste alto" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>High Saturation</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
                <button id="lowSaturationColorsButton" class="content-button" role="button" aria-label="Contraste alto"
                   title="Contraste alto" tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>Low Saturation</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
                 <button id="monochromaticColorsButton" class="content-button" role="button" aria-label="Contraste alto"
                   title="Monocromatico" tabindex="0" style="line-break: anywhere;">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>Monochromatic</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
             </div>
             
             <div class="container-buttons">
                <button id="redDefButton" class="content-button" role="button" aria-label="Deficiencia de vermelho"
                   title="Deficiencia de vermelho" tabindex="0" style="line-break: anywhere;">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>Protanomaly</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
                <button id="greenDefButton" class="content-button" role="button" aria-label="Deficiencia de verde"
                   title="Deficiencia de verde" tabindex="0" style="line-break: anywhere;">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>Deuteranomaly</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
                 <button id="blueDefButton" class="content-button" role="button" aria-label="Deficiencia de azul"
                   title="Deficiencia de azul" tabindex="0" style="line-break: anywhere;">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
                   <div class="icon">
                   </div>
                   <span>Tritanomaly</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
                </button>
             </div>
             
             <div data-test="adjustTextColor" class="range-container">
+            
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            
                 <div class="title-container">
                   <label for="letterSpacingSlide" class="slider-icon-title">
                      <span class="slider-title">Adjust Text Colors</span>
@@ -1219,10 +1475,22 @@ button {
                 
                </div>
                
+                <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                </div>
+               
                <a href="#" class="link-default-color">Default</a>
                
             </div>
             <div data-test="adjustTitleColor" class="range-container">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            
                 <div class="title-container">
                   <label for="letterSpacingSlide" class="slider-icon-title">
                      <span class="slider-title">Adjust Title Colors</span>
@@ -1264,11 +1532,23 @@ button {
                 
                </div>
                
+                <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                </div>
+                
                <a href="#" class="link-default-color">Default</a>
 
                
             </div>
             <div data-test="adjustBackgroundColor" class="range-container">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            
                 <div class="title-container">
                   <label for="letterSpacingSlide" class="slider-icon-title">
                      <span class="slider-title">Adjust Background Colors</span>
@@ -1310,11 +1590,230 @@ button {
                 
                </div>
                
+                <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                </div>
+                
                <a href="#" class="link-default-color">Default</a>
+               
                
             </div>
          </div>
       </div>
+     
+      <div class="scrollable-content">
+        <div class="title">
+            <span>Orientation</span>
+            <span class="contentButton">
+               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                  <path d="m6 9 6 6 6-6"></path>
+               </svg>
+            </span>
+        </div>
+        
+        <div class="content-buttons">
+        <div class="container-buttons">
+               <button id="textEnlargeButton" class="content-button" role="button" aria-label="Ampliador de Texto"
+                tabindex="0">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-in">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+                        <line x1="11" x2="11" y1="8" y2="14"></line>
+                        <line x1="8" x2="14" y1="11" y2="11"></line>
+                     </svg>
+                  </div>
+                  <span>Text Magnifier</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
+               </button>
+               
+               
+                <button id="initVlibrasButton" class="content-button" role="button" aria-label="Deficiencia de azul"
+                  title="Deficiencia de azul" tabindex="0" style="line-break: anywhere;">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  
+                  <div class="icon">
+                  </div>
+                  <span>Vlibras</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
+               </button>
+               
+               
+               <button id="highlightHoverButton" class="content-button" role="button" aria-label="Highlight Hover"
+                  title="Highlight Hover" tabindex="0">
+                  
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+
+                  
+                  <div class="icon">
+                  </div>
+                  <span>Highlight Hover</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
+               </button>
+         </div>
+         
+         <div class="container-buttons">
+         
+         
+             <button id="highlightButtonsButton" class="content-button" role="button" aria-label="Highlight Buttons"
+                      title="Highlight Buttons" tabindex="0">
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+
+                      <div class="icon">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed-mouse-pointer">
+                            <path d="M5 3a2 2 0 0 0-2 2"></path>
+                            <path d="M19 3a2 2 0 0 1 2 2"></path>
+                            <path d="m12 12 4 10 1.7-4.3L22 16Z"></path>
+                            <path d="M5 21a2 2 0 0 1-2-2"></path>
+                            <path d="M9 3h1"></path>
+                            <path d="M9 21h2"></path>
+                            <path d="M14 3h1"></path>
+                            <path d="M3 9v1"></path>
+                            <path d="M21 9v2"></path>
+                            <path d="M3 14v1"></path>
+                         </svg>
+                      </div>
+                      <span>Highlight Buttons</span>
+
+
+                      <div class="tooltip-content">
+                        Faz um highlight nos botões.
+                        <span class="tooltip-arrow"></span>
+                      </div>
+
+                   </button>
+         
+         
+                <button id="highlightTitlesButton" class="content-button" role="button" aria-label="Highlight Titles"
+                  title="Highlight Titles" tabindex="0">
+                  
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+
+                  
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-select">
+                        <path d="M5 3a2 2 0 0 0-2 2"></path>
+                        <path d="M19 3a2 2 0 0 1 2 2"></path>
+                        <path d="M21 19a2 2 0 0 1-2 2"></path>
+                        <path d="M5 21a2 2 0 0 1-2-2"></path>
+                        <path d="M9 3h1"></path>
+                        <path d="M9 21h1"></path>
+                        <path d="M14 3h1"></path>
+                        <path d="M14 21h1"></path>
+                        <path d="M3 9v1"></path>
+                        <path d="M21 9v1"></path>
+                        <path d="M3 14v1"></path>
+                        <path d="M21 14v1"></path>
+                        <line x1="7" x2="15" y1="8" y2="8"></line>
+                        <line x1="7" x2="17" y1="12" y2="12"></line>
+                        <line x1="7" x2="13" y1="16" y2="16"></line>
+                     </svg>
+                  </div>
+                  <span>Highlight Titles</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
+               </button>
+               <button id="highlightLinksButton" class="content-button" role="button" aria-label="Highlight Links"
+                  title="Highlight Links" tabindex="0">
+                  
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                        position: absolute;
+                        left: 10px;
+                        top: 8px;
+                    "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+
+                  
+                  <div class="icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link-2">
+                        <path d="M9 17H7A5 5 0 0 1 7 7h2"></path>
+                        <path d="M15 7h2a5 5 0 1 1 0 10h-2"></path>
+                        <line x1="8" x2="16" y1="12" y2="12"></line>
+                     </svg>
+                  </div>
+                  <span>Highlight Links</span>
+                  
+                  <div class="tooltip-content">
+                        Descrição de tooltip teste.
+                        <span class="tooltip-arrow"></span>
+                   </div>
+                  
+               </button>
+               
+          </div>
+        
+                <div class="container-buttons">
+                <button id="highlightFocusButton" class="content-button" role="button" aria-label="Highlight Focus"
+                          title="Highlight Focus" tabindex="0">
+                          
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6eff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info" style="
+                                position: absolute;
+                                left: 10px;
+                                top: 8px;
+                            "><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+        
+                          
+                          <div class="icon">
+                          </div>
+                          <span>Highlight Focus</span>
+                          
+                          <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                           </div>
+                          
+                       </button>
+               </div>
+        
+        </div>
+        
+      </div>
+      
    </div>
 </div>
 <div id="modal-hide" class="app-window" role="application" aria-label="Modal para esconder Widget">
@@ -1368,10 +1867,9 @@ button {
     expandWindow.style.position = 'fixed';
     expandWindow.style.left = '0';
     expandWindow.style.top = '0';
-    expandWindow.style.zIndex = '9999';
+    expandWindow.style.zIndex = '2147483649';
     expandWindow.style.width = '100%';
     expandWindow.style.height = '100%';
-
 
     shadowRoot.innerHTML = '<button id="accessibilityButton" class="accessibility-button">' +
         '<svg fill="#FFF" width="50px" height="50px" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg" stroke="#FFF" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.288"></g><g id="SVGRepo_iconCarrier"><path d="M9.5,3.5A2.5,2.5,0,1,1,12,6,2.5,2.5,0,0,1,9.5,3.5ZM20,7H4A1,1,0,0,0,4,9H9V22a1,1,0,0,0,2,0V15h2v7a1,1,0,0,0,2,0V9h5a1,1,0,0,0,0-2Z"></path></g></svg>' +
@@ -1383,6 +1881,42 @@ button {
 
 }
 
+function initializeVlibras() {
+
+    // Função para carregar e executar scripts dinamicamente
+    function loadScript(src, callback) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.async = true;
+        s.onload = callback;
+        (document.querySelector('head') || document.body).appendChild(s);
+    }
+
+// Adiciona o HTML necessário para o VLibras
+    function addVLibrasHTML() {
+        var vLibrasDiv = document.createElement('div');
+        vLibrasDiv.setAttribute('vw', 'class');
+        vLibrasDiv.className = 'enabled';
+        vLibrasDiv.id = "vlibras";
+        vLibrasDiv.style.display = 'none';
+        // vLibrasDiv.style.zIndex = '9998 !important;'
+
+        vLibrasDiv.innerHTML = `
+        <div vw-access-button class="active" id="vlibrasclick"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    `;
+
+        document.body.appendChild(vLibrasDiv);
+    }
+
+    addVLibrasHTML();
+
+    loadScript('https://vlibras.gov.br/app/vlibras-plugin.js', function() {
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    });
+}
 
 function assignFunctionsToIds() {
 
@@ -1490,6 +2024,12 @@ function assignFunctionsToIds() {
     highlightButtonsButton = shadowR.querySelector("#highlightButtonsButton");
     highlightButtonsButton.addEventListener('click', highlightButtons);
 
+    highlightHoverButton = shadowR.querySelector("#highlightHoverButton");
+    highlightHoverButton.addEventListener('click', setHighlightHover);
+
+    highlightFocusButton = shadowR.querySelector("#highlightFocusButton");
+    highlightFocusButton.addEventListener('click', setHighlightFocus);
+
     readableFontButton = shadowR.querySelector("#readableFontButton");
     readableFontButton.addEventListener('click', () => {
         changeFontFamily(1);
@@ -1574,6 +2114,25 @@ function assignFunctionsToIds() {
         changeDaltonismFilter(3, document.activeElement.parentElement.parentElement);
     });
 
+    initVlibrasButton = shadowR.querySelector("#initVlibrasButton");
+    initVlibrasButton.addEventListener('click', () => {
+        changeStyleButtonSelected(initVlibrasButton);
+
+        let display = document.getElementById("vlibras").style.display;
+
+        if(display === 'block') {
+            // display = 'hide';
+            document.querySelector('.vpw-header-btn-close').click();
+            document.getElementById("vlibras").style.display = "none";
+        }else {
+            // display = 'block';
+            document.getElementById("vlibras").style.display = "block";
+            toggleExpandWindow();
+            document.getElementById("vlibrasclick").click();
+        }
+
+    });
+
 
 //    MODAL HIDE
 
@@ -1612,35 +2171,28 @@ function changeTextAndColorRangeValue(percentAcrescentar, percentageElement) {
 
 function changeStyleButtonSelected(id) {
 
-
-    if (id.style.background === 'rgb(26, 110, 255)') {
-        id.style.background = '#ffffff';
-        // id.style.borderColor = 'transparent';
-        id.style.color = '#000';
-    } else {
-        id.style.background = '#1a6eff'; //#ffffff
-        // id.style.borderColor = '#1a6eff'; //#8e8e8e
-        id.style.color = '#fff'; //#000
+    if(!id.classList.contains('btn-active')) {
+        id.classList.add("btn-active");
+    }else {
+        id.classList.remove("btn-active");
     }
-
 
 }
 
 function changeStyleButtonSelectedAndDeselectOthers(idActivate, idsDisable) {
 
-
     if (idActivate !== null) {
-        idActivate.style.setProperty('background', '#1a6eff', 'important');
-        idActivate.style.setProperty('borderColor', '#1a6eff', 'important');
-        idActivate.style.setProperty('color', '#fff', 'important');
+        if(!idActivate.classList.contains('btn-active')) {
+            idActivate.classList.add("btn-active");
+        }else {
+            idActivate.classList.remove("btn-active");
+        }
     }
 
     idsDisable.forEach(function (index) {
-
-        index.style.setProperty('background', '#ffffff', 'important');
-        index.style.setProperty('borderColor', '#8e8e8e', 'important');
-        index.style.setProperty('color', '#000', 'important');
-
+        if(index.classList.contains('btn-active')) {
+            index.classList.remove("btn-active");
+        }
     });
 
 }
@@ -1722,7 +2274,7 @@ function updateFontSizeSlide(defaultPercentage) {
         currentFontSize.value,
         currentFontSize.percentage);
 
-    const percentageElement = shadowR.querySelector(`[func="${FONT_SIZE_KEY}"]`).children[1]
+    const percentageElement = shadowR.querySelector(`[func="${FONT_SIZE_KEY}"]`).children[2]
         .getElementsByClassName('base-range')[0];
     changeTextAndColorRangeValue(defaultPercentage, percentageElement);
 
@@ -1798,7 +2350,7 @@ function updateZoomSlide(percentage) {
         currentZoom.percentage);
 
 
-    const percentageElement = shadowR.querySelector(`[func="${ZOOM_KEY}"]`).children[1]
+    const percentageElement = shadowR.querySelector(`[func="${ZOOM_KEY}"]`).children[2]
         .getElementsByClassName('base-range')[0];
     changeTextAndColorRangeValue(percentage, percentageElement);
 
@@ -1859,7 +2411,7 @@ function updateLineHeightSlide(percentage) {
         percentage);
 
 
-    const percentageElement = shadowR.querySelector(`[func="${LINE_HEIGHT_KEY}"]`).children[1]
+    const percentageElement = shadowR.querySelector(`[func="${LINE_HEIGHT_KEY}"]`).children[2]
         .getElementsByClassName('base-range')[0];
     changeTextAndColorRangeValue(percentage, percentageElement);
 
@@ -1941,7 +2493,7 @@ function updateLetterSpacingSlide(percentage) {
         percentage);
 
 
-    const percentageElement = shadowR.querySelector(`[func="${LETTER_SPACING_KEY}"]`).children[1]
+    const percentageElement = shadowR.querySelector(`[func="${LETTER_SPACING_KEY}"]`).children[2]
         .getElementsByClassName('base-range')[0];
     changeTextAndColorRangeValue(percentage, percentageElement);
 
@@ -2551,7 +3103,9 @@ function createStyleGlobal() {
         '.mono-saturation { filter: grayscale(100%) !important; } ' +
         '.protanomaly { filter: url(#protanomaly-filter)}' +
         '.deuteranomaly { filter: url(#deuteranomaly-filter)}' +
-        '.tritanomaly { filter: url(#tritanomaly-filter)}'
+        '.tritanomaly { filter: url(#tritanomaly-filter)}' +
+        '.hover-active:hover { outline: rgb(20, 111, 248) solid 2px; outline-offset: 2px; }' +
+        '.focus-active:focus { outline: rgba(255, 114, 22, 0.5) solid 2px; outline-offset: 2px; }'
     );
 
 
@@ -2619,32 +3173,52 @@ function setColorContrast(html) {
         html.classList.remove("inverted", "dark-contrast", "light-contrast");
         removeContrastClasses();
 
+        let widget = shadowR.querySelector('#widget');
+
         switch (selectedColorContrast) {
             case 'inverted':
+                // filterStyle.innerHTML = 'body > *:not(#shadow) { filter: invert(100%) !important; background: #fff !important; }';
                 filterStyle.innerHTML = 'body > *:not(#shadow) { filter: invert(100%) !important; background: #fff !important; }';
-                // filterStyle.innerHTML = '';
+                widget.style.filter = 'invert(100%)';
+                widget.style.background = '#fff';
+
                 break;
             case 'int-inverted':
                 filterStyle.innerHTML = 'body > *:not(#shadow) { filter: invert(100%) !important; background: #fff !important; }' +
                     ' img, video, iframe, picture, svg { filter: invert(1); }';
-                // filterStyle.innerHTML = '';
+                widget.style.filter = 'invert(100%)';
+                widget.style.background = '#fff';
+
                 break;
             case 'light':
                 filterStyle.innerHTML = 'body > *:not(#shadow) { background-color: #fff !important; color: #181818 !important; }';
+                widget.style.filter = '';
+                widget.style.color = '#181818';
+                widget.style.background = '#fff';
+
                 txtTags.forEach(txtTag => txtTag.classList.add("light-contrast"));
                 buttons.forEach(button => button.classList.add("light-contrast"));
 
                 break;
             case 'dark':
                 filterStyle.innerHTML = 'body > *:not(#shadow) { background-color: #181818 !important; color: #fff !important; }';
+                widget.style.filter = '';
+                widget.style.color = '#fff';
+                widget.style.background = '#181818';
+
                 txtTags.forEach(txtTag => txtTag.classList.add("dark-contrast"));
                 buttons.forEach(button => button.classList.add("dark-contrast"));
                 break;
             case 'high':
                 removeContrastClasses();
                 filterStyle.innerHTML = 'body > *:not(#shadow) { filter: contrast(135%) !important; }';
+                widget.style.filter = 'contrast(135%)';
+                widget.style.color = '#181818';
+                widget.style.background = '#fff';
+
                 break;
             default:
+                widget.style = 'transform: translate(0px, 0px) !important;';
                 removeContrastClasses();
         }
 
@@ -2793,6 +3367,25 @@ function assignAdjustColorsEventListeners() {
     assignAdjustTitleColor();
     assignAdjustBackgroundColor();
     assignDefaultButtonsAdjustColor();
+
+    shadowR.querySelectorAll('.lucide-info').forEach(info => {
+        info.addEventListener('mouseenter', () => {
+            const tooltip = info.nextElementSibling.nextElementSibling.nextElementSibling;
+            if (tooltip && tooltip.classList.contains('tooltip-content')) {
+                tooltip.style.visibility = 'visible';
+                tooltip.style.opacity = '1';
+            }
+        });
+        
+        info.addEventListener('mouseleave', () => {
+            const tooltip = info.nextElementSibling.nextElementSibling.nextElementSibling;
+            if (tooltip && tooltip.classList.contains('tooltip-content')) {
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.opacity = '0';
+            }
+        });
+    });
+
 }
 
 function assignAdjustTextColor() {
@@ -3051,5 +3644,83 @@ function setDaltonismFilter(html) {
         const selectedButton = buttonsMap[indexActualDaltonismFilter] || null;
         const otherButtons = Object.values(buttonsMap).filter(button => button !== selectedButton);
         changeStyleButtonSelectedAndDeselectOthers(selectedButton, otherButtons);
+    }
+}
+
+function setHighlightHover() {
+
+    let txtTags = getLastLeafElementsWithText();
+    let otherItens = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"], img');
+
+    let otherItensArray = Array.from(otherItens);
+    let combined = [...txtTags, ...otherItensArray];
+
+    const isHoverActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
+
+    if (isHoverActive && isHoverActive.value === 'true') {
+        combined.forEach(el => el.classList.remove('hover-active'));
+        setItemToLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY, 'false', null);
+    } else {
+        combined.forEach(el => el.classList.add('hover-active'));
+        setItemToLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY, 'true', null);
+
+    }
+
+    changeStyleButtonSelected(highlightHoverButton);
+
+}
+
+function loadHighlightHover() {
+    let txtTags = getLastLeafElementsWithText();
+    let otherItens = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"], img');
+
+    let otherItensArray = Array.from(otherItens);
+    let combined = [...txtTags, ...otherItensArray];
+    const isHoverActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
+
+    if (isHoverActive !== null && isHoverActive.value === 'true') {
+        combined.forEach(el => el.classList.add('hover-active'));
+        changeStyleButtonSelected(highlightHoverButton);
+    } else {
+        combined.forEach(el => el.classList.remove('hover-active'));
+    }
+
+}
+
+function setHighlightFocus() {
+
+    let allItens = document.querySelectorAll('body *');
+
+    // Verifica o estado do localStorage
+    const isFocusActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY);
+
+    if (isFocusActive && isFocusActive.value === 'true') {
+        // Remove a classe de focus de todos os elementos
+        allItens.forEach(el => el.classList.remove('focus-active'));
+        setItemToLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY, 'false', null);
+    } else {
+        // Adiciona a classe de focus a todos os elementos
+        allItens.forEach(el => el.classList.add('focus-active'));
+        setItemToLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY, 'true', null);
+    }
+
+    // Atualiza o estilo do botão (pode ser omitido se não houver um botão específico)
+    changeStyleButtonSelected(highlightFocusButton);
+}
+
+function loadHighlightFocus() {
+
+    let allItens = document.querySelectorAll('body *');
+
+    // Verifica o estado do localStorage
+    const isFocusActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY);
+
+    if (isFocusActive !== null && isFocusActive.value === 'true') {
+        // Adiciona a classe de focus a todos os elementos
+        allItens.forEach(el => el.classList.add('focus-active'));
+        changeStyleButtonSelected(highlightFocusButton);
+    } else {
+        // Remove a classe de focus de todos os elementos
+        allItens.forEach(el => el.classList.remove('focus-active'));
     }
 }
