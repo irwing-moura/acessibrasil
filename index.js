@@ -180,15 +180,6 @@ if (widgetStatus == null) {
         loadBackgroundColor();
         loadDaltonismFilter();
 
-        // console.log = function () {
-        //     // Obtém o elemento onde as mensagens serão exibidas
-        //     var consoleLog = document.getElementById('consoleLog');
-        //     // Concatena todas as mensagens de log com um espaço entre elas
-        //     var logMessage = Array.from(arguments).join(' ');
-        //     // Adiciona a nova mensagem ao conteúdo existente
-        //     consoleLog.innerHTML += logMessage + '<br>';
-        // };
-
         let modalAppWindow = shadowR.querySelector('#appWindow');
         modalAppWindow.addEventListener('click', (event) => {
             if (event.target.id === 'appWindow') {
@@ -1855,7 +1846,6 @@ button {
 </div>
     `;
 
-    // expandWindow.style.display = 'none';
     expandWindow.style.opacity = '0';
     expandWindow.style.visibility = 'hidden';
     expandWindow.style.position = 'fixed';
@@ -1879,7 +1869,7 @@ function initializeVlibras() {
 
     // Função para carregar e executar scripts dinamicamente
     function loadScript(src, callback) {
-        var s = document.createElement('script');
+        let s = document.createElement('script');
         s.src = src;
         s.async = true;
         s.onload = callback;
@@ -1888,7 +1878,7 @@ function initializeVlibras() {
 
 // Adiciona o HTML necessário para o VLibras
     function addVLibrasHTML() {
-        var vLibrasDiv = document.createElement('div');
+        let vLibrasDiv = document.createElement('div');
         vLibrasDiv.setAttribute('vw', 'class');
         vLibrasDiv.className = 'enabled';
         vLibrasDiv.id = "vlibras";
@@ -2115,11 +2105,9 @@ function assignFunctionsToIds() {
         let display = document.getElementById("vlibras").style.display;
 
         if(display === 'block') {
-            // display = 'hide';
             document.querySelector('.vpw-header-btn-close').click();
             document.getElementById("vlibras").style.display = "none";
         }else {
-            // display = 'block';
             document.getElementById("vlibras").style.display = "block";
             toggleExpandWindow();
             document.getElementById("vlibrasclick").click();
@@ -2200,8 +2188,6 @@ function toggleExpandWindow() {
     let button = shadowR.querySelector('#accessibilityButton');
     let modal = shadowR.querySelector('#modal-hide');
 
-    let screenWidth = window.innerWidth;
-
     if (appWindow.style.opacity === '0' || appWindow.style.opacity === '') {
 
 
@@ -2250,7 +2236,6 @@ function updateFontSizeSlide(defaultPercentage) {
             let attName = txtTag.getAttribute('original-size');
             let initialSize = parseInt(attName);
             let newSize = initialSize + (initialSize * defaultPercentage / 100);
-            // txtTag.style.fontSize = newSize + 'px';
             txtTag.style.setProperty('font-size', newSize + 'px', 'important');
         }
 
@@ -2289,7 +2274,6 @@ function loadFontSize() {
             if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
                 let initialSize = parseInt(txtTag.getAttribute('original-size'));
                 let newSize = initialSize + (initialSize * currentFontSize.percentage / 100);
-                // txtTag.style.fontSize = newSize + 'px';
                 txtTag.style.setProperty('font-size', newSize + 'px', 'important');
             }
             updateFontSizeSlide(currentFontSize.percentage);
@@ -2556,7 +2540,6 @@ function getLastLeafElementsWithText() {
     }
 
     // Função para verificar se o elemento é uma tag de imagem
-    //TODO:: REFAZER ESSE METODO, ONDE IRA RECEBER UMA LISTA COM AS TAGS QUE DEVEM SER EXCLUIDAS
     function shouldBeRemoved(element) {
         return element.tagName.toLowerCase() === 'img' || element.tagName.toLowerCase() === 'svg' ||
             element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
@@ -2697,8 +2680,8 @@ function criarBalao() {
 // Função para atualizar a posição do balão
 function atualizarPosicaoBalao(event, balao) {
     // Leva em consideração a posição do scroll
-    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
-    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollX = window.scrollX || document.documentElement.scrollLeft;
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
 
     // Calcula a posição horizontal do cursor do mouse em relação ao centro da tela
     const cursorXFromCenter = event.clientX - window.innerWidth / 2;
@@ -2815,13 +2798,11 @@ function setAlignText() {
         let selectedAlignText = aligns[indexActualTextAlign];
         let elements = getLastLeafElementsWithText();
 
-        for (let i = 0; i < elements.length; i++) {
+        for (let element of elements) {
 
-            // elements[i].style.setProperty('font-family', selectedFontFamily, 'important');
-
-            if (!elements[i].closest('.app-window') && !elements[i].closest('.accessibility-button')) {
+            if (!element.closest('.app-window') && !element.closest('.accessibility-button')) {
                 // Aplique os estilos apenas se não pertencer à classe 'app-window'
-                elements[i].style.setProperty('text-align', selectedAlignText, 'important');
+                element.style.setProperty('text-align', selectedAlignText, 'important');
             }
 
             if (selectedAlignText === '') {
@@ -2863,7 +2844,6 @@ function highlightHeading() {
 
         if (attName == null) {
 
-            // txtTag.style.setProperty('outline', '2px solid rgba(255, 114, 22, 0.5)', 'important');
             txtTag.style.setProperty('outline', 'rgb(20, 111, 248) solid 2px', 'important');
             txtTag.style.setProperty('outline-offset', '2px', 'important');
 
@@ -2894,24 +2874,6 @@ function loadHighlightHeading() {
         highlightHeading();
     }
 }
-
-
-function transformToHex(rgb) {
-    // Verifique se a cor está no formato 'rgb(r, g, b)'
-    var match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-
-    if (match) {
-        // Converte os valores para hexadecimal e os concatena
-        return '#' +
-            ('0' + parseInt(match[1], 10).toString(16)).slice(-2) +
-            ('0' + parseInt(match[2], 10).toString(16)).slice(-2) +
-            ('0' + parseInt(match[3], 10).toString(16)).slice(-2);
-    } else {
-        // Se a cor já estiver no formato hexadecimal, retorna ela mesma
-        return rgb;
-    }
-}
-
 
 function highlightLinks() {
 
@@ -3034,13 +2996,11 @@ function setFontFamily() {
         let selectedFontFamily = fontes[indexActualFontFamily];
         let elements = document
             .querySelectorAll('li, a, p, h1, span, h2, h3, h4, h5, h6, input[type="button"], button, input[type="submit"]');
-        for (let i = 0; i < elements.length; i++) {
+        for (let element of elements) {
 
-            // elements[i].style.setProperty('font-family', selectedFontFamily, 'important');
-
-            if (!elements[i].closest('.app-window') && !elements[i].closest('.accessibility-button')) {
+            if (!element.closest('.app-window') && !element.closest('.accessibility-button')) {
                 // Aplique os estilos apenas se não pertencer à classe 'app-window'
-                elements[i].style.setProperty('font-family', selectedFontFamily, 'important');
+                element.style.setProperty('font-family', selectedFontFamily, 'important');
             }
 
             if (selectedFontFamily === '') {
@@ -3171,7 +3131,6 @@ function setColorContrast(html) {
 
         switch (selectedColorContrast) {
             case 'inverted':
-                // filterStyle.innerHTML = 'body > *:not(#shadow) { filter: invert(100%) !important; background: #fff !important; }';
                 filterStyle.innerHTML = 'body > *:not(#shadow) { filter: invert(100%) !important; background: #fff !important; }';
                 widget.style.filter = 'invert(100%)';
                 widget.style.background = '#fff';
@@ -3259,8 +3218,6 @@ function changeColorSaturation(saturation, html) {
 
 function setColorSaturation(html) {
 
-    const filterStyle = document.getElementById('filter-incloowe');
-
     if (indexActualColorSaturation !== null) {
         const selectedColorSaturation = saturations[indexActualColorSaturation];
         html.classList.remove("high-saturation", "low-saturation", "mono-saturation");
@@ -3268,15 +3225,12 @@ function setColorSaturation(html) {
         switch (selectedColorSaturation) {
             case 'high':
                 html.classList.add("high-saturation");
-                // filterStyle.innerHTML = 'body > *:not(#shadow) { filter: saturate(3) !important; }';
                 break;
             case 'low':
                 html.classList.add("low-saturation");
-                // filterStyle.innerHTML = 'body > *:not(#shadow) { filter: saturate(0.5) !important; }';
                 break;
             case 'mono':
                 html.classList.add("mono-saturation");
-                // filterStyle.innerHTML = 'body > *:not(#shadow) { filter: grayscale(100%) !important; }';
                 break;
             default:
                 html.classList.remove("high", "low", "mono");
@@ -3344,7 +3298,6 @@ function loadBackgroundColor() {
 
 function assignDefaultButtonsAdjustColor() {
 
-    // let colorPickButtons  = shadowR.querySelectorAll('.color-pick');
     let defaultButtons = shadowR.querySelectorAll('.link-default-color')
     defaultButtons.forEach(button => {
         button.addEventListener('click', function (e) {
@@ -3365,7 +3318,7 @@ function assignAdjustColorsEventListeners() {
     shadowR.querySelectorAll('.lucide-info').forEach(info => {
         info.addEventListener('mouseenter', () => {
             const tooltip = info.nextElementSibling.nextElementSibling.nextElementSibling;
-            if (tooltip && tooltip.classList.contains('tooltip-content')) {
+            if (tooltip?.classList.contains('tooltip-content')) {
                 tooltip.style.visibility = 'visible';
                 tooltip.style.opacity = '1';
             }
@@ -3373,7 +3326,7 @@ function assignAdjustColorsEventListeners() {
         
         info.addEventListener('mouseleave', () => {
             const tooltip = info.nextElementSibling.nextElementSibling.nextElementSibling;
-            if (tooltip && tooltip.classList.contains('tooltip-content')) {
+            if (tooltip?.classList.contains('tooltip-content')) {
                 tooltip.style.visibility = 'hidden';
                 tooltip.style.opacity = '0';
             }
@@ -3384,7 +3337,6 @@ function assignAdjustColorsEventListeners() {
 
 function assignAdjustTextColor() {
 
-    // let colorPickButtons  = shadowR.querySelectorAll('.color-pick');
     let colorPickButtons = shadowR.querySelectorAll('div[data-test="adjustTextColor"]')[0]
         .querySelectorAll('.color-pick');
     colorPickButtons.forEach(button => {
@@ -3397,7 +3349,6 @@ function assignAdjustTextColor() {
 
 function assignAdjustTitleColor() {
 
-    // let colorPickButtons  = shadowR.querySelectorAll('.color-pick');
     let colorPickButtons = shadowR.querySelectorAll('div[data-test="adjustTitleColor"]')[0]
         .querySelectorAll('.color-pick');
     colorPickButtons.forEach(button => {
@@ -3410,7 +3361,6 @@ function assignAdjustTitleColor() {
 
 function assignAdjustBackgroundColor() {
 
-    // let colorPickButtons  = shadowR.querySelectorAll('.color-pick');
     let colorPickButtons = shadowR.querySelectorAll('div[data-test="adjustBackgroundColor"]')[0]
         .querySelectorAll('.color-pick');
     colorPickButtons.forEach(button => {
@@ -3426,8 +3376,6 @@ let lastSelectedTitleColor;
 let lastSelectedBackgroundColor;
 
 function setAdjustColor(button, fila) {
-
-    // todo:: VERIFICAR FUNCIONAMENTO JUNTO AS FUNCOES DE HIGHLIGHT
 
     const isDefault = button.classList.contains('link-default-color');
 
