@@ -1,6 +1,6 @@
 window.acessiBrasil = window.acessiBrasil || {};
 
-const WIDGET_STATUS = "widget-status";
+const WIDGET_STATUS_KEY = "widget-status";
 
 const FONT_SIZE_KEY = "font-size";
 const ZOOM_KEY = "zoom";
@@ -14,7 +14,6 @@ const HIGHLIGHT_BUTTONS_KEY = "highlight-buttons";
 const HIGHLIGHT_HOVER_KEY = "highlight-hover";
 const HIGHLIGHT_FOCUS_KEY = "highlight-focus";
 const FONT_FAMILY_KEY = "font-family";
-const INVERTED_COLORS_KEY = "inverted-colors";
 const COLORS_CONTRAST_KEY = "colors-contrast";
 const COLORS_SATURATION_KEY = "colors-saturation";
 
@@ -25,7 +24,7 @@ const ADJUST_BACKGROUND_COLOR_KEY = "adjust-background-color"
 
 const DALTONISM_FILTER_KEY = "daltonism-filter";
 
-let widgetStatus = getItemFromLocalStorageWithExpiry(WIDGET_STATUS);
+let widgetStatus = getItemFromLocalStorageWithExpiry(WIDGET_STATUS_KEY);
 
 let currentFontSize = getItemFromLocalStorageWithExpiry(FONT_SIZE_KEY);
 let currentZoom = getItemFromLocalStorageWithExpiry(ZOOM_KEY);
@@ -37,7 +36,6 @@ let textAlign = getItemFromLocalStorageWithExpiry(TEXT_ALIGN_KEY);
 let hightlightHeadings = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HEADINGS_KEY);
 let hightlightLinks = getItemFromLocalStorageWithExpiry(HIGHLIGHT_LINKS_KEY);
 let hightlightButtons = getItemFromLocalStorageWithExpiry(HIGHLIGHT_BUTTONS_KEY);
-let hightlightHover = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
 let fontFamily = getItemFromLocalStorageWithExpiry(FONT_FAMILY_KEY);
 
 //COLORS CONTRAST
@@ -92,10 +90,6 @@ let alignCenter;
 let alignRight;
 let cancelHide;
 let submitHide;
-let fontSizeSlide;
-let zoomSlide;
-let lineHeightSlide;
-let letterSpacingSlide;
 
 let shadowR;
 
@@ -2154,7 +2148,7 @@ function hideWidget() {
 
     setTimeout(function () {
         clearLocalStorage();
-        setItemToLocalStorageWithExpiry("widget-status", 'hide', null);
+        setItemToLocalStorageWithExpiry(WIDGET_STATUS_KEY, 'hide', null);
     }, 1500);
 
 }
@@ -2270,7 +2264,7 @@ function updateFontSizeSlide(defaultPercentage) {
         expiry: plusDays
     }
 
-    setItemToLocalStorageWithExpiry("font-size",
+    setItemToLocalStorageWithExpiry(FONT_SIZE_KEY,
         currentFontSize.value,
         currentFontSize.percentage);
 
@@ -2345,7 +2339,7 @@ function updateZoomSlide(percentage) {
         expiry: plusDays
     }
 
-    setItemToLocalStorageWithExpiry("zoom",
+    setItemToLocalStorageWithExpiry(ZOOM_KEY,
         currentZoom.value,
         currentZoom.percentage);
 
@@ -2406,7 +2400,7 @@ function updateLineHeightSlide(percentage) {
         expiry: plusDays
     }
 
-    setItemToLocalStorageWithExpiry("line-height",
+    setItemToLocalStorageWithExpiry(LINE_HEIGHT_KEY,
         null,
         percentage);
 
@@ -2488,7 +2482,7 @@ function updateLetterSpacingSlide(percentage) {
         expiry: plusDays
     }
 
-    setItemToLocalStorageWithExpiry("letter-spacing",
+    setItemToLocalStorageWithExpiry(LETTER_SPACING_KEY,
         null,
         percentage);
 
@@ -2768,11 +2762,11 @@ function updateTextMagnifier() {
     let balao = document.querySelector(".balao");
     if (balao.style.display === 'block') {
         balao.style.setProperty('display', 'none', 'important');
-        removeItemFromLocalStorage("text-magnifier");
+        removeItemFromLocalStorage(TEXT_MAGNIFIER_KEY);
 
     } else {
         balao.style.setProperty('display', 'block', 'important');
-        setItemToLocalStorageWithExpiry("text-magnifier",
+        setItemToLocalStorageWithExpiry(TEXT_MAGNIFIER_KEY,
             true,
             null);
         getElementCursorHover();
@@ -2804,9 +2798,9 @@ function changeAlignText(direction) {
     setAlignText();
 
     if (indexActualTextAlign === 0) {
-        removeItemFromLocalStorage("text-align");
+        removeItemFromLocalStorage(TEXT_ALIGN_KEY);
     } else {
-        setItemToLocalStorageWithExpiry("text-align",
+        setItemToLocalStorageWithExpiry(TEXT_ALIGN_KEY,
             indexActualTextAlign,
             null);
     }
@@ -2831,13 +2825,13 @@ function setAlignText() {
             }
 
             if (selectedAlignText === '') {
-                removeItemFromLocalStorage("text-align");
+                removeItemFromLocalStorage(TEXT_ALIGN_KEY);
 
             }
 
         }
 
-        setItemToLocalStorageWithExpiry("text-align",
+        setItemToLocalStorageWithExpiry(TEXT_ALIGN_KEY,
             indexActualTextAlign,
             null);
 
@@ -2874,7 +2868,7 @@ function highlightHeading() {
             txtTag.style.setProperty('outline-offset', '2px', 'important');
 
             txtTag.setAttribute('data-inclowee-hlh-styled', 'true');
-            setItemToLocalStorageWithExpiry("highlight-headings",
+            setItemToLocalStorageWithExpiry(HIGHLIGHT_HEADINGS_KEY,
                 true,
                 null);
 
@@ -2884,7 +2878,7 @@ function highlightHeading() {
             txtTag.style.outlineOffset = '';
 
             txtTag.removeAttribute("data-inclowee-hlh-styled");
-            removeItemFromLocalStorage("highlight-headings");
+            removeItemFromLocalStorage(HIGHLIGHT_HEADINGS_KEY);
         }
 
     });
@@ -2934,7 +2928,7 @@ function highlightLinks() {
             txtTag.style.setProperty('outline-offset', '2px', 'important');
 
             txtTag.setAttribute('data-inclowee-hll-styled', 'true');
-            setItemToLocalStorageWithExpiry("highlight-links",
+            setItemToLocalStorageWithExpiry(HIGHLIGHT_LINKS_KEY,
                 true,
                 null);
 
@@ -2944,7 +2938,7 @@ function highlightLinks() {
             txtTag.style.outlineOffset = '';
 
             txtTag.removeAttribute("data-inclowee-hll-styled");
-            removeItemFromLocalStorage("highlight-links");
+            removeItemFromLocalStorage(HIGHLIGHT_LINKS_KEY);
         }
 
     });
@@ -2980,7 +2974,7 @@ function highlightButtons() {
 
 
                 txtTag.setAttribute('data-inclowee-hlb-styled', 'true');
-                setItemToLocalStorageWithExpiry("highlight-buttons",
+                setItemToLocalStorageWithExpiry(HIGHLIGHT_BUTTONS_KEY,
                     true,
                     null);
 
@@ -2992,7 +2986,7 @@ function highlightButtons() {
             txtTag.style.outlineOffset = '';
 
             txtTag.removeAttribute("data-inclowee-hlb-styled");
-            removeItemFromLocalStorage("highlight-buttons");
+            removeItemFromLocalStorage(HIGHLIGHT_BUTTONS_KEY);
         }
 
     });
@@ -3022,9 +3016,9 @@ function changeFontFamily(font) {
     setFontFamily();
 
     if (indexActualFontFamily === 0) {
-        removeItemFromLocalStorage("font-family");
+        removeItemFromLocalStorage(FONT_FAMILY_KEY);
     } else {
-        setItemToLocalStorageWithExpiry("font-family",
+        setItemToLocalStorageWithExpiry(FONT_FAMILY_KEY,
             indexActualFontFamily,
             null);
     }
@@ -3050,12 +3044,12 @@ function setFontFamily() {
             }
 
             if (selectedFontFamily === '') {
-                removeItemFromLocalStorage("font-family");
+                removeItemFromLocalStorage(FONT_FAMILY_KEY);
             }
 
         }
 
-        setItemToLocalStorageWithExpiry("font-family",
+        setItemToLocalStorageWithExpiry(FONT_FAMILY_KEY,
             indexActualFontFamily,
             null);
 
@@ -3128,7 +3122,7 @@ function loadContrastColors() {
 
 function changeColorContrast(contrast, html) {
 
-    let colorContrastSaved = getItemFromLocalStorageWithExpiry("colors-contrast");
+    let colorContrastSaved = getItemFromLocalStorageWithExpiry(COLORS_CONTRAST_KEY);
 
     if (colorContrastSaved !== null && colorContrastSaved.value === contrast) {
         indexActualColorContrast = 0;
@@ -3139,9 +3133,9 @@ function changeColorContrast(contrast, html) {
     setColorContrast(html);
 
     if (indexActualColorContrast === 0) {
-        removeItemFromLocalStorage("colors-contrast");
+        removeItemFromLocalStorage(COLORS_CONTRAST_KEY);
     } else {
-        setItemToLocalStorageWithExpiry("colors-contrast",
+        setItemToLocalStorageWithExpiry(COLORS_CONTRAST_KEY,
             indexActualColorContrast,
             null);
     }
@@ -3243,7 +3237,7 @@ function loadSaturationColors() {
 
 function changeColorSaturation(saturation, html) {
 
-    let colorSaturationSaved = getItemFromLocalStorageWithExpiry("colors-saturation");
+    let colorSaturationSaved = getItemFromLocalStorageWithExpiry(COLORS_SATURATION_KEY);
 
     if (colorSaturationSaved !== null && colorSaturationSaved.value === saturation) {
         indexActualColorSaturation = 0;
@@ -3254,9 +3248,9 @@ function changeColorSaturation(saturation, html) {
     setColorSaturation(html);
 
     if (indexActualColorSaturation === 0) {
-        removeItemFromLocalStorage("colors-saturation");
+        removeItemFromLocalStorage(COLORS_SATURATION_KEY);
     } else {
-        setItemToLocalStorageWithExpiry("colors-saturation",
+        setItemToLocalStorageWithExpiry(COLORS_SATURATION_KEY,
             indexActualColorSaturation,
             null);
     }
@@ -3459,22 +3453,13 @@ function setAdjustColor(button, fila) {
 
     const adjustColor = (fila, selectedColor) => {
         if (fila === 'adjustTitleColor') {
-            // document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(txtTag => {
-            //     const attName = txtTag.getAttribute('data-inclowee-atc-styled');
-            //     if (!attName || selectedColor !== txtTag.style.color) {
-            //         txtTag.style.setProperty('color', selectedColor, 'important');
-            //         txtTag.setAttribute('data-inclowee-atc-styled', 'true');
-            //         setItemToLocalStorageWithExpiry("adjust-title-color", selectedColor, null);
-            //     }
-            // });
-
             let titleColorStyle = document.getElementById('title-color-incloowe') || document.createElement('style');
             titleColorStyle.id = 'title-color-incloowe';
             titleColorStyle.innerHTML = `body :not(#shadow) h1, body :not(#shadow) h2, body :not(#shadow) h3, body :not(#shadow) h4,
                 body :not(#shadow) h5, body :not(#shadow) h6 { color: ${selectedColor} !important }`;
 
             document.head.appendChild(titleColorStyle);
-            setItemToLocalStorageWithExpiry("adjust-title-color", selectedColor, null);
+            setItemToLocalStorageWithExpiry(ADJUST_TITLE_COLOR_KEY, selectedColor, null);
 
         } else if (fila === 'adjustTextColor') {
             let textColorStyle = document.getElementById('text-color-incloowe') || document.createElement('style');
@@ -3484,31 +3469,26 @@ function setAdjustColor(button, fila) {
                 body :not(#shadow) code, body :not(#shadow) pre, body :not(#shadow) dd, body :not(#shadow) dt, body :not(#shadow) span,
                 body :not(#shadow) blockquote { color: ${selectedColor} !important }`;
             document.head.appendChild(textColorStyle);
-            setItemToLocalStorageWithExpiry("adjust-text-color", selectedColor, null);
+            setItemToLocalStorageWithExpiry(ADJUST_TEXT_COLOR_KEY, selectedColor, null);
         } else if (fila === 'adjustBackgroundColor') {
             document.body.style.setProperty('background-color', selectedColor, 'important');
-            setItemToLocalStorageWithExpiry("adjust-background-color", selectedColor, null);
+            setItemToLocalStorageWithExpiry(ADJUST_BACKGROUND_COLOR_KEY, selectedColor, null);
         }
     };
 
     const removeAdjustColor = (fila) => {
         if (fila === 'adjustTitleColor') {
-            // document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(txtTag => {
-            //     txtTag.style.color = '';
-            //     txtTag.removeAttribute('data-inclowee-atc-styled');
-            //     removeItemFromLocalStorage("adjust-title-color");
-            // });
             const titleColorStyle = document.getElementById('title-color-incloowe');
             titleColorStyle.innerHTML = '';
-            removeItemFromLocalStorage("adjust-title-color");
+            removeItemFromLocalStorage(ADJUST_TITLE_COLOR_KEY);
 
         } else if (fila === 'adjustTextColor') {
             const textColorStyle = document.getElementById('text-color-incloowe');
             textColorStyle.innerHTML = '';
-            removeItemFromLocalStorage("adjust-text-color");
+            removeItemFromLocalStorage(ADJUST_TEXT_COLOR_KEY);
         } else if (fila === 'adjustBackgroundColor') {
             document.body.style.backgroundColor = '';
-            removeItemFromLocalStorage("adjust-background-color");
+            removeItemFromLocalStorage(ADJUST_BACKGROUND_COLOR_KEY);
         }
     };
 
@@ -3557,9 +3537,9 @@ function changeDaltonismFilter(daltonismFilter, html) {
     setDaltonismFilter(html);
 
     if (indexActualDaltonismFilter === 0) {
-        removeItemFromLocalStorage("daltonism-filter");
+        removeItemFromLocalStorage(DALTONISM_FILTER_KEY);
     } else {
-        setItemToLocalStorageWithExpiry("daltonism-filter",
+        setItemToLocalStorageWithExpiry(DALTONISM_FILTER_KEY,
             indexActualDaltonismFilter,
             null);
     }
