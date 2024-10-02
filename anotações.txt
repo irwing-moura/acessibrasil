@@ -1,0 +1,32 @@
+--- OQUE FAZER PARA PROTEGER APLICAÇÂO RODANDO NO CLIENTE ---
+
+- proteger o codigo contra debbuging
+- proteger o codigo contra tampering (alteração do codigo durante o tempo de execução)
+- ofuscar o codigo  (se possivel, de uma forma que evite engenharia reversa)
+- minificar o codigo
+- proteger contra extração de dados (regulamentações GDPR/CCPA/HIPAA impõe penalidades severas por vazamento de dados)
+
+<<<< MELHOR SOLUÇÃO - PROTEÇÃO EM TEMPO REAL >>>>
+
+OBS: Jscrambler resolve todos esses problemas acima, pois faz proteção em tempo real
+
+
+- javascript integrity checks
+- avoid evaluating user input
+- use https and SRI
+- validate input
+- protect your cookies
+- lint your code
+- define content security policies
+- use "strict mode"
+- protect against json injection
+- bundling - combines multiple JavaScript files into a single file, reducing the number of requests made to the server and improving performance.
+- Verify Data Integrity - proteger contra SQL Injection e XSS
+- manter libs atualizadas
+- fazer testes automatizados
+- Property Whitelisting
+- writing quality code
+
+
+https://www.google.com/search?q=The+Most+Effective+Way+to+Protect+Client-Side+JavaScript&sca_esv=e72e56e851032d2d&sca_upv=1&rlz=1C1PNBB_enBR1129BR1129&sxsrf=ADLYWIIT34guOOMGlKzoH1O-_RqjsaaHEA%3A1727834533913&ei=pan8ZomyN5CI5OUPjruIsAY&ved=0ahUKEwjJmP-cze6IAxUQBLkGHY4dAmYQ4dUDCA8&uact=5&oq=The+Most+Effective+Way+to+Protect+Client-Side+JavaScript&gs_lp=Egxnd3Mtd2l6LXNlcnAiOFRoZSBNb3N0IEVmZmVjdGl2ZSBXYXkgdG8gUHJvdGVjdCBDbGllbnQtU2lkZSBKYXZhU2NyaXB0MgUQIRigAUiTEFC3A1i3A3ABeACQAQCYAcoCoAHWBKoBBTItMS4xuAEDyAEA-AEC-AEBmAICoAKWAsICChAAGLADGNYEGEeYAwCIBgGQBgOSBwUxLjAuMaAH-wM&sclient=gws-wiz-serp
+https://www.veracode.com/blog/intro-appsec/securing-javascript-best-practices-and-common-vulnerabilities

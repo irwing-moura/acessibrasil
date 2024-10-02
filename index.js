@@ -2179,7 +2179,6 @@ function changeStyleButtonSelectedAndDeselectOthers(idActivate, idsDisable) {
 
 }
 
-
 function toggleExpandWindow() {
 
 
@@ -2216,7 +2215,6 @@ function toggleExpandWindow() {
     }
 
 }
-
 
 //
 // // ******************** FONT SIZE ********************//
@@ -3033,7 +3031,7 @@ function createStyleGlobal() {
     estiloGlobal.setAttribute("id", "incloowe-style")
     let estilo = document.createTextNode(' @font-face { ' +
         '            font-family: \'OpenDyslexic\'; ' +
-        '            src: url("https://raw.githack.com/irwing-moura/acessibrasil/main/OpenDyslexic-Regular.woff");, ' +
+        '            src: url("OpenDyslexic-Regular.woff");, ' +
         '            url("OpenDyslexic-Regular.woff"); ' +
         '            font-weight: normal; ' +
         '            font-style: normal; ' +
