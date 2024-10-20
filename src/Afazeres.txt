@@ -1,0 +1,4 @@
+- iniciar refatoração de codigos repetitivos
+- trocar textos dos tooltips para os corretos
+- implementar i18n
+- verificar quais alterações o usuario poderá fazer no Widget e colocar como parametros de inicialização

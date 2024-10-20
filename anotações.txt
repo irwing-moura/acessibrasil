@@ -11,9 +11,9 @@
 OBS: Jscrambler resolve todos esses problemas acima, pois faz proteção em tempo real
 
 
-- javascript integrity checks
+- javascript integrity checks (SRI)
 - avoid evaluating user input
-- use https and SRI
+- use https
 - validate input
 - protect your cookies
 - lint your code
@@ -27,6 +27,26 @@ OBS: Jscrambler resolve todos esses problemas acima, pois faz proteção em temp
 - Property Whitelisting
 - writing quality code
 
-
 https://www.google.com/search?q=The+Most+Effective+Way+to+Protect+Client-Side+JavaScript&sca_esv=e72e56e851032d2d&sca_upv=1&rlz=1C1PNBB_enBR1129BR1129&sxsrf=ADLYWIIT34guOOMGlKzoH1O-_RqjsaaHEA%3A1727834533913&ei=pan8ZomyN5CI5OUPjruIsAY&ved=0ahUKEwjJmP-cze6IAxUQBLkGHY4dAmYQ4dUDCA8&uact=5&oq=The+Most+Effective+Way+to+Protect+Client-Side+JavaScript&gs_lp=Egxnd3Mtd2l6LXNlcnAiOFRoZSBNb3N0IEVmZmVjdGl2ZSBXYXkgdG8gUHJvdGVjdCBDbGllbnQtU2lkZSBKYXZhU2NyaXB0MgUQIRigAUiTEFC3A1i3A3ABeACQAQCYAcoCoAHWBKoBBTItMS4xuAEDyAEA-AEC-AEBmAICoAKWAsICChAAGLADGNYEGEeYAwCIBgGQBgOSBwUxLjAuMaAH-wM&sclient=gws-wiz-serp
 https://www.veracode.com/blog/intro-appsec/securing-javascript-best-practices-and-common-vulnerabilities
+
+
+--------------------------------------------------------------------------------
+Cabeçalhos de Segurança:
+Ao servir o bundle, você pode aplicar cabeçalhos de segurança através do servidor web, como:
+
+Content-Security-Policy (CSP): Limita de onde scripts e outros recursos podem ser carregados.
+X-Content-Type-Options: Evita que navegadores interpretem tipos MIME incorretamente.
+Strict-Transport-Security (HSTS): Garante que o site só será acessado por HTTPS.
+
+----------------------------------------------------------------------------------
+
+----------------------------------------------------------------
+SRI
+
+- Automatizar a distribuição do hash para clientes:
+Se você quiser garantir a segurança sem forçar os clientes a manualmente atualizarem o hash de integridade,
+pode-se automatizar a entrega dessa chave. Por exemplo, se você controlar a página HTML onde o script é incluído,
+pode fornecer uma API ou gerar HTML dinamicamente que já contenha o hash atualizado.
+
+------------------------------------------------------------------

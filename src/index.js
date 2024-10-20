@@ -1,3 +1,5 @@
+// import { searchArt } from './axios';
+
 window.acessiBrasil = window.acessiBrasil || {};
 
 const WIDGET_STATUS_KEY = "widget-status";
@@ -156,6 +158,8 @@ window.acessiBrasil.init = function init() {
 if (widgetStatus == null) {
     window.addEventListener("load", (event) => {
 
+        // document.getElementById('title-search-button').addEventListener('click', handleSearchClick);
+
         shadowR = document.getElementById("shadow").shadowRoot;
 
         createStyleGlobal();
@@ -189,6 +193,16 @@ if (widgetStatus == null) {
 
     });
 }
+
+// //AXIOS
+// const handleSearchClick = (ev) => {
+//     const title = document.getElementById('title-search-input').value;
+//     searchArt({ title }).then(renderResults);
+// }
+//
+// const renderResults = ({ artPieces }) => {
+//     document.getElementById('search-results').innerHTML = artPieces.join('');
+// }
 
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
@@ -1868,11 +1882,13 @@ button {
 function initializeVlibras() {
 
     // Função para carregar e executar scripts dinamicamente
-    function loadScript(src, callback) {
+    function loadScript(src, integrity, callback) {
         let s = document.createElement('script');
         s.src = src;
         s.async = true;
         s.onload = callback;
+        s.integrity = integrity;
+        s.crossOrigin = 'anonymous';
         (document.querySelector('head') || document.body).appendChild(s);
     }
 
@@ -1897,7 +1913,9 @@ function initializeVlibras() {
 
     addVLibrasHTML();
 
-    loadScript('https://vlibras.gov.br/app/vlibras-plugin.js', function() {
+    loadScript('https://vlibras.gov.br/app/vlibras-plugin.js',
+        'sha384-BgTCwEnvz5TBHffFIh8rpuoS2JY0MrUi+c19zh5wX25LzCTe/74tMbSX9YaOIDe9',
+        function() {
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     });
 }
@@ -3029,10 +3047,10 @@ function createStyleGlobal() {
     // Cria um elemento <style>
     let estiloGlobal = document.createElement('style');
     estiloGlobal.setAttribute("id", "incloowe-style")
+    let fonteUrl = require('./assets/fonts/OpenDyslexic-Regular.woff');
     let estilo = document.createTextNode(' @font-face { ' +
         '            font-family: \'OpenDyslexic\'; ' +
-        '            src: url("OpenDyslexic-Regular.woff");, ' +
-        '            url("OpenDyslexic-Regular.woff"); ' +
+        `            src: url(${fonteUrl}) format(\'woff\'); ` +
         '            font-weight: normal; ' +
         '            font-style: normal; ' +
         '        } ' +

@@ -21,6 +21,14 @@
 </head>
 <body>
 
+<!--<div id='root'>-->
+<!--    <input type='text' id='title-search-input'/>-->
+<!--    <button id='title-search-button'>Search</button>-->
+<!--    <div id='search-results'>-->
+<!--    </div>-->
+<!--</div>-->
+
+
 <!-- Navbar -->
 <div class="w3-top">
     <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
@@ -143,11 +151,14 @@
 
 <script>
     (function(){
-        var s = document.createElement('script');
-        var body = document.querySelector('head') || document.body;
-        s.src = 'index.js';
+        let s = document.createElement('script');
+        let body = document.querySelector('head') || document.body;
+        // s.src = '/main.bundle.js'; // DEV
+        s.src = '../dist/main.1d051f7c4550e6d3f317.bundle.js'; //-- PROD
         // s.src = 'https://raw.githack.com/irwing-moura/acessibrasil/feature/shadow-root/index.js';
         s.async = true;
+        // s.integrity = integrity; -- PARA PROD -> ALTERAR O VERSIONAMENTO DO JS JUNTO, PARA QUE QUANDO O CLIENTE FOR ATUALZIAR A VERSÃO, JA ATUALIZA JUNTO A INTEGRITY
+        // s.crossOrigin = 'anonymous';
         s.onload = function () {
             acessiBrasil.init();
         }
