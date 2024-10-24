@@ -154,13 +154,13 @@
         let s = document.createElement('script');
         let body = document.querySelector('head') || document.body;
         // s.src = '/main.bundle.js'; // DEV
-        s.src = '../dist/main.1d051f7c4550e6d3f317.bundle.js'; //-- PROD
+        s.src = '../dist/main.80fcc5f6989d7af10cea.bundle.js'; //-- PROD
         // s.src = 'https://raw.githack.com/irwing-moura/acessibrasil/feature/shadow-root/index.js';
         s.async = true;
         // s.integrity = integrity; -- PARA PROD -> ALTERAR O VERSIONAMENTO DO JS JUNTO, PARA QUE QUANDO O CLIENTE FOR ATUALZIAR A VERSÃO, JA ATUALIZA JUNTO A INTEGRITY
         // s.crossOrigin = 'anonymous';
         s.onload = function () {
-            acessiBrasil.init();
+            incloowe.init();
         }
         body.appendChild(s);
     })();

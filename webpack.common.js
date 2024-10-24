@@ -9,6 +9,17 @@ module.exports = {
     },
     module: {
         rules: [
+            {
+                test: /\.html$/, // Padrão para identificar arquivos HTML
+                use: [
+                    {
+                        loader: 'html-loader', // Usa o html-loader para processar HTML
+                        options: {
+                            minimize: true, // Minimiza o HTML, removendo espaços e comentários
+                        },
+                    },
+                ],
+            },
             // Regra para JavaScript e JSX
             {
                 test: /\.js$/, // Aceita arquivos .js
