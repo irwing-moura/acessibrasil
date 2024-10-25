@@ -9,7 +9,8 @@ module.exports = merge(common, {
     mode: 'production',
     devtool: false, // Desativa source maps para produção
     output: {
-        filename: '[name].[contenthash].bundle.js', // Inclui o contenthash no nome dos arquivos
+        // filename: '[name].[contenthash].bundle.js', // Inclui o contenthash no nome dos arquivos  - FINAL PROD
+        filename: '[name].bundle.js', // Inclui o contenthash no nome dos arquivos
         path: path.resolve(__dirname, 'dist'),
         clean: true, // Limpa o diretório 'dist' antes de cada build
     },
