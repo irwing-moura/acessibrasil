@@ -153,8 +153,8 @@
     (function(){
         let s = document.createElement('script');
         let body = document.querySelector('head') || document.body;
-        // s.src = '/main.bundle.js'; // DEV
-        s.src = '../dist/main.bundle.js'; //-- PROD
+        s.src = '/main.bundle.js'; // DEV
+        // s.src = '../dist/main.bundle.js'; //-- PROD
         // s.src = 'https://raw.githack.com/irwing-moura/acessibrasil/feature/shadow-root/index.js';
         s.async = true;
         // s.integrity = integrity; -- PARA PROD -> ALTERAR O VERSIONAMENTO DO JS JUNTO, PARA QUE QUANDO O CLIENTE FOR ATUALZIAR A VERSÃO, JA ATUALIZA JUNTO A INTEGRITY
