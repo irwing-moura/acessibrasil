@@ -1,3 +1,5 @@
+// GERA CODIGO HASH PARA ADICIONAR NA INJEÇÃO DE SCRIPTS
+
 const crypto = require('crypto');
 const fs = require('fs');
 
