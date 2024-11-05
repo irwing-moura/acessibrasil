@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Incloowe</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body>
+
+<button id="accessibilityButton" class="accessibility-button">
+    <span class="icon icon-widget"></span>
+</button>
+
+<div id="appWindow">
+
+    <div id="widget" class="app-window" role="application" aria-label="Janela do Widget">
+        <div class="toolbar">
+            <div class="toolbar-actions">
+                <button id="createshortcuts" class="toolbar-button" role="button" aria-label="Criar atalhos"
+                        tabindex="0"
+                        title="Criar Atalhos">
+                    <span class="icon icon-shortcut"></span>
+                </button>
+                <button id="resetButton" class="toolbar-button" role="button" aria-label="Restaurar" tabindex="0"
+                        title="Reiniciar Configurações">
+                    <span class="icon icon-refresh"></span>
+                </button>
+                <button id="hideButton" class="toolbar-button" role="button" aria-label="Ocultar" tabindex="0"
+                        title="Ocultar Interface">
+                    <span class="icon icon-eye-off"></span>
+                </button>
+            </div>
+            <button id="closeButton" class="toolbar-button" role="button" aria-label="Fechar" tabindex="0"
+                    title="Fechar Janela">
+                <span class="icon icon-close"></span>
+            </button>
+        </div>
+        <!-- Conteúdo do aplicativo aqui -->
+        <div class="content-container">
+            <div class="scrollable-content">
+                <!-- ... Outros botões de configuração ... -->
+                <div class="title">
+                    <span>Content</span>
+                    <span class="contentButton active">
+               <span class="icon icon-expand-content"></span>
+            </span>
+                </div>
+                <div class="content-buttons active">
+
+                    <div class="range-container" func="font-size">
+
+                        <span class="icon icon-tooltip"></span>
+
+                        <div class="title-container">
+                            <label class="slider-icon-title">
+                                <span class="icon icon-font-size"></span>
+                                <span class="slider-title">Font Size</span>
+                            </label>
+                        </div>
+                        <div class="range">
+                            <button class="material-icons arrow left minus-button">
+                                <span class="icon icon-arrow-down"></span>
+                            </button>
+                            <div class="base-range">Default</div>
+                            <button class="material-icons arrow right plus-button">
+                                <span class="icon icon-arrow-up"></span>
+                            </button>
+                        </div>
+
+                        <div class="tooltip-content">
+                            Descrição de tooltip teste.
+                            <span class="tooltip-arrow"></span>
+                        </div>
+
+                    </div>
+
+<!--                    <div id="container-teste" class="container-buttons"></div>-->
+
+                    <div class="container-buttons">
+                        <button id="readableFontButton" class="content-button" role="button" aria-label="Readable Font"
+                                title="Readable Font" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+                            <span class="icon icon-read"></span>
+                            <span>Readable Font</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                        <button id="friendlyDyslexiaButton" class="content-button" role="button"
+                                aria-label="Friendly Dyslexia"
+                                title="Friendly Dyslexia" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <span class="icon icon-dyslexia"></span>
+                            <span>Friendly Dyslexia</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                    </div>
+                    <div class="container-buttons">
+                        <button id="alignLeft" class="content-button" role="button" aria-label="align left"
+                                title="align left"
+                                tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <span class="icon icon-align-left"></span>
+                            <span>Align Left</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                        <button id="alignCenter" class="content-button" role="button" aria-label="format align center"
+                                title="format align center" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <span class="icon icon-align-center"></span>
+                            <span>Align Center</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                        <button id="alignRight" class="content-button" role="button" aria-label="format align right"
+                                title="format align right" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <span class="icon icon-align-right"></span>
+                            <span>Align Right</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                    </div>
+                    <div class="range-container" func="zoom">
+
+                        <span class="icon icon-tooltip"></span>
+
+
+                        <div class="title-container">
+                            <label for="letterSpacingSlide" class="slider-icon-title">
+                                <span class="icon icon-zoom"></span>
+                                <span class="slider-title">Content Scaling</span>
+                            </label>
+                        </div>
+                        <div class="range">
+                            <button class="material-icons arrow left minus-button">
+                                <span class="icon icon-arrow-down"></span>
+                            </button>
+                            <div class="base-range">Default</div>
+                            <button class="material-icons arrow right plus-button">
+                                <span class="icon icon-arrow-up"></span>
+                            </button>
+                        </div>
+                        <div class="tooltip-content">
+                            Descrição de tooltip teste.
+                            <span class="tooltip-arrow"></span>
+                        </div>
+                    </div>
+                    <div class="range-container" func="line-height">
+
+                        <span class="icon icon-tooltip"></span>
+
+
+                        <div class="title-container">
+                            <label for="letterSpacingSlide" class="slider-icon-title">
+                                <span class="icon icon-line-height"></span>
+                                <span class="slider-title">Line Height</span>
+                            </label>
+                        </div>
+                        <div class="range">
+                            <button class="material-icons arrow left minus-button">
+                                <span class="icon icon-arrow-down"></span>
+                            </button>
+                            <div class="base-range">Default</div>
+                            <button class="material-icons arrow right plus-button">
+                                <span class="icon icon-arrow-up"></span>
+                            </button>
+                        </div>
+
+                        <div class="tooltip-content">
+                            Descrição de tooltip teste.
+                            <span class="tooltip-arrow"></span>
+                        </div>
+
+                    </div>
+                    <div class="range-container" func="letter-spacing">
+
+                        <span class="icon icon-tooltip"></span>
+
+
+                        <div class="title-container">
+                            <label for="letterSpacingSlide" class="slider-icon-title">
+                                <span class="icon icon-letter-space"></span>
+                                <span class="slider-title">Letter Spacing</span>
+                            </label>
+                        </div>
+                        <div class="range">
+                            <button class="material-icons arrow left minus-button">
+                                <span class="icon icon-arrow-down"></span>
+                            </button>
+                            <div class="base-range">Default</div>
+                            <button class="material-icons arrow right plus-button">
+                                <span class="icon icon-arrow-up"></span>
+                            </button>
+                        </div>
+
+                        <div class="tooltip-content">
+                            Descrição de tooltip teste.
+                            <span class="tooltip-arrow"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="scrollable-content">
+                <!-- ... Outros botões de configuração ... -->
+                <div class="title">
+                    <span>Color and Screen</span>
+                    <span class="contentButton">
+               <span class="icon icon-expand-content"></span>
+            </span>
+                </div>
+                <div class="content-buttons">
+
+                    <div class="container-buttons">
+
+                        <button id="invertedColorsButton" class="content-button" role="button"
+                                aria-label="Inversor de cores"
+                                title="Inversor de cores" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>Inverted Colors</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+
+                        <button id="intelligentInvertedColorsButton" class="content-button" role="button"
+                                aria-label="Inversor de cores inteligente"
+                                title="Inversor de cores inteligente" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+                            <div class="icon">
+                            </div>
+                            <span>Intelligent Inverted Colors</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+
+                    </div>
+
+                    <div class="container-buttons">
+
+                        <button id="lightContrastColorsButton" class="content-button" role="button"
+                                aria-label="Contraste claro"
+                                title="Contraste claro" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>Light Contrast</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                        <button id="darkContrastColorsButton" class="content-button" role="button"
+                                aria-label="Contraste escuro"
+                                title="Contraste escuro" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>Dark Contrast</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                        <button id="highContrastColorsButton" class="content-button" role="button"
+                                aria-label="Contraste alto"
+                                title="Contraste alto" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+                            <div class="icon">
+                            </div>
+                            <span>High Contrast</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="container-buttons">
+                        <button id="highSaturationColorsButton" class="content-button" role="button"
+                                aria-label="Contraste alto"
+                                title="Contraste alto" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>High Saturation</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                        <button id="lowSaturationColorsButton" class="content-button" role="button"
+                                aria-label="Contraste alto"
+                                title="Contraste alto" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>Low Saturation</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                        <button id="monochromaticColorsButton" class="content-button" role="button"
+                                aria-label="Contraste alto"
+                                title="Monocromatico" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>Monochromatic</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                    </div>
+
+                    <div class="container-buttons">
+                        <button id="redDefButton" class="content-button" role="button"
+                                aria-label="Deficiencia de vermelho"
+                                title="Deficiencia de vermelho" tabindex="0" >
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>Protanomaly</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                        <button id="greenDefButton" class="content-button" role="button"
+                                aria-label="Deficiencia de verde"
+                                title="Deficiencia de verde" tabindex="0" >
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>Deuteranomaly</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                        <button id="blueDefButton" class="content-button" role="button" aria-label="Deficiencia de azul"
+                                title="Deficiencia de azul" tabindex="0" >
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>Tritanomaly</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                    </div>
+
+                    <div data-test="adjustTextColor" class="range-container">
+
+                        <span class="icon icon-tooltip"></span>
+
+                        <div class="title-container">
+                            <label for="letterSpacingSlide" class="slider-icon-title">
+                                <span class="slider-title">Adjust Text Colors</span>
+                            </label>
+                        </div>
+                        <div class="color-picker">
+
+                            <button class="color-pick" aria-label="Change Color to Blue"
+                                    tabindex="0"
+                                    style="background-color: rgb(0, 118, 180)">
+
+                            </button>
+
+                            <button class="color-pick" aria-label="Change Color to Purple"
+                                    tabindex="0"
+                                    style="background-color: rgb(122, 84, 156)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Red"
+                                    tabindex="0"
+                                    style="background-color: rgb(200, 55, 51)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Orange"
+                                    tabindex="0"
+                                    style="background-color: rgb(208, 112, 33)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Teal"
+                                    tabindex="0"
+                                    style="background-color: rgb(38, 153, 159)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Green"
+                                    tabindex="0"
+                                    style="background-color: rgb(77, 120, 49)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to White"
+                                    tabindex="0"
+                                    style="background-color: rgb(255, 255, 255)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Black"
+                                    tabindex="0"
+                                    style="background-color: rgb(0, 0, 0)"></button>
+
+                        </div>
+
+                        <div class="tooltip-content">
+                            Descrição de tooltip teste.
+                            <span class="tooltip-arrow"></span>
+                        </div>
+
+                        <a href="#" class="link-default-color">Default</a>
+
+                    </div>
+                    <div data-test="adjustTitleColor" class="range-container">
+
+                        <span class="icon icon-tooltip"></span>
+
+                        <div class="title-container">
+                            <label for="letterSpacingSlide" class="slider-icon-title">
+                                <span class="slider-title">Adjust Title Colors</span>
+                            </label>
+                        </div>
+                        <div class="color-picker">
+
+                            <button class="color-pick" aria-label="Change Color to Blue"
+                                    tabindex="0"
+                                    style="background-color: rgb(0, 118, 180)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Purple"
+                                    tabindex="0"
+                                    style="background-color: rgb(122, 84, 156)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Red"
+                                    tabindex="0"
+                                    style="background-color: rgb(200, 55, 51)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Orange"
+                                    tabindex="0"
+                                    style="background-color: rgb(208, 112, 33)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Teal"
+                                    tabindex="0"
+                                    style="background-color: rgb(38, 153, 159)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Green"
+                                    tabindex="0"
+                                    style="background-color: rgb(77, 120, 49)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to White"
+                                    tabindex="0"
+                                    style="background-color: rgb(255, 255, 255)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Black"
+                                    tabindex="0"
+                                    style="background-color: rgb(0, 0, 0)"></button>
+
+                        </div>
+
+                        <div class="tooltip-content">
+                            Descrição de tooltip teste.
+                            <span class="tooltip-arrow"></span>
+                        </div>
+
+                        <a href="#" class="link-default-color">Default</a>
+
+
+                    </div>
+                    <div data-test="adjustBackgroundColor" class="range-container">
+
+                        <span class="icon icon-tooltip"></span>
+
+
+                        <div class="title-container">
+                            <label for="letterSpacingSlide" class="slider-icon-title">
+                                <span class="slider-title">Adjust Background Colors</span>
+                            </label>
+                        </div>
+                        <div class="color-picker">
+
+                            <button class="color-pick" aria-label="Change Color to Blue"
+                                    tabindex="0"
+                                    style="background-color: rgb(0, 118, 180)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Purple"
+                                    tabindex="0"
+                                    style="background-color: rgb(122, 84, 156)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Red"
+                                    tabindex="0"
+                                    style="background-color: rgb(200, 55, 51)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Orange"
+                                    tabindex="0"
+                                    style="background-color: rgb(208, 112, 33)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Teal"
+                                    tabindex="0"
+                                    style="background-color: rgb(38, 153, 159)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Green"
+                                    tabindex="0"
+                                    style="background-color: rgb(77, 120, 49)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to White"
+                                    tabindex="0"
+                                    style="background-color: rgb(255, 255, 255)"></button>
+
+                            <button class="color-pick" aria-label="Change Color to Black"
+                                    tabindex="0"
+                                    style="background-color: rgb(0, 0, 0)"></button>
+
+                        </div>
+
+                        <div class="tooltip-content">
+                            Descrição de tooltip teste.
+                            <span class="tooltip-arrow"></span>
+                        </div>
+
+                        <a href="#" class="link-default-color">Default</a>
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="scrollable-content">
+                <div class="title">
+                    <span>Orientation</span>
+                    <span class="contentButton">
+               <span class="icon icon-expand-content"></span>
+            </span>
+                </div>
+
+                <div class="content-buttons">
+                    <div class="container-buttons">
+                        <button id="textEnlargeButton" class="content-button" role="button"
+                                aria-label="Ampliador de Texto"
+                                tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <span class="icon icon-txt-magnifier"></span>
+                            <span>Text Magnifier</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+
+
+                        <button id="initVlibrasButton" class="content-button" role="button"
+                                aria-label="Deficiencia de azul"
+                                title="Deficiencia de azul" tabindex="0" >
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>Vlibras</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+
+
+                        <button id="highlightHoverButton" class="content-button" role="button"
+                                aria-label="Highlight Hover"
+                                title="Highlight Hover" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <div class="icon">
+                            </div>
+                            <span>Highlight Hover</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                    </div>
+
+                    <div class="container-buttons">
+
+
+                        <button id="highlightButtonsButton" class="content-button" role="button"
+                                aria-label="Highlight Buttons"
+                                title="Highlight Buttons" tabindex="0">
+
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <span class="icon icon-highlight-button"></span>
+                            <span>Highlight Buttons</span>
+
+
+                            <div class="tooltip-content">
+                                Faz um highlight nos botões.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+
+
+                        <button id="highlightTitlesButton" class="content-button" role="button"
+                                aria-label="Highlight Titles"
+                                title="Highlight Titles" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <span class="icon icon-highlight-title"></span>
+                            <span>Highlight Titles</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                        <button id="highlightLinksButton" class="content-button" role="button"
+                                aria-label="Highlight Links"
+                                title="Highlight Links" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+
+                            <span class="icon icon-highlight-link"></span>
+                            <span>Highlight Links</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+
+                    </div>
+
+                    <div class="container-buttons">
+                        <button id="highlightFocusButton" class="content-button" role="button"
+                                aria-label="Highlight Focus"
+                                title="Highlight Focus" tabindex="0">
+
+                            <span class="icon icon-tooltip"></span>
+
+                            <div class="icon">
+                            </div>
+                            <span>Highlight Focus</span>
+
+                            <div class="tooltip-content">
+                                Descrição de tooltip teste.
+                                <span class="tooltip-arrow"></span>
+                            </div>
+
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <div id="modal-hide" class="app-window" role="application" aria-label="Modal para esconder Widget">
+        <div class="container-modal-hide">
+            <div>
+                <span class="icon icon-alert"></span>
+            </div>
+            <div class="modal-hide-messages">
+                <h3>Tem certeza que deseja ocultar a interface de
+                    usabilidade?</h3>
+                <span>Optar por ocultar a interface de acessibilidade implica que você não será mais capaz de visualizá-la, a menos que limpe seu histórico de navegação.</span>
+            </div>
+            <div class="modal-hide-buttons">
+                <button id="cancelHide" type="button" class="button-modal button-submit-modal">Não, quero manter</button>
+                <button id="submitHide" type="button" class="button-modal">
+                    <span id="msgBtnDisable">Sim, quero desativar</span>
+                    <div id="loading-bar-spinner" class="spinner">
+                        <div class="spinner-icon"></div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

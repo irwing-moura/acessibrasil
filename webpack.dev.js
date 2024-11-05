@@ -11,8 +11,8 @@ module.exports = merge(common, {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: './src/index.html', // Caminho do template HTML
-            filename: 'index.html', // Nome do arquivo HTML gerado
+            template: './src/widget.html', // Caminho do template HTML
+            filename: 'widget.html', // Nome do arquivo HTML gerado
             inject: false,
         }),
     ],

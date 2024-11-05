@@ -1,0 +1,290 @@
+{
+  //manter isso em um servidor e fazer requisição, para manter mais escondido."
+  "containers": [
+    {
+      "title": "Content",
+      "content": [
+        {
+          "title": "Font Size", //Texto do titulo
+          "type": "range", //tipo do botão (activate/range/radio)
+          "action": "updateFontSizeSlide", //nome da function chamada para ação
+          "icon": "icon-font-size", //nome do icone, que sera criada como uma classe no css e carregara esse icone
+          "tooltip": "Controla o tamanho da fonte", //texto do tooltip
+          "group": null, //separando os botões que desativam outros
+          "order": 1 //Ordem de posicionamento do botão
+        },
+        {
+          "title": "Readable Font",
+          "type": "activate",
+          "action": "changeFontFamily",
+          "icon": "icon-read",
+          "tooltip": "Torna a fonte legível",
+          "group": "i1",
+          "order": 2
+        },
+        {
+          "title": "Friendly Dyslexia",
+          "type": "activate",
+          "action": "changeFontFamily",
+          "icon": "icon-dyslexia",
+          "tooltip": "Troca a fonte para dyslexia",
+          "group": "i1",
+          "order": 3
+        },
+        {
+          "title": "Align Left",
+          "type": "activate",
+          "action": "changeAlignText",
+          "icon": "icon-align-left",
+          "tooltip": "Alinha textos a esquerda",
+          "group": "i2",
+          "order": 4
+        },
+        {
+          "title": "Align Center",
+          "type": "activate",
+          "action": "changeAlignText",
+          "icon": "icon-align-center",
+          "tooltip": "Alinha textos ao centro",
+          "group": "i2",
+          "order": 5
+        },
+        {
+          "title": "Align Right",
+          "type": "activate",
+          "action": "changeAlignText",
+          "icon": "icon-align-right",
+          "tooltip": "Alinha textos a direita",
+          "group": "i2",
+          "order": 6
+        },
+        {
+          "title": "Content Scaling",
+          "type": "range",
+          "action": "updateZoomSlide",
+          "icon": "icon-zoom",
+          "tooltip": "Controla o zoom",
+          "group": null,
+          "order": 7
+        },
+        {
+          "title": "Line Height",
+          "type": "range",
+          "action": "updateLineHeightSlide",
+          "icon": "icon-line-height",
+          "tooltip": "Controla a altura dos textos",
+          "group": null,
+          "order": 8
+        },
+        {
+          "title": "Letter Spacing",
+          "type": "range",
+          "action": "updateLetterSpacingSlide",
+          "icon": "icon-letter-space",
+          "tooltip": "Controla o espaçamento dos textos",
+          "group": null,
+          "order": 9
+        }
+      ]
+    },
+    {
+      "title": "Color and Screen",
+      "content": [
+        {
+          "title": "Inverted Colors",
+          "type": "activate",
+          "action": "changeColorContrast",
+          "icon": "icon-invert-color",
+          "tooltip": "Inverte as cores",
+          "group": "i3",
+          "order": 1
+        },
+        {
+          "title": "Intelligent Inverted Colors",
+          "type": "activate",
+          "action": "changeColorContrast",
+          "icon": "icon-invert-color-2",
+          "tooltip": "Inverte as cores, menos imagens",
+          "group": "i3",
+          "order": 2
+        },
+        {
+          "title": "Light Contrast",
+          "type": "activate",
+          "action": "changeColorContrast",
+          "icon": "icon-light-contrast",
+          "tooltip": "Contraste claro",
+          "group": "i3",
+          "order": 3
+        },
+        {
+          "title": "Dark Contrast",
+          "type": "activate",
+          "action": "changeColorContrast",
+          "icon": "icon-dark-contrast",
+          "tooltip": "Contraste escuro",
+          "group": "i3",
+          "order": 4
+        },
+        {
+          "title": "High Contrast",
+          "type": "activate",
+          "action": "changeColorContrast",
+          "icon": "icon-high-contrast",
+          "tooltip": "Contraste alto",
+          "group": "i3",
+          "order": 5
+        },
+        {
+          "title": "High Saturation",
+          "type": "activate",
+          "action": "changeColorSaturation",
+          "icon": "icon-high-saturation",
+          "tooltip": "Saturação alta",
+          "group": "i4",
+          "order": 6
+        },
+        {
+          "title": "Low Saturation",
+          "type": "activate",
+          "action": "changeColorSaturation",
+          "icon": "icon-low-saturation",
+          "tooltip": "Saturação baixa",
+          "group": "i4",
+          "order": 7
+        },
+        {
+          "title": "Monochromatic",
+          "type": "activate",
+          "action": "changeColorSaturation",
+          "icon": "icon-monochromatic",
+          "tooltip": "Monocromatico",
+          "group": "i4",
+          "order": 8
+        },
+        {
+          "title": "Protanomaly",
+          "type": "activate",
+          "action": "changeDaltonismFilter",
+          "icon": "icon-protanomaly",
+          "tooltip": "Daltonismo Protanomalia",
+          "group": "i5",
+          "order": 9
+        },
+        {
+          "title": "Deuteranomaly",
+          "type": "activate",
+          "action": "changeDaltonismFilter",
+          "icon": "icon-deuteranomaly",
+          "tooltip": "Daltonismo Deuteranomalia",
+          "group": "i5",
+          "order": 10
+        },
+        {
+          "title": "Tritanomaly",
+          "type": "activate",
+          "action": "changeDaltonismFilter",
+          "icon": "icon-tritanomaly",
+          "tooltip": "Daltonismo Tritanomalia",
+          "group": "i5",
+          "order": 11
+        },
+        {
+          "title": "Adjust Text Colors",
+          "type": "radio",
+          "action": "assignAdjustTextColor",
+          "icon": "icon-adj-text-color",
+          "tooltip": "Seleciona cor dos textos",
+          "group": null,
+          "order": 12
+        },
+        {
+          "title": "Adjust Title Colors",
+          "type": "radio",
+          "action": "assignAdjustTitleColor",
+          "icon": "icon-adj-title-color",
+          "tooltip": "Seleciona cor dos titulos",
+          "group": null,
+          "order": 13
+        },
+        {
+          "title": "Adjust Background Colors",
+          "type": "radio",
+          "action": "assignAdjustBackgroundColor",
+          "icon": "icon-adj-background-color",
+          "tooltip": "Seleciona cor do fundo",
+          "group": null,
+          "order": 14
+        }
+      ]
+    },
+    {
+      "title": "Orientation",
+      "content": [
+        {
+          "title": "Text Magnifier",
+          "type": "activate",
+          "action": "updateTextMagnifier",
+          "icon": "icon-txt-magnifier",
+          "tooltip": "Tooltip no hover",
+          "group": null,
+          "order": 1
+        },
+        {
+          "title": "Vlibras",
+          "type": "activate",
+          "action": "initVlibras",
+          "icon": "icon-vlibras",
+          "tooltip": "Ativa o Vlibras",
+          "group": null,
+          "order": 2
+        },
+        {
+          "title": "Highlight Hover",
+          "type": "activate",
+          "action": "setHighlightHover",
+          "icon": "icon-highlight-hover",
+          "tooltip": "Destaca os textos ao fazer hover",
+          "group": null,
+          "order": 3
+        },
+        {
+          "title": "Highlight Buttons",
+          "type": "activate",
+          "action": "highlightButtons",
+          "icon": "icon-highlight-button",
+          "tooltip": "Destaca os botões",
+          "group": null,
+          "order": 4
+        },
+        {
+          "title": "Highlight Titles",
+          "type": "activate",
+          "action": "highlightHeading",
+          "icon": "icon-highlight-title",
+          "tooltip": "Destaca os titulos",
+          "group": null,
+          "order": 5
+        },
+        {
+          "title": "Highlight Links",
+          "type": "activate",
+          "action": "highlightLinks",
+          "icon": "icon-highlight-link",
+          "tooltip": "Destaca os links",
+          "group": null,
+          "order": 6
+        },
+        {
+          "title": "Highlight Focus",
+          "type": "activate",
+          "action": "setHighlightFocus",
+          "icon": "icon-highlight-focus",
+          "tooltip": "Destaca os textos ao focar",
+          "group": null,
+          "order": 7
+        }
+      ]
+    }
+  ]
+}

@@ -33,10 +33,10 @@ module.exports = {
             },
 
             // Regra para arquivos CSS
-            {
-                test: /\.css$/, // Aceita arquivos .css
-                use: ['style-loader', 'css-loader'], // Aplica CSS no DOM e resolve @imports
-            },
+            // {
+            //     test: /\.css$/, // Aceita arquivos .css
+            //     use: ['style-loader', 'css-loader'], // Aplica CSS no DOM e resolve @imports
+            // },
 
             // Regra para imagens (PNG, JPG, GIF, SVG)
             {
