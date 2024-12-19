@@ -1,0 +1,15 @@
+1. Usuário Compra a Assinatura (Webflow e Stripe/Gumroad)
+    - O usuário acessa o site no Webflow e compra o widget de acessibilidade usando Stripe ou Gumroad.
+    - Após a compra, o Webflow/Stripe ou Gumroad envia um webhook para uma função backend (pode ser em Vercel) que registra o domínio autorizado e as configurações iniciais do cliente no Supabase.
+
+2. Registro de Domínio e Configurações (Supabase)
+    - O webhook armazena o domínio e as configurações personalizadas (JSON) no banco de dados Supabase.
+    - Essas configurações incluem informações específicas para o widget do cliente, como preferências de acessibilidade.
+
+3. Carregamento do Widget no Site do Cliente (Vercel)
+    - O cliente incorpora um código JavaScript hospedado no Vercel em seu site.
+    - Esse código carrega o widget, realiza uma requisição ao Supabase para validar o domínio e busca as configurações JSON personalizadas.
+
+4. Verificação de Permissão e Configuração Dinâmica (Supabase e Vercel)
+    - O código do widget, hospedado no Vercel, envia o domínio do cliente para Supabase para verificação.
+    - Se o domínio for autorizado, o Supabase retorna o JSON de configurações que o widget usa para personalizar o menu e funcionalidades.

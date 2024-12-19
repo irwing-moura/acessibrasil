@@ -1,4 +1,39 @@
-// import { searchArt } from './axios';
+import {
+    fetchButtons,
+    fetchContainersWithContent
+} from './supabase';
+import {
+    openModalHideButtonOrNot,
+    expandContent,
+    showTooltip,
+    toggleExpandWindow,
+    hideWidget,
+    setShadowRoot,
+    changeTextAndColorRangeValue,
+    changeStyleButtonSelected,
+    changeStyleButtonSelectedAndDeselectOthers,
+    calculateZoomPercentageInPixels,
+    calculateLetterSpacingInPixels,
+    getElementCursorHover,
+    criarBalao,
+    createStyleGlobal
+} from "./support";
+import {
+    setItemToLocalStorageWithExpiry,
+    getItemFromLocalStorageWithExpiry,
+    removeItemFromLocalStorage,
+    changeItemGroup,
+    setItemGroup,
+    clearLocalStorage
+} from "./storage";
+import {
+    getLineHeightInPixelsIfText,
+    getLastLeafElementsWithText,
+    getFirstChildElementsBelowBody
+} from "./queries";
+
+import widgetHtml from './widget.html';
+
 
 window.incloowe = window.incloowe || {};
 
@@ -23,6 +58,7 @@ window.incloowe.init = function init() {
     const ADJUST_TITLE_COLOR_KEY = "adjust-title-color"
     const ADJUST_BACKGROUND_COLOR_KEY = "adjust-background-color"
     const DALTONISM_FILTER_KEY = "daltonism-filter";
+    const VLIBRAS_KEY = "vlibras";
 
     let widgetStatus = getItemFromLocalStorageWithExpiry(WIDGET_STATUS_KEY);
     let currentFontSize = getItemFromLocalStorageWithExpiry(FONT_SIZE_KEY);
@@ -34,6 +70,8 @@ window.incloowe.init = function init() {
     let hightlightHeadings = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HEADINGS_KEY);
     let hightlightLinks = getItemFromLocalStorageWithExpiry(HIGHLIGHT_LINKS_KEY);
     let hightlightButtons = getItemFromLocalStorageWithExpiry(HIGHLIGHT_BUTTONS_KEY);
+    let hightlightHover = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
+    let hightlightFocus = getItemFromLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY);
     let fontFamily = getItemFromLocalStorageWithExpiry(FONT_FAMILY_KEY);
     let colorsContrast = getItemFromLocalStorageWithExpiry(COLORS_CONTRAST_KEY);
     let colorsSaturation = getItemFromLocalStorageWithExpiry(COLORS_SATURATION_KEY);
@@ -41,48 +79,21 @@ window.incloowe.init = function init() {
     let adjustTitleColor = getItemFromLocalStorageWithExpiry(ADJUST_TITLE_COLOR_KEY);
     let adjustBackgroundColor = getItemFromLocalStorageWithExpiry(ADJUST_BACKGROUND_COLOR_KEY);
     let daltonismFilter = getItemFromLocalStorageWithExpiry(DALTONISM_FILTER_KEY);
+    let vLibras = getItemFromLocalStorageWithExpiry(VLIBRAS_KEY);
 
-//botao abrir
     let expandButton;
-
-//header buttons
     let closeButton;
     let resetButton;
     let createshortcutsButton;
     let hideButton;
-
-//title buttons
     let contentButton;
-
-    let textEnlargeButton;
-    let hlHeading;
-    let highlightLinksButton;
-    let highlightButtonsButton;
-    let highlightHoverButton;
-    let highlightFocusButton;
-    let readableFontButton;
-    let friendlyDyslexiaButton;
-    let invertedColorsButton;
-    let intelligentInvertedColorsButton;
-    let lightContrastColorsButton;
-    let darkContrastColorsButton;
-    let highContrastColorsButton;
-    let monochromaticColorsButton;
-    let highSaturationColorsButton
-    let lowSaturationColorsButton
-    let redDefButton;
-    let greenDefButton;
-    let blueDefButton;
-
-    let initVlibrasButton;
-
-    let alignLeft;
-    let alignCenter;
-    let alignRight;
     let cancelHide;
     let submitHide;
-
     let shadowR;
+
+    let lastSelectedTextColor;
+    let lastSelectedTitleColor;
+    let lastSelectedBackgroundColor;
 
 //FONT FAMILY
     let fontes = ['', 'Arial, sans-serif', 'OpenDyslexic'];
@@ -104,63 +115,31 @@ window.incloowe.init = function init() {
     let daltonisms = ['', 'protanomaly', 'deuteranomaly', 'tritanomaly'];
     let indexActualDaltonismFilter = daltonismFilter != null ? daltonismFilter.value : daltonismFilter;
 
-    const tagsQueDevemMostrarBalaoMesmoComMaisDeUmItem = [
-        "select",
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
-        "ul",
-        "ol",
-        "dl",
-        "dt",
-        "dd",
-        "li",
-        "a",
-        "p",
-        "span",
-        "a",
-        "strong",
-        "em",
-        "b",
-        "i",
-        "u",
-        "s",
-        "q",
-        "abbr",
-        "cite",
-        "code",
-        "kbd",
-        "mark",
-        "time"
-    ];
+    let html;
 
     if (widgetStatus === null) {
 
         initializeVlibras();
-        createWidget();
 
-        window.addEventListener("load", (event) => {
+        window.addEventListener("load", async (event) => {
 
-            // document.getElementById('title-search-button').addEventListener('click', handleSearchClick);
+            html = document.activeElement.parentElement;
 
-            shadowR = document.getElementById("shadow").shadowRoot;
-
+            await createWidget();
+            await setLocalStoregeButtonsId();
             createStyleGlobal();
-            assignFunctionsToIds();
-            assignAdjustColorsEventListeners();
+            assignSupportFunctions();
             loadFontSize();
-            loadZoom();
+            loadContentScaling();
             loadLineHeight();
             loadLetterSpacing();
             loadTextMagnifier()
-            loadHighlightHeading();
+            loadHighlightHeadings();
             loadHighlightLinks();
             loadHighlightButtons();
             loadHighlightHover();
             loadHighlightFocus();
+            loadVlibras();
             setFontFamily();
             setAlignText();
             loadContrastColors();
@@ -170,168 +149,310 @@ window.incloowe.init = function init() {
             loadBackgroundColor();
             loadDaltonismFilter();
 
-            let modalAppWindow = shadowR.querySelector('#appWindow');
-            modalAppWindow.addEventListener('click', (event) => {
-                if (event.target.id === 'appWindow') {
-                    toggleExpandWindow();
-                }
-            });
-
         });
     }
-
-// //AXIOS
-// const handleSearchClick = (ev) => {
-//     const title = document.getElementById('title-search-input').value;
-//     searchArt({ title }).then(renderResults);
-// }
-//
-// const renderResults = ({ artPieces }) => {
-//     document.getElementById('search-results').innerHTML = artPieces.join('');
-// }
-
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
 
 
-    function createWidget() {
+    async function createWidget() {
 
-        let host = document.createElement('div');
+        let host = document.createElement('widget-ui');
         host.id = 'shadow';
         let shadowRoot = host.attachShadow({mode: 'open'});
-        let html = require('./widget.html');
+        // let html = require('./widget.html');
 
-        let botoes = [];
+        shadowRoot.innerHTML = widgetHtml; // Insere o HTML no shadowRoot
+        document.body.appendChild(host);
 
-        fetch('./widget.html') // Caminho do arquivo HTML
-            .then(response => response.text()) // Converte o arquivo em texto
-            .then(html => {
-                shadowRoot.innerHTML = html; // Insere o HTML no shadowRoot
-            })
-            .catch(error => {
-                console.error('Erro ao carregar o HTML:', error);
-            }).finally(function () {
-                // let cont = shadowRoot.querySelector('#container-teste');
-                // let botao = createButton('Readable Font',
-                //     'Tooltip de Teste 222',
-                //     () => changeFontFamily(1));
-                // cont.appendChild(botao);
+        let listaContainersCompleto = await fetchContainersWithContent();
 
-                //TODO:: SEGUIR COM OS OUTROS BOTÕES
+        for (const container of listaContainersCompleto) {
+            let order = container.order - 1;
+            let cont = shadowRoot.querySelectorAll('.scrollable-content')[order];
 
-                // let botao1 = createButton('Readable Font',
-                //     'Tooltip de Teste 222',
-                //     () => changeFontFamily(1));
-                // cont.appendChild(botao1);
+            let titleContainer = createTitleContainer(container.title, order);
 
+            const contentButtons = document.createElement("div");
+            contentButtons.className = "content-buttons " + (container.order === 1 ? 'active' : '');
 
-                document.body.appendChild(host);
-
+            for (const item of container.funcionalidades) {
+                let botao1 = createButton(item.title,
+                    item.tooltip,
+                    item.action,
+                    item.order,
+                    item.icon,
+                    item.type,
+                    item.group,
+                    item?.buttons?.name);
+                contentButtons.appendChild(botao1);
             }
-        );
 
-        //FAZER O FOREACH PARA CRIAÇÃO DOS BOTÕES
-
-
-        function createButton(texto, descricaoTooltip, acaoClique) {
-            // Cria o botão com as classes e atributos especificados
-            const botao = document.createElement('button');
-            botao.className = 'content-button';
-            botao.setAttribute('role', 'button');
-            botao.setAttribute('aria-label', texto);
-            botao.title = texto;
-            botao.tabIndex = 0;
-
-            // Cria o SVG de Info
-            // const svgInfo = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            // svgInfo.setAttribute('width', '16');
-            // svgInfo.setAttribute('height', '16');
-            // svgInfo.setAttribute('viewBox', '0 0 24 24');
-            // svgInfo.setAttribute('fill', 'none');
-            // svgInfo.setAttribute('stroke', '#1a6eff');
-            // svgInfo.setAttribute('stroke-width', '2.25');
-            // svgInfo.setAttribute('stroke-linecap', 'round');
-            // svgInfo.setAttribute('stroke-linejoin', 'round');
-            // svgInfo.classList.add('lucide', 'lucide-info');
-            // svgInfo.style.position = 'absolute';
-            // svgInfo.style.left = '10px';
-            // svgInfo.style.top = '8px';
-            //
-            // const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            // circle.setAttribute('cx', '12');
-            // circle.setAttribute('cy', '12');
-            // circle.setAttribute('r', '10');
-            // svgInfo.appendChild(circle);
-            //
-            // const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            // path1.setAttribute('d', 'M12 16v-4');
-            // svgInfo.appendChild(path1);
-            //
-            // const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            // path2.setAttribute('d', 'M12 8h.01');
-            // svgInfo.appendChild(path2);
-            //
-            // botao.appendChild(svgInfo);
-            //
-            // // Cria a div do ícone com o segundo SVG
-            // const divIcon = document.createElement('div');
-            // divIcon.className = 'icon';
-            //
-            // const svgSpellCheck = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            // svgSpellCheck.setAttribute('width', '24');
-            // svgSpellCheck.setAttribute('height', '24');
-            // svgSpellCheck.setAttribute('viewBox', '0 0 24 24');
-            // svgSpellCheck.setAttribute('fill', 'none');
-            // svgSpellCheck.setAttribute('stroke', 'currentColor');
-            // svgSpellCheck.setAttribute('stroke-width', '2');
-            // svgSpellCheck.setAttribute('stroke-linecap', 'round');
-            // svgSpellCheck.setAttribute('stroke-linejoin', 'round');
-            // svgSpellCheck.classList.add('lucide', 'lucide-spell-check');
-            //
-            // const path3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            // path3.setAttribute('d', 'm6 16 6-12 6 12');
-            // svgSpellCheck.appendChild(path3);
-            //
-            // const path4 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            // path4.setAttribute('d', 'M8 12h8');
-            // svgSpellCheck.appendChild(path4);
-            //
-            // const path5 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            // path5.setAttribute('d', 'm16 20 2 2 4-4');
-            // svgSpellCheck.appendChild(path5);
-            //
-            // divIcon.appendChild(svgSpellCheck);
-            // botao.appendChild(divIcon);
-
-            // Cria o span com o texto
-            const span = document.createElement('span');
-            span.textContent = texto;
-            botao.appendChild(span);
-
-            // Cria a div do tooltip
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip-content';
-            tooltip.textContent = descricaoTooltip;
-
-            const tooltipArrow = document.createElement('span');
-            tooltipArrow.className = 'tooltip-arrow';
-            tooltip.appendChild(tooltipArrow);
-
-            botao.appendChild(tooltip);
-
-            // Adiciona o evento de clique ao botão
-            botao.onclick = acaoClique;
-
-            // Adiciona o botão ao shadowRoot
-            // shadowRoot.appendChild(botao);
-
-            return botao;
+            cont.appendChild(titleContainer);
+            cont.appendChild(contentButtons);
         }
 
+        shadowR = document.getElementById("shadow").shadowRoot;
+        setShadowRoot(shadowR);
 
+        let modalAppWindow = shadowR.querySelector('#appWindow');
+        modalAppWindow.addEventListener('click', (event) => {
+            if (event.target.id === 'appWindow') {
+                toggleExpandWindow();
+            }
+        });
 
     }
 
+    function createTitleContainer(title, order) {
+        // Cria o container principal
+        const titleContainer = document.createElement("div");
+        titleContainer.className = "title";
+
+        // Cria o primeiro span com o texto "Content"
+        const contentText = document.createElement("span");
+        contentText.textContent = title;
+        titleContainer.appendChild(contentText);
+
+        // Cria o span com a classe "contentButton active"
+        const contentButton = document.createElement("span");
+        if(order == 0){
+            contentButton.className = "contentButton active";
+        }else {
+            contentButton.className = "contentButton";
+        }
+
+        // Cria o ícone dentro do contentButton
+        const iconExpand = document.createElement("span");
+        iconExpand.className = "icon icon-expand-content";
+        contentButton.appendChild(iconExpand);
+
+        titleContainer.appendChild(contentButton);
+
+        return titleContainer;
+    }
+
+    function createButton(texto, textoTooltip, acaoClique, order, classe, type, group, id) {
+        if (type === 'range') {
+            return createButtonRange(texto, classe, textoTooltip, id, acaoClique);
+        } else if (type === 'activate') {
+            return createButtonActivate(texto, textoTooltip, acaoClique, order, classe, group, id);
+        } else if (type === 'radio') {
+            return createButtonRadio(texto, textoTooltip, acaoClique);
+        }
+    }
+
+    function createButtonRange(texto, classe, textoTooltip, id, acaoClique){
+        // Cria o container principal
+        const contentButton = document.createElement("div");
+        contentButton.className = "content-button full-width";
+        // contentButton.setAttribute("func", "font-size");
+
+        // Cria o ícone de tooltip
+        const iconTooltip = document.createElement("span");
+        iconTooltip.className = "icon icon-tooltip";
+        contentButton.appendChild(iconTooltip);
+
+        // Cria o container de título
+        const titleContainer = document.createElement("div");
+        titleContainer.className = "title-container";
+
+        // Cria o label do título do slider
+        const sliderIconTitle = document.createElement("label");
+        sliderIconTitle.className = "slider-icon-title";
+
+        // Ícone do tamanho da fonte
+        const iconFontSize = document.createElement("span");
+        iconFontSize.className = "icon " + classe;
+        sliderIconTitle.appendChild(iconFontSize);
+
+        // Título do slider
+        const sliderTitle = document.createElement("span");
+        sliderTitle.className = "slider-title";
+        sliderTitle.textContent = texto;
+        sliderIconTitle.appendChild(sliderTitle);
+
+        titleContainer.appendChild(sliderIconTitle);
+        contentButton.appendChild(titleContainer);
+
+        // Cria o container de range
+        const rangeContainer = document.createElement("div");
+        rangeContainer.className = "range";
+
+        // Botão de diminuir
+        const minusButton = document.createElement("button");
+        minusButton.className = "arrow left minus-button";
+        const iconArrowDown = document.createElement("span");
+        iconArrowDown.className = "icon icon-arrow-down";
+        minusButton.onclick = funcoes[acaoClique];
+        minusButton.appendChild(iconArrowDown);
+        rangeContainer.appendChild(minusButton);
+
+        // Base range com texto "Default"
+        const baseRange = document.createElement("div");
+        baseRange.className = "base-range";
+        baseRange.style.color = "rgb(104, 104, 104)";
+        baseRange.textContent = "Default";
+        baseRange.id = id;
+        rangeContainer.appendChild(baseRange);
+
+        // Botão de aumentar
+        const plusButton = document.createElement("button");
+        plusButton.className = "arrow right plus-button";
+        const iconArrowUp = document.createElement("span");
+        iconArrowUp.className = "icon icon-arrow-up";
+        plusButton.onclick = funcoes[acaoClique];
+        plusButton.appendChild(iconArrowUp);
+        rangeContainer.appendChild(plusButton);
+
+        contentButton.appendChild(rangeContainer);
+
+        // Cria o conteúdo do tooltip
+        const tooltipContent = document.createElement("div");
+        tooltipContent.className = "tooltip-content";
+        tooltipContent.textContent = textoTooltip;
+
+        // Adiciona a seta do tooltip
+        const tooltipArrow = document.createElement("span");
+        tooltipArrow.className = "tooltip-arrow";
+        tooltipContent.appendChild(tooltipArrow);
+
+        contentButton.appendChild(tooltipContent);
+
+        return contentButton;
+
+    }
+
+    function createButtonActivate(texto, textoTooltip, acaoClique, order, classe, group, id) {
+        const botao = document.createElement('button');
+        botao.id = id;
+        botao.className = group == null ? 'content-button': 'content-button ' + group;
+        botao.role = 'button'
+        botao.ariaLabel = texto;
+        botao.tabIndex = order;
+
+        // Cria a div do tooltip
+        const iconTooltip = document.createElement('i');
+        iconTooltip.className = 'icon icon-tooltip';
+        botao.appendChild(iconTooltip);
+
+        //Cria icone
+        const icon = document.createElement('i');
+        icon.className = 'icon ' + classe;
+        botao.appendChild(icon);
+
+        // Cria o span com o texto
+        const span = document.createElement('span');
+        span.textContent = texto;
+        botao.appendChild(span);
+
+        //Cria balão do tooltip
+        const divTooltip = document.createElement('div');
+        divTooltip.className = 'tooltip-content';
+        divTooltip.textContent = textoTooltip;
+
+        const spanArrowToltip = document.createElement('span');
+        spanArrowToltip.className = 'tooltip-arrow';
+        divTooltip.appendChild(spanArrowToltip);
+
+        botao.appendChild(divTooltip);
+
+        // Adiciona o evento de clique ao botão
+        botao.onclick = funcoes[acaoClique];
+
+
+        return botao;
+    }
+
+    function createButtonRadio(texto, textoTooltip, acaoClique) {
+
+        // Cria o container principal
+        const contentButton = document.createElement("div");
+        // contentButton.setAttribute("data-test", "adjustTextColor");
+        contentButton.className = "content-button full-width";
+        contentButton.setAttribute("data-test", acaoClique);
+
+        // Cria o ícone de tooltip
+        const iconTooltip = document.createElement("span");
+        iconTooltip.className = "icon icon-tooltip";
+        contentButton.appendChild(iconTooltip);
+
+        // Cria o container de título
+        const titleContainer = document.createElement("div");
+        titleContainer.className = "title-container";
+
+        // Cria o label do título do slider
+        const sliderIconTitle = document.createElement("label");
+        sliderIconTitle.setAttribute("for", "letterSpacingSlide");
+        sliderIconTitle.className = "slider-icon-title";
+
+        // Título do slider
+        const sliderTitle = document.createElement("span");
+        sliderTitle.className = "slider-title";
+        sliderTitle.textContent = texto;
+        sliderIconTitle.appendChild(sliderTitle);
+
+        titleContainer.appendChild(sliderIconTitle);
+        contentButton.appendChild(titleContainer);
+
+        // Cria o container para os botões de seleção de cor
+        const colorPicker = document.createElement("div");
+        colorPicker.className = "color-picker";
+
+        // Função auxiliar para criar cada botão de cor
+        const createColorButton = (color, label) => {
+            const colorButton = document.createElement("button");
+            colorButton.className = "color-pick";
+            colorButton.setAttribute("aria-label", `Change Color to ${label}`);
+            colorButton.setAttribute("tabindex", "0");
+            colorButton.style.backgroundColor = color;
+
+            colorButton.onclick = () => setAdjustColor(colorButton, acaoClique);
+
+
+            return colorButton;
+        };
+
+        // Adiciona os botões de cores ao container de seleção de cor
+        colorPicker.appendChild(createColorButton("#0076b4", "Blue"));
+        colorPicker.appendChild(createColorButton("#7a549c", "Purple"));
+        colorPicker.appendChild(createColorButton("#c83733", "Red"));
+        colorPicker.appendChild(createColorButton("#d07021", "Orange"));
+        colorPicker.appendChild(createColorButton("#26999f", "Teal"));
+        colorPicker.appendChild(createColorButton("#4d7831", "Green"));
+        colorPicker.appendChild(createColorButton("#fff", "White"));
+        colorPicker.appendChild(createColorButton("#000", "Black"));
+
+        contentButton.appendChild(colorPicker);
+
+        // Cria o conteúdo do tooltip
+        const tooltipContent = document.createElement("div");
+        tooltipContent.className = "tooltip-content";
+        tooltipContent.textContent = textoTooltip;
+
+        // Adiciona a seta do tooltip
+        const tooltipArrow = document.createElement("span");
+        tooltipArrow.className = "tooltip-arrow";
+        tooltipContent.appendChild(tooltipArrow);
+
+        contentButton.appendChild(tooltipContent);
+
+        // Cria o link de "Default"
+        const linkDefaultColor = document.createElement("a");
+        linkDefaultColor.href = "#";
+        linkDefaultColor.className = "link-default-color";
+        linkDefaultColor.textContent = "Default";
+
+        linkDefaultColor.onclick = () => setAdjustColor(linkDefaultColor, acaoClique);
+
+        // e.preventDefault();
+        // let dataTest = button.parentElement.getAttribute('data-test');
+
+        contentButton.appendChild(linkDefaultColor);
+
+        return contentButton;
+
+    }
 
 
     function initializeVlibras() {
@@ -375,57 +496,88 @@ window.incloowe.init = function init() {
             });
     }
 
-    function assignFunctionsToIds() {
+    const funcoes = {
 
-        //TODO:: ENCONTRAR MELHOR FORMA DE RECUPERAR CLIQUE DOS BOTÕES E SYNCAR SUAS FUNCTIONS, TALVEZ USAR POR CLASSE "btn-i{number}"
+        //todo:: CRIAR AS FUNCTIONS DOS OUTROS TIPOS DE BOTAO E SETAR NO SUPABASE
+
+        //ACTIVATE
+        triggerReadableFont: function () {changeFontFamily(1, this);},
+        triggerDyslexiaFont: function () {changeFontFamily(2, this);},
+        triggerAlignLeft: function () {changeAlignText(1, this);},
+        triggerAlignCenter: function () {changeAlignText(2, this);},
+        triggerAlignRight: function () {changeAlignText(3, this);},
+
+        triggerInvertedColors: function () {changeColorContrast(1,this);},
+        triggerInteligentInvertedColors: function (){changeColorContrast(2,this);},
+        triggerLightContrast: function (){changeColorContrast(3,this);},
+        triggerDarkContrast: function (){changeColorContrast(4,this);},
+        triggerHighContrast: function (){changeColorContrast(5,this);},
+        triggerHighSaturation: function (){changeColorSaturation(1, this);},
+        triggerLowSaturation: function (){changeColorSaturation(2, this);},
+        triggerMonochromatic: function (){changeColorSaturation(3, this);},
+        triggerProtanomaly: function (){changeDaltonismFilter(1, this);},
+        triggerDeutaronomaly: function (){changeDaltonismFilter(2, this);},
+        triggerTritanomaly: function (){changeDaltonismFilter(3, this);},
+
+        triggerTextMagnifier: function (){changeIndividualActivateButton(this, TEXT_MAGNIFIER_KEY, setTextMagnifier);},
+        triggerVlibras: function (){changeIndividualActivateButton(this, VLIBRAS_KEY, setVlibras);},
+        triggerHighlightHover: function (){changeIndividualActivateButton(this, HIGHLIGHT_HOVER_KEY, setHighlightHover);},
+        triggerHighlightButtons: function (){changeIndividualActivateButton(this, HIGHLIGHT_BUTTONS_KEY, setHighlightButtons);},
+        triggerHighlightTitles: function (){changeIndividualActivateButton(this, HIGHLIGHT_HEADINGS_KEY, setHighlightHeading);},
+        triggerHighlightLinks: function (){changeIndividualActivateButton(this, HIGHLIGHT_LINKS_KEY, setHighlightLinks);},
+        triggerHighlightFocus: function (){changeIndividualActivateButton(this, HIGHLIGHT_FOCUS_KEY, setHighlightFocus);},
+
+
+        //RANGE
+        triggerFontSize: function () {changeRangeButton(this, FONT_SIZE_KEY, updateFontSize);},
+        triggerContentScaling: function () {changeRangeButton(this, ZOOM_KEY, updateContentScaling);},
+        triggerLineHeight: function () {changeRangeButton(this, LINE_HEIGHT_KEY, updateLineHeight);},
+        triggerLetterSpacing: function () {changeRangeButton(this, LETTER_SPACING_KEY, updateLetterSpacing);}
+
+        //TODO:: CRIAR FUNCTION GENERICA PARA EXECUÇÃO DE CADA TIPO DE BOTÃO, POIS TEM MTA REGRA DUPLICADA
+        //TODO:: COLOCAR QUERIES DENTRO DO SUPABASE, PARA DIFICULTAR NA VISUALIZAÇÃO DO CONSOLE
+
+    }
+
+    async function setLocalStoregeButtonsId() {
+
+        let buttons = await fetchButtons();
+
+        for (const btn of buttons) {
+
+            let value = localStorage.getItem(btn.name);
+
+            if(value == null) {
+                localStorage.setItem(btn.name, 0);
+            }else if(value == 1) {
+                let button = shadowR.querySelector('#' + btn.name);
+                button.classList.add("btn-active"); // Ativa o botão clicado
+            }else if(value.includes('%')) {
+                //range
+                let button = shadowR.querySelector('#' + btn.name);
+
+                if (value === '0%') {
+                    button.style.setProperty('color', '#686868', 'important');
+                    button.textContent = 'Default';
+                } else {
+                    button.style.setProperty('color', 'var(--lead-color)', 'important');
+                    button.textContent = localStorage.getItem(btn.name);
+                }
+            }
+
+        }
+
+    }
+
+    function assignSupportFunctions() {
 
         let shadowR = document.getElementById("shadow").shadowRoot;
-        const rangeButtons = shadowR.querySelectorAll('.minus-button, .plus-button');
 
-        rangeButtons.forEach(elemento => {
-            elemento.addEventListener('click', () => {
-
-                //elemento que deve se trocar o texto
-                // let percentageElement = elemento.offsetParent.children[1];
-                let percentAcrescentar;
-
-                if (elemento.className.includes('minus-button')) {
-                    percentAcrescentar = -10;
-
-                } else if (elemento.className.includes('plus-button')) {
-                    percentAcrescentar = 10;
-                }
-
-                const elementoPai = elemento.parentNode.parentNode;
-                let func = elementoPai.getAttribute('func');
-
-                if (func === FONT_SIZE_KEY) {
-                    percentAcrescentar = currentFontSize != null ? currentFontSize.percentage + percentAcrescentar : percentAcrescentar;
-                    updateFontSizeSlide(percentAcrescentar);
-                } else if (func === ZOOM_KEY) {
-                    percentAcrescentar = currentZoom != null ? currentZoom.percentage + percentAcrescentar : percentAcrescentar;
-                    updateZoomSlide(percentAcrescentar);
-                } else if (func === LINE_HEIGHT_KEY) {
-                    percentAcrescentar = currentLineHeight != null ? currentLineHeight.percentage + percentAcrescentar : percentAcrescentar;
-                    updateLineHeightSlide(percentAcrescentar);
-                } else if (func === LETTER_SPACING_KEY) {
-                    percentAcrescentar = currentLetterSpacing != null ? currentLetterSpacing.percentage + percentAcrescentar : percentAcrescentar;
-                    updateLetterSpacingSlide(percentAcrescentar);
-                }
-
-            });
-        });
-
-
-//    BOTÃO ABRIR WIDGET
-
+        //BOTÃO ABRIR WIDGET
         expandButton = shadowR.querySelector("#accessibilityButton");
         expandButton.addEventListener('click', toggleExpandWindow);
 
-//
-//     //HEADER
-//
-
+        //HEADER
         closeButton = shadowR.querySelector("#closeButton");
         closeButton.addEventListener('click', toggleExpandWindow);
 
@@ -435,161 +587,9 @@ window.incloowe.init = function init() {
         createshortcutsButton = shadowR.querySelector("#createshortcuts");
         createshortcutsButton.onclick = () => alert('Não esta pronto ainda, meu chapinha!');
 
+        //MODAL HIDE
         hideButton = shadowR.querySelector("#hideButton");
-        hideButton.addEventListener('click', () => {
-
-            const appWindow = shadowR.querySelector("#appWindow");
-            appWindow.style.setProperty('background', 'rgb(0 0 0 / 30%)', 'important');
-
-            const modal = shadowR.querySelector("#modal-hide");
-            modal.style.setProperty('opacity', '1', 'important');
-            modal.style.setProperty('visibility', 'visible', 'important');
-            modal.style.setProperty('transform', 'translate(-50%, -20%)', 'important');
-        });
-
-//
-//     //TITLE
-//
-        contentButton = shadowR.querySelectorAll('.contentButton');
-        contentButton.forEach(elemento => {
-            elemento.addEventListener('click', () => {
-
-                let content = elemento.parentElement.parentElement.children[1];
-                if (content.classList.contains('active')) {
-                    content.classList.remove('active')
-                    elemento.style.setProperty('transform', 'rotate(90deg)', 'important');
-                } else {
-                    content.classList.toggle('active');
-                    elemento.style.setProperty('transform', 'rotate(0deg)', 'important');
-                }
-
-            });
-        });
-
-
-        //FUNCIONALIDADES
-
-        textEnlargeButton = shadowR.querySelector("#textEnlargeButton");
-        textEnlargeButton.addEventListener('click', updateTextMagnifier);
-
-        hlHeading = shadowR.querySelector("#highlightTitlesButton");
-        hlHeading.addEventListener('click', highlightHeading);
-
-        highlightLinksButton = shadowR.querySelector("#highlightLinksButton");
-        highlightLinksButton.addEventListener('click', highlightLinks);
-
-        highlightButtonsButton = shadowR.querySelector("#highlightButtonsButton");
-        highlightButtonsButton.addEventListener('click', highlightButtons);
-
-        highlightHoverButton = shadowR.querySelector("#highlightHoverButton");
-        highlightHoverButton.addEventListener('click', setHighlightHover);
-
-        highlightFocusButton = shadowR.querySelector("#highlightFocusButton");
-        highlightFocusButton.addEventListener('click', setHighlightFocus);
-
-        readableFontButton = shadowR.querySelector("#readableFontButton");
-        readableFontButton.addEventListener('click', () => {
-            changeFontFamily(1);
-        });
-
-        friendlyDyslexiaButton = shadowR.querySelector("#friendlyDyslexiaButton");
-        friendlyDyslexiaButton.addEventListener('click', () => {
-            changeFontFamily(2);
-        });
-
-        alignLeft = shadowR.querySelector("#alignLeft");
-        alignLeft.addEventListener('click', () => {
-            changeAlignText(1);
-        });
-
-        alignCenter = shadowR.querySelector("#alignCenter");
-        alignCenter.addEventListener('click', () => {
-            changeAlignText(2);
-        });
-
-        alignRight = shadowR.querySelector("#alignRight");
-        alignRight.addEventListener('click', () => {
-            changeAlignText(3);
-        });
-
-
-//    COLORS
-        invertedColorsButton = shadowR.querySelector("#invertedColorsButton");
-        invertedColorsButton.addEventListener('click', () => {
-            changeColorContrast(1, document.activeElement.parentElement.parentElement)
-        });
-
-        intelligentInvertedColorsButton = shadowR.querySelector("#intelligentInvertedColorsButton");
-        intelligentInvertedColorsButton.addEventListener('click', () => {
-            changeColorContrast(2, document.activeElement.parentElement.parentElement)
-        });
-
-
-        lightContrastColorsButton = shadowR.querySelector("#lightContrastColorsButton");
-        lightContrastColorsButton.addEventListener('click', () => {
-            changeColorContrast(3, document.activeElement.parentElement.parentElement)
-        });
-
-        darkContrastColorsButton = shadowR.querySelector("#darkContrastColorsButton");
-        darkContrastColorsButton.addEventListener('click', () => {
-            changeColorContrast(4, document.activeElement.parentElement.parentElement)
-        });
-
-        highContrastColorsButton = shadowR.querySelector("#highContrastColorsButton");
-        highContrastColorsButton.addEventListener('click', () => {
-            changeColorContrast(5, document.activeElement.parentElement.parentElement)
-        });
-
-
-        highSaturationColorsButton = shadowR.querySelector("#highSaturationColorsButton");
-        highSaturationColorsButton.addEventListener('click', () => {
-            changeColorSaturation(1, document.activeElement.parentElement.parentElement)
-        });
-
-        lowSaturationColorsButton = shadowR.querySelector("#lowSaturationColorsButton");
-        lowSaturationColorsButton.addEventListener('click', () => {
-            changeColorSaturation(2, document.activeElement.parentElement.parentElement)
-        });
-
-        monochromaticColorsButton = shadowR.querySelector("#monochromaticColorsButton");
-        monochromaticColorsButton.addEventListener('click', () => {
-            changeColorSaturation(3, document.activeElement.parentElement.parentElement)
-        });
-
-        redDefButton = shadowR.querySelector("#redDefButton");
-        redDefButton.addEventListener('click', () => {
-            changeDaltonismFilter(1, document.activeElement.parentElement.parentElement);
-        });
-
-        greenDefButton = shadowR.querySelector("#greenDefButton");
-        greenDefButton.addEventListener('click', () => {
-            changeDaltonismFilter(2, document.activeElement.parentElement.parentElement);
-        });
-
-        blueDefButton = shadowR.querySelector("#blueDefButton");
-        blueDefButton.addEventListener('click', () => {
-            changeDaltonismFilter(3, document.activeElement.parentElement.parentElement);
-        });
-
-        initVlibrasButton = shadowR.querySelector("#initVlibrasButton");
-        initVlibrasButton.addEventListener('click', () => {
-            changeStyleButtonSelected(initVlibrasButton);
-
-            let display = document.getElementById("vlibras").style.display;
-
-            if (display === 'block') {
-                document.querySelector('.vpw-header-btn-close').click();
-                document.getElementById("vlibras").style.display = "none";
-            } else {
-                document.getElementById("vlibras").style.display = "block";
-                toggleExpandWindow();
-                document.getElementById("vlibrasclick").click();
-            }
-
-        });
-
-
-//    MODAL HIDE
+        hideButton.addEventListener('click', openModalHideButtonOrNot);
 
         cancelHide = shadowR.querySelector("#cancelHide");
         cancelHide.addEventListener('click', toggleExpandWindow);
@@ -597,107 +597,43 @@ window.incloowe.init = function init() {
         submitHide = shadowR.querySelector("#submitHide");
         submitHide.addEventListener('click', hideWidget);
 
-    }
-
-    function hideWidget() {
-
-        let msg = shadowR.querySelector('#msgBtnDisable');
-        let spinner = shadowR.querySelector('#loading-bar-spinner');
-
-        msg.style.setProperty('display', 'none');
-        spinner.style.setProperty('display', 'block');
-
-        setTimeout(function () {
-            clearLocalStorage();
-            setItemToLocalStorageWithExpiry(WIDGET_STATUS_KEY, 'hide', null);
-        }, 1500);
-
-    }
-
-    function changeTextAndColorRangeValue(percentAcrescentar, percentageElement) {
-        if (percentAcrescentar === 0) {
-            percentageElement.style.setProperty('color', '#686868', 'important');
-            percentageElement.textContent = 'Default';
-        } else {
-            percentageElement.style.setProperty('color', '#1A6EFF', 'important');
-            percentageElement.textContent = percentAcrescentar + '%';
-        }
-    }
-
-    function changeStyleButtonSelected(id) {
-
-        if (!id.classList.contains('btn-active')) {
-            id.classList.add("btn-active");
-        } else {
-            id.classList.remove("btn-active");
-        }
-
-    }
-
-    function changeStyleButtonSelectedAndDeselectOthers(idActivate, idsDisable) {
-
-        if (idActivate !== null) {
-            if (!idActivate.classList.contains('btn-active')) {
-                idActivate.classList.add("btn-active");
-            } else {
-                idActivate.classList.remove("btn-active");
-            }
-        }
-
-        idsDisable.forEach(function (index) {
-            if (index.classList.contains('btn-active')) {
-                index.classList.remove("btn-active");
-            }
+        contentButton = shadowR.querySelectorAll('.contentButton');
+        contentButton.forEach(elemento => {
+            elemento.addEventListener('click', () => expandContent(elemento));
         });
 
+        shadowR.querySelectorAll('.icon-tooltip').forEach(
+            info => showTooltip(info));
     }
 
-    function toggleExpandWindow() {
 
+    //RANGE BUTTONS
 
-        let appWindow = shadowR.querySelector('#appWindow');
-        let widget = shadowR.querySelector('#widget');
-        let button = shadowR.querySelector('#accessibilityButton');
-        let modal = shadowR.querySelector('#modal-hide');
+    function changeRangeButton(btn, key, updateFunction) {
+        const activeProperty = getItemFromLocalStorageWithExpiry(key);
 
-        if (appWindow.style.opacity === '0' || appWindow.style.opacity === '') {
+        let percentChange = btn.className.includes('minus-button') ? -10 : 10;
 
+        let currentPercentage = activeProperty ? parseFloat(activeProperty.value.replace('%', '')) : 0;
+        percentChange += currentPercentage;
 
-            widget.style.setProperty('transform', 'translate(0, 0)', 'important');
+        if (percentChange > 200 || percentChange < -200) return;
 
+        updateFunction(percentChange);
 
-            appWindow.style.setProperty('opacity', '1', 'important');
-            appWindow.style.setProperty('visibility', 'visible', 'important');
-            button.style.setProperty('display', 'none', 'important');
+        let textElement = btn.parentElement.children[1];
+        changeTextAndColorRangeValue(percentChange, textElement);
 
-            appWindow.style.setProperty('background', 'transparent', 'important');
-            modal.style.setProperty('opacity', '0', 'important');
-            modal.style.setProperty('visibility', 'hidden', 'important');
-            modal.style.setProperty('transform', 'translate(-50%, -100%)', 'important');
-
-        } else if (appWindow.style.opacity === '1') {
-
-
-            widget.style.setProperty('transform', 'translate(0, 50%)', 'important');
-
-            appWindow.style.setProperty('opacity', '0', 'important');
-            appWindow.style.setProperty('visibility', 'hidden', 'important');
-            button.style.setProperty('display', 'flex', 'important');
-            shadowR.querySelector(".content-container").scrollTo({top: 0});
-
-        }
-
+        setItemToLocalStorageWithExpiry(
+            key,
+            `${percentChange}%`,
+            null,
+            textElement.id,
+            true
+        );
     }
 
-//
-// // ******************** FONT SIZE ********************//
-//
-    function updateFontSizeSlide(defaultPercentage) {
-
-
-        if (defaultPercentage > 200 || defaultPercentage < -200) {
-            return;
-        }
+    function updateFontSize(defaultPercentage) {
 
         const lastLeafElementsWithText = getLastLeafElementsWithText();
         lastLeafElementsWithText.forEach(function (txtTag) {
@@ -712,21 +648,6 @@ window.incloowe.init = function init() {
 
 
         });
-
-        const plusDays = addDays(new Date(), 2).getTime();
-        currentFontSize = {
-            value: null,
-            percentage: defaultPercentage,
-            expiry: plusDays
-        }
-
-        setItemToLocalStorageWithExpiry(FONT_SIZE_KEY,
-            currentFontSize.value,
-            currentFontSize.percentage);
-
-        const percentageElement = shadowR.querySelector(`[func="${FONT_SIZE_KEY}"]`).children[2]
-            .getElementsByClassName('base-range')[0];
-        changeTextAndColorRangeValue(defaultPercentage, percentageElement);
 
     }
 
@@ -747,32 +668,15 @@ window.incloowe.init = function init() {
                     let newSize = initialSize + (initialSize * currentFontSize.percentage / 100);
                     txtTag.style.setProperty('font-size', newSize + 'px', 'important');
                 }
-                updateFontSizeSlide(currentFontSize.percentage);
+                let porcentagem =  parseFloat(currentFontSize.value.replace('%', ''));
+                updateFontSize(porcentagem);
             }
 
         });
 
     }
 
-// *********** ZOOM ********** //
-
-    function calculateZoomPercentageInPixels(percentage) {
-        let zoomValue = percentage * 0.32;
-        zoomValue = 1 + (zoomValue / 100);
-        return zoomValue;
-    }
-
-    function calculateLetterSpacingInPixels(percentage) {
-        let letterSpacing = percentage * 2;
-        letterSpacing = (letterSpacing / 100);
-        return letterSpacing;
-    }
-
-    function updateZoomSlide(percentage) {
-
-        if (percentage > 200 || percentage < -200) {
-            return;
-        }
+    function updateContentScaling(percentage) {
 
         let zoom = calculateZoomPercentageInPixels(percentage);
 
@@ -787,38 +691,16 @@ window.incloowe.init = function init() {
 
         });
 
-        const plusDays = addDays(new Date(), 2).getTime();
-        currentZoom = {
-            value: zoom,
-            percentage: percentage,
-            expiry: plusDays
-        }
-
-        setItemToLocalStorageWithExpiry(ZOOM_KEY,
-            currentZoom.value,
-            currentZoom.percentage);
-
-
-        const percentageElement = shadowR.querySelector(`[func="${ZOOM_KEY}"]`).children[2]
-            .getElementsByClassName('base-range')[0];
-        changeTextAndColorRangeValue(percentage, percentageElement);
-
-
     }
 
-    function loadZoom() {
+    function loadContentScaling() {
         if (currentZoom !== null) {
-            updateZoomSlide(currentZoom.percentage);
+            let percentage = parseFloat(currentZoom.value.replace('%', ''));
+            updateContentScaling(percentage);
         }
     }
 
-// ******************** LINE HEIGHT ********************//
-
-    function updateLineHeightSlide(percentage) {
-
-        if (percentage > 200 || percentage < -200) {
-            return;
-        }
+    function updateLineHeight(percentage) {
 
         const lastLeafElementsWithText = getLastLeafElementsWithText();
 
@@ -845,62 +727,20 @@ window.incloowe.init = function init() {
                 txtTag.style.setProperty('line-height', lineHeightFormated + (lineHeightFormated * percentage / 100) + 'px', 'important');
             }
 
-
         });
 
-        const plusDays = addDays(new Date(), 2).getTime();
-        currentLineHeight = {
-            value: null,
-            percentage: percentage,
-            expiry: plusDays
-        }
-
-        setItemToLocalStorageWithExpiry(LINE_HEIGHT_KEY,
-            null,
-            percentage);
-
-
-        const percentageElement = shadowR.querySelector(`[func="${LINE_HEIGHT_KEY}"]`).children[2]
-            .getElementsByClassName('base-range')[0];
-        changeTextAndColorRangeValue(percentage, percentageElement);
-
     }
-
 
     function loadLineHeight() {
         if (currentLineHeight !== null) {
-            updateLineHeightSlide(currentLineHeight.percentage);
+            let porcentagem = parseFloat(currentLineHeight.value.replace('%', ''));
+            updateLineHeight(porcentagem);
         }
     }
 
-    function getLineHeightInPixelsIfText(element) {
-
-        //RECUPERA O LINE HEIGHT CORRETO DE ELEMENTOS QUE ESTÃO COMO 'NORMAL'
-
-        let tempElement = document.createElement("div");
-        tempElement.style.fontSize = window.getComputedStyle(element).fontSize;
-        tempElement.style.lineHeight = "normal";
-        tempElement.innerHTML = "&nbsp;";
-
-        document.body.appendChild(tempElement);
-
-        let lineHeight = tempElement.offsetHeight;
-
-        document.body.removeChild(tempElement);
-
-        return lineHeight;
-    }
-
-// *********** LETTER SPACING ********** //
-
-    function updateLetterSpacingSlide(percentage) {
+    function updateLetterSpacing(percentage) {
 
         //VALOR PADRÃO DE ADIÇÃO E REDUÇÃO - 0.2PX A CADA 10%
-
-        if (percentage > 200 || percentage < -200) {
-            return;
-        }
-
         let letterSpacingAdd = calculateLetterSpacingInPixels(percentage);
 
         const lastLeafElementsWithText = getLastLeafElementsWithText();
@@ -929,303 +769,76 @@ window.incloowe.init = function init() {
 
         });
 
-        const plusDays = addDays(new Date(), 2).getTime();
-
-        currentLetterSpacing = {
-            value: null,
-            percentage: percentage,
-            expiry: plusDays
-        }
-
-        setItemToLocalStorageWithExpiry(LETTER_SPACING_KEY,
-            null,
-            percentage);
-
-
-        const percentageElement = shadowR.querySelector(`[func="${LETTER_SPACING_KEY}"]`).children[2]
-            .getElementsByClassName('base-range')[0];
-        changeTextAndColorRangeValue(percentage, percentageElement);
-
     }
-
 
     function loadLetterSpacing() {
         if (currentLetterSpacing !== null) {
-            updateLetterSpacingSlide(currentLetterSpacing.percentage);
+            let porcentagem = parseFloat(currentLetterSpacing.value.replace('%', ''));
+            updateLetterSpacing(porcentagem);
         }
     }
 
-// ******************** RECUPERAR ELEMENTOS ********************//
+    //ACTIVATE BUTTONS
 
-    function percorrerElementos(bodyElement) {
-        let resultados = [];
+    function changeIndividualActivateButton(btn, key, updateFunction) {
 
-        function percorrer(elemento) {
-            // Ignora o próprio elemento <body> com a classe "app-window"
-            if (
-                elemento.tagName !== 'BODY' &&
-                !elemento.classList.contains('app-window') &&
-                elemento.id !== 'appWindow'
-            ) {
-                // Verifica se é o último elemento filho na árvore
-                if (!elemento.nextElementSibling) {
-                    resultados.push(elemento);
-                }
-            }
+        let activeProperty = getItemFromLocalStorageWithExpiry(key);
 
-            // Percorre os filhos do elemento
-            for (let filho of elemento.children) {
-                percorrer(filho);
-            }
+        updateFunction()
+        changeStyleButtonSelected(btn);
+
+        if (activeProperty == null) {
+            setItemToLocalStorageWithExpiry(key,
+                true,
+                null,
+                btn.id);
+        }else {
+            removeItemFromLocalStorage(key, btn.id);
         }
 
-        percorrer(document.body);
-        return resultados;
     }
 
-    function getLastLeafElementsWithText() {
-        const body = document.body;
-        const elementsWithText = [];
+    // function changeGroupActivateButton(btn, key, optionSelected, updateFunction) {
+    //
+    //         let propertySaved = getItemFromLocalStorageWithExpiry(key);
+    //
+    //         if (propertySaved !== null && propertySaved.value === optionSelected) {
+    //             optionSelected = 0;
+    //         }
+    //
+    //         setItemToLocalStorageWithExpiry(key,
+    //         optionSelected,
+    //         null,
+    //         btn.id);
+    //
+    //         setItemGroup(btn.id);
+    //
+    //         updateFunction();
+    //         changeStyleButtonSelectedAndDeselectOthers(btn, FONT_FAMILY_KEY);
+    //
+    //         // if (indexActualFontFamily === 0) {
+    //         //     removeItemFromLocalStorage(FONT_FAMILY_KEY, btn.id);
+    //         // } else {
+    //         //     setItemToLocalStorageWithExpiry(FONT_FAMILY_KEY,
+    //         //         indexActualFontFamily,
+    //         //         null,
+    //         //         btn.id);
+    //         // }
+    //
+    // }
 
-        function traverse(element) {
-            // Verifica se o elemento é uma folha e tem texto
-            // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
-            if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
-                || (element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'LABEL')) {
-                elementsWithText.push(element);
-            }
-            //QUANDO POSSUIR FILHOS
-            else {
-                //POSSUI CONTEUDO
-                if (element.textContent.trim() !== "" && element.tagName !== 'BODY' &&
-                    !element.classList.contains('app-window') &&
-                    element.id !== 'appWindow') {
-                    elementsWithText.push(element);
-                }
+    //TODO:: TRABALHAR NESSA FUNCTION GENERICA PARA BOTOES ACTIVATE DE GRUPO
 
-
-                for (let child of element.children) {
-                    traverse(child);
-                }
-            }
-        }
-
-        // Função para verificar se o elemento é uma tag de imagem
-        function shouldBeRemoved(element) {
-            return element.tagName.toLowerCase() === 'img' || element.tagName.toLowerCase() === 'svg' ||
-                element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
-                || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
-                || element.tagName.toLowerCase() === 'br';
-        }
-
-        // Inicia a travessia a partir do corpo (body)
-        traverse(body);
-
-        // Invertendo a lista para que na aplicação, a tag não herde o estilo da tag pai. Fazendo a aplicação de dentro para fora
-        return elementsWithText.reverse();
-    }
-
-    function getFirstChildElementsBelowBody() {
-        // Obtém os primeiros filhos diretos do body
-        let body = document.body;
-        return Array.from(body.children);
-    }
-
-    function getElementCursorHover() {
-        document.addEventListener('mouseover', function (event) {
-
-            const element = event.target;
-
-            function traverse(element) {
-                // Verifica se o elemento é uma folha e tem texto
-                // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
-                if (((!shouldBeRemoved(element) && element.children.length === 0))
-                    && element.textContent.trim() !== "") {
-
-                    if (!element.closest('.app-window') && !element.closest('.accessibility-button')) {
-                        element.addEventListener("mouseover", mostrarBalao);
-                        element.addEventListener("mouseout", esconderBalao);
-                    }
-
-                }
-                //QUANDO POSSUIR FILHOS
-                else {
-
-                    //POSSUI CONTEUDO
-                    if (element.textContent.trim() !== "" && !element.classList.contains('app-window') && element.id !== 'appWindow'
-                        && (tagsQueDevemMostrarBalaoMesmoComMaisDeUmItem.includes(element.tagName.toLowerCase()))) {
-                        element.addEventListener("mouseover", mostrarBalao);
-                        element.addEventListener("mouseout", esconderBalao);
-                    }
-
-                    for (let child of element.children) {
-                        traverse(child);
-                    }
-                }
-            }
-
-            // Função para verificar se o elemento é uma tag de imagem
-            function shouldBeRemoved(element) {
-                return element.tagName.toLowerCase() === 'style' || element.tagName.toLowerCase() === 'noscript'
-                    || element.tagName.toLowerCase() === 'script' || element.tagName.toLowerCase() === 'link'
-                    || element.tagName.toLowerCase() === 'br' || element.tagName.toLowerCase() === 'i'
-                    || element.tagName.toLowerCase() === 'svg' || element.tagName.toLowerCase() === 'img';
-
-
-            }
-
-            traverse(element);
-
-        });
-    }
-
-// ******************** LOCAL STORAGE ********************//
-
-    function setItemToLocalStorageWithExpiry(key, value, percentage) {
-
-        const newDate = addDays(new Date(), 2);
-
-        const item = {
-            value: value,
-            percentage: percentage,
-            expiry: newDate.getTime(),
-        }
-        localStorage.setItem(key, JSON.stringify(item))
-    }
-
-    function getItemFromLocalStorageWithExpiry(key) {
-        const itemStr = localStorage.getItem(key)
-        // if the item doesn't exist, return null
-        if (!itemStr) {
-            return null
-        }
-        const item = JSON.parse(itemStr)
-        const now = new Date()
-        // compare the expiry time of the item with the current time
-        if (now.getTime() > item.expiry) {
-            // If the item is expired, delete the item from storage
-            // and return null
-            removeItemFromLocalStorage(key);
-            return null
-        }
-        return item;
-    }
-
-    function removeItemFromLocalStorage(key) {
-        localStorage.removeItem(key);
-    }
-
-    function addDays(date, days) {
-        date.setDate(date.getDate() + days);
-        return date;
-    }
-
-    function clearLocalStorage() {
-        localStorage.clear();
-        location.reload(true);
-    }
-
-
-// ******************** LUPA ********************//
-
-// Função para criar o balão
-    function criarBalao() {
-        let balao = document.createElement("div");
-        balao.className = "balao";
-        balao.style.padding = "10px";
-        balao.style.backgroundColor = "rgba(51, 51, 51, 0.8)"; /* Fundo escurecido */
-        balao.style.color = "white"; /* Texto branco */
-        balao.style.borderRadius = "5px";
-        balao.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.2)";
-        balao.style.fontSize = "40px"; /* Tamanho da fonte aumentado (ajuste conforme necessário) */
-        balao.style.position = "absolute";
-        balao.style.zIndex = 999999;
-        balao.style.maxWidth = '700px';
-        balao.style.visibility = 'hidden';
-        balao.style.display = 'none';
-        document.body.appendChild(balao);
-        return balao;
-    }
-
-
-// Função para atualizar a posição do balão
-    function atualizarPosicaoBalao(event, balao) {
-        // Leva em consideração a posição do scroll
-        const scrollX = window.scrollX || document.documentElement.scrollLeft;
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-
-        // Calcula a posição horizontal do cursor do mouse em relação ao centro da tela
-        const cursorXFromCenter = event.clientX - window.innerWidth / 2;
-
-        // Define a posição do balão perto do cursor do mouse considerando o scroll
-        if (cursorXFromCenter >= 0) {
-            // Cursor à direita do centro da tela, posicione o balão à esquerda do cursor
-            balao.style.left = (event.clientX + scrollX - balao.offsetWidth - 10) + "px";
-        } else {
-            // Cursor à esquerda do centro da tela, posicione o balão à direita do cursor
-            balao.style.left = (event.clientX + scrollX + 10) + "px";
-        }
-
-        balao.style.top = (event.clientY + scrollY + 10) + "px";
-    }
-
-// Função para mostrar o balão com o texto maior
-    function mostrarBalao(event) {
-
-        let textMagnifier = getItemFromLocalStorageWithExpiry("text-magnifier");
-
-        if (textMagnifier == null) {
-            return;
-        }
-
-        // Obtém ou cria o elemento do balão
-        let balao = document.querySelector(".balao");
-
-        // Obtém o conteúdo com base no tipo de tag
-        let conteudo;
-        conteudo = event.target.textContent;
-
-        // Define o conteúdo no balão
-        balao.innerHTML = conteudo;
-
-        // Atualiza a posição do balão
-        atualizarPosicaoBalao(event, balao);
-
-        // Exibe o balão
-        balao.style.visibility = "visible";
-
-        // Adiciona o evento de movimento do mouse para atualizar a posição do balão
-        document.addEventListener("mousemove", function (event) {
-            atualizarPosicaoBalao(event, balao);
-        });
-    }
-
-// Função para esconder o balão ao retirar o mouse
-    function esconderBalao() {
-        let balao = document.querySelector(".balao");
-        if (balao) {
-            balao.style.visibility = "hidden";
-            // Remove o evento de movimento do mouse
-            document.removeEventListener("mousemove", atualizarPosicaoBalao);
-        }
-    }
-
-    function updateTextMagnifier() {
+    function setTextMagnifier() {
 
         // Se a funcionalidade for desativada, esconde o balão
         let balao = document.querySelector(".balao");
         if (balao.style.display === 'block') {
             balao.style.setProperty('display', 'none', 'important');
-            removeItemFromLocalStorage(TEXT_MAGNIFIER_KEY);
-
         } else {
             balao.style.setProperty('display', 'block', 'important');
-            setItemToLocalStorageWithExpiry(TEXT_MAGNIFIER_KEY,
-                true,
-                null);
             getElementCursorHover();
         }
-        changeStyleButtonSelected(textEnlargeButton);
     }
 
     function loadTextMagnifier() {
@@ -1233,15 +846,14 @@ window.incloowe.init = function init() {
         criarBalao();
 
         if (textMagnifier !== null) {
-            updateTextMagnifier();
+            setTextMagnifier();
         }
 
     }
 
+    function changeAlignText(direction, btn) {
 
-    function changeAlignText(direction) {
-
-        let textAlignSaved = getItemFromLocalStorageWithExpiry("text-align");
+        let textAlignSaved = getItemFromLocalStorageWithExpiry(TEXT_ALIGN_KEY);
 
         if (textAlignSaved !== null && textAlignSaved.value === direction) {
             indexActualTextAlign = 0;
@@ -1250,17 +862,18 @@ window.incloowe.init = function init() {
         }
 
         setAlignText();
+        changeStyleButtonSelectedAndDeselectOthers(btn, TEXT_ALIGN_KEY);
 
         if (indexActualTextAlign === 0) {
-            removeItemFromLocalStorage(TEXT_ALIGN_KEY);
+            removeItemFromLocalStorage(TEXT_ALIGN_KEY, btn.id);
         } else {
             setItemToLocalStorageWithExpiry(TEXT_ALIGN_KEY,
                 indexActualTextAlign,
-                null);
+                null,
+                btn.id);
         }
 
     }
-
 
     function setAlignText() {
 
@@ -1275,36 +888,12 @@ window.incloowe.init = function init() {
                     // Aplique os estilos apenas se não pertencer à classe 'app-window'
                     element.style.setProperty('text-align', selectedAlignText, 'important');
                 }
-
-                if (selectedAlignText === '') {
-                    removeItemFromLocalStorage(TEXT_ALIGN_KEY);
-
-                }
-
             }
-
-            setItemToLocalStorageWithExpiry(TEXT_ALIGN_KEY,
-                indexActualTextAlign,
-                null);
-
-
-            if (indexActualTextAlign === 1) {
-                changeStyleButtonSelectedAndDeselectOthers(alignLeft, [alignCenter, alignRight])
-            } else if (indexActualTextAlign === 2) {
-                changeStyleButtonSelectedAndDeselectOthers(alignCenter, [alignLeft, alignRight])
-            } else if (indexActualTextAlign === 3) {
-                changeStyleButtonSelectedAndDeselectOthers(alignRight, [alignLeft, alignCenter])
-            } else {
-                changeStyleButtonSelectedAndDeselectOthers(null, [alignLeft, alignCenter, alignRight])
-            }
-
-
         }
 
     }
 
-
-    function highlightHeading() {
+    function setHighlightHeading() {
 
         let txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
 
@@ -1314,40 +903,26 @@ window.incloowe.init = function init() {
             let attName = txtTag.getAttribute('data-inclowee-hlh-styled');
 
             if (attName == null) {
-
                 txtTag.style.setProperty('outline', 'rgb(20, 111, 248) solid 2px', 'important');
                 txtTag.style.setProperty('outline-offset', '2px', 'important');
-
                 txtTag.setAttribute('data-inclowee-hlh-styled', 'true');
-                setItemToLocalStorageWithExpiry(HIGHLIGHT_HEADINGS_KEY,
-                    true,
-                    null);
 
             } else {
-
                 txtTag.style.outline = '';
                 txtTag.style.outlineOffset = '';
-
                 txtTag.removeAttribute("data-inclowee-hlh-styled");
-                removeItemFromLocalStorage(HIGHLIGHT_HEADINGS_KEY);
             }
 
         });
-
-        changeStyleButtonSelected(hlHeading);
-
     }
 
-
-    function loadHighlightHeading() {
-
+    function loadHighlightHeadings() {
         if (hightlightHeadings != null) {
-            highlightHeading();
+            setHighlightHeading();
         }
     }
 
-    function highlightLinks() {
-
+    function setHighlightLinks() {
         let txtTags = document.querySelectorAll('a');
 
         // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
@@ -1359,86 +934,120 @@ window.incloowe.init = function init() {
 
                 txtTag.style.setProperty('outline', '2px solid rgba(255, 114, 22, 0.5)', 'important');
                 txtTag.style.setProperty('outline-offset', '2px', 'important');
-
                 txtTag.setAttribute('data-inclowee-hll-styled', 'true');
-                setItemToLocalStorageWithExpiry(HIGHLIGHT_LINKS_KEY,
-                    true,
-                    null);
-
             } else {
-
                 txtTag.style.outline = '';
                 txtTag.style.outlineOffset = '';
-
                 txtTag.removeAttribute("data-inclowee-hll-styled");
-                removeItemFromLocalStorage(HIGHLIGHT_LINKS_KEY);
             }
-
         });
-
-        changeStyleButtonSelected(highlightLinksButton);
-
-
     }
 
     function loadHighlightLinks() {
 
         if (hightlightLinks != null) {
-            highlightLinks();
+            setHighlightLinks();
         }
 
     }
 
-    function highlightButtons() {
+    function setHighlightButtons() {
 
         let txtTags = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"]');
 
         // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
         txtTags.forEach(function (txtTag) {
-
             let attName = txtTag.getAttribute('data-inclowee-hlb-styled');
-
             if (attName == null) {
 
                 if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
-
                     txtTag.style.setProperty('outline', '2px solid rgba(255, 114, 22, 0.5)', 'important');
                     txtTag.style.setProperty('outline-offset', '2px', 'important');
-
-
                     txtTag.setAttribute('data-inclowee-hlb-styled', 'true');
-                    setItemToLocalStorageWithExpiry(HIGHLIGHT_BUTTONS_KEY,
-                        true,
-                        null);
-
                 }
 
             } else {
-
                 txtTag.style.outline = '';
                 txtTag.style.outlineOffset = '';
-
                 txtTag.removeAttribute("data-inclowee-hlb-styled");
-                removeItemFromLocalStorage(HIGHLIGHT_BUTTONS_KEY);
             }
 
         });
-
-        changeStyleButtonSelected(highlightButtonsButton);
 
     }
 
     function loadHighlightButtons() {
 
         if (hightlightButtons != null) {
-            highlightButtons();
+            setHighlightButtons();
         }
 
     }
 
-    function changeFontFamily(font) {
+    function setHighlightHover() {
+        let txtTags = getLastLeafElementsWithText();
+        let otherItens = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"], img');
 
-        let fontFam = getItemFromLocalStorageWithExpiry("font-family");
+        let otherItensArray = Array.from(otherItens);
+        let combined = [...txtTags, ...otherItensArray];
+
+        const isHoverActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
+
+        if (isHoverActive && isHoverActive.value) {
+            combined.forEach(el => el.classList.remove('hover-active'));
+        } else {
+            combined.forEach(el => el.classList.add('hover-active'));
+        }
+    }
+
+    function loadHighlightHover() {
+        if (hightlightHover != null) {
+            let txtTags = getLastLeafElementsWithText();
+            let otherItens = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"], img');
+
+            let otherItensArray = Array.from(otherItens);
+            let combined = [...txtTags, ...otherItensArray];
+
+            const isHoverActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
+
+            if (isHoverActive && isHoverActive.value === 'true') {
+                combined.forEach(el => el.classList.add('hover-active'));
+            } else {
+                combined.forEach(el => el.classList.remove('hover-active'));
+            }
+        }
+    }
+
+    function setHighlightFocus() {
+        let allItens = document.querySelectorAll('body *');
+
+        // Verifica o estado do localStorage
+        const isFocusActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY);
+
+        if (isFocusActive && isFocusActive.value === 'true') {
+            allItens.forEach(el => el.classList.remove('focus-active'));
+        } else {
+            allItens.forEach(el => el.classList.add('focus-active'));
+        }
+    }
+
+    function loadHighlightFocus() {
+        if (hightlightFocus != null) {
+            let allItens = document.querySelectorAll('body *');
+            // Verifica o estado do localStorage
+            const isFocusActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY);
+
+            if (isFocusActive && isFocusActive.value === 'true') {
+                allItens.forEach(el => el.classList.add('focus-active'));
+            } else {
+                allItens.forEach(el => el.classList.remove('focus-active'));
+            }
+        }
+    }
+
+    function changeFontFamily(font, btn) {
+
+        let fontFam = getItemFromLocalStorageWithExpiry(FONT_FAMILY_KEY);
 
         if (fontFam !== null && fontFam.value === font) {
             indexActualFontFamily = 0;
@@ -1447,22 +1056,24 @@ window.incloowe.init = function init() {
         }
 
         setFontFamily();
+        changeStyleButtonSelectedAndDeselectOthers(btn, FONT_FAMILY_KEY);
 
         if (indexActualFontFamily === 0) {
-            removeItemFromLocalStorage(FONT_FAMILY_KEY);
+            removeItemFromLocalStorage(FONT_FAMILY_KEY, btn.id);
         } else {
             setItemToLocalStorageWithExpiry(FONT_FAMILY_KEY,
                 indexActualFontFamily,
-                null);
+                null,
+                btn.id);
         }
-
 
     }
 
     function setFontFamily() {
 
-        if (indexActualFontFamily !== null) {
+        // let propertySaved = getItemFromLocalStorageWithExpiry(FONT_FAMILY_KEY);
 
+        if (indexActualFontFamily !== null) {
 
             let selectedFontFamily = fontes[indexActualFontFamily];
             let elements = document
@@ -1473,85 +1084,39 @@ window.incloowe.init = function init() {
                     // Aplique os estilos apenas se não pertencer à classe 'app-window'
                     element.style.setProperty('font-family', selectedFontFamily, 'important');
                 }
-
-                if (selectedFontFamily === '') {
-                    removeItemFromLocalStorage(FONT_FAMILY_KEY);
-                }
-
             }
-
-            setItemToLocalStorageWithExpiry(FONT_FAMILY_KEY,
-                indexActualFontFamily,
-                null);
-
-
-            if (indexActualFontFamily === 1) {
-                changeStyleButtonSelectedAndDeselectOthers(readableFontButton, [friendlyDyslexiaButton])
-            } else if (indexActualFontFamily === 2) {
-                changeStyleButtonSelectedAndDeselectOthers(friendlyDyslexiaButton, [readableFontButton])
-            } else {
-                changeStyleButtonSelectedAndDeselectOthers(null, [readableFontButton, friendlyDyslexiaButton])
-            }
-
-
         }
 
     }
 
-    function createStyleGlobal() {
-        // Cria um elemento <style>
-        let estiloGlobal = document.createElement('style');
-        estiloGlobal.setAttribute("id", "incloowe-style")
-        let fonteUrl = require('./assets/fonts/OpenDyslexic-Regular.woff');
-        let estilo = document.createTextNode(' @font-face { ' +
-            '            font-family: \'OpenDyslexic\'; ' +
-            `            src: url(${fonteUrl}) format(\'woff\'); ` +
-            '            font-weight: normal; ' +
-            '            font-style: normal; ' +
-            '        } ' +
-            '.inverted { filter: invert(100%) !important; background: #fff !important; } ' +
+    function setVlibras(){
 
-            '.light-contrast { background-color: #fff !important; color: #181818 !important; } ' +
-            'h1.light-contrast, h2.light-contrast, h3.light-contrast, h4.light-contrast, h5.light-contrast, h6.light-contrast { background-color: #fff !important; color: #075f39 !important; } ' +
-            'button.light-contrast { background-color: #fff !important; color: #000 !important; border-color: #000 !important; } ' +
-            'a.light-contrast { color: #181818 !important; border-color: #181818; background-color:#fff !important; } ' +
-            'a.light-contrast:hover { color: #181818 !important; outline: aqua solid 2px !important; outline-offset: 1px !important; background-color:#fff !important; } ' +
+        let display = document.getElementById("vlibras").style.display;
+        if (display === 'block') {
+            let btnClose = document.querySelector('.vpw-header-btn-close');
+            if(btnClose == null) {
+                return false;
+            }
+            btnClose.click();
+            document.getElementById("vlibras").style.display = "none";
 
-            '.dark-contrast { background-color: #181818 !important; color: #fff !important;} ' +
-            'h1.dark-contrast, h2.dark-contrast, h3.dark-contrast, h4.dark-contrast, h5.dark-contrast, h6.dark-contrast { color: #50d0a0 !important; } ' +
-            'a.dark-contrast { background-color: #181818 !important; color: #fcff3c !important; border-color: #fff; } ' +
-            'a.dark-contrast:hover { background-color: #181818 !important; color: #fcff3c !important; outline: rgb(242, 167, 98) solid 2px !important; outline-offset: 1px !important; } ' +
-            'button.dark-contrast { background-color: #181818 !important; border-color: #fff !important; outline: rgb(242, 167, 98) solid 2px !important; outline-offset: 1px !important;} ' +
+        } else {
+            document.getElementById("vlibras").style.display = "block";
+            // toggleExpandWindow();
+            document.getElementById("vlibrasclick").click();
+        }
 
-            '.high-saturation { filter: saturate(3) !important; } ' +
-            '.low-saturation { filter: saturate(0.5) !important; } ' +
-            '.mono-saturation { filter: grayscale(100%) !important; } ' +
-            '.protanomaly { filter: url(#protanomaly-filter)}' +
-            '.deuteranomaly { filter: url(#deuteranomaly-filter)}' +
-            '.tritanomaly { filter: url(#tritanomaly-filter)}' +
-            '.hover-active:hover { outline: rgb(20, 111, 248) solid 2px; outline-offset: 2px; }' +
-            '.focus-active:focus { outline: rgba(255, 114, 22, 0.5) solid 2px; outline-offset: 2px; }'
-        );
+        return true;
 
-
-        estiloGlobal.appendChild(estilo);
-
-        const estiloFilter = document.createElement('style');
-        estiloFilter.setAttribute("id", "filter-incloowe");
-
-        document.head.appendChild(estiloGlobal);
-        document.head.appendChild(estiloFilter);
     }
 
-
-//COLORS
-    function loadContrastColors() {
-        if (colorsContrast != null) {
-            setColorContrast(document.activeElement.parentElement);
+    function loadVlibras() {
+        if (vLibras != null) {
+            setVlibras();
         }
     }
 
-    function changeColorContrast(contrast, html) {
+    function changeColorContrast(contrast, btn) {
 
         let colorContrastSaved = getItemFromLocalStorageWithExpiry(COLORS_CONTRAST_KEY);
 
@@ -1561,20 +1126,22 @@ window.incloowe.init = function init() {
             indexActualColorContrast = contrast;
         }
 
-        setColorContrast(html);
+        setColorContrast();
+        changeStyleButtonSelectedAndDeselectOthers(btn, COLORS_CONTRAST_KEY);
 
         if (indexActualColorContrast === 0) {
-            removeItemFromLocalStorage(COLORS_CONTRAST_KEY);
+            removeItemFromLocalStorage(COLORS_CONTRAST_KEY, btn.id);
         } else {
             setItemToLocalStorageWithExpiry(COLORS_CONTRAST_KEY,
                 indexActualColorContrast,
-                null);
+                null,
+                btn.id);
         }
 
     }
 
+    function setColorContrast() {
 
-    function setColorContrast(html) {
         const filterStyle = document.getElementById('filter-incloowe');
 
         if (indexActualColorContrast !== null) {
@@ -1605,7 +1172,6 @@ window.incloowe.init = function init() {
                     filterStyle.innerHTML = 'body > *:not(#shadow) { filter: invert(100%) !important; background: #fff !important; }';
                     widget.style.filter = 'invert(100%)';
                     widget.style.background = '#fff';
-
                     break;
                 case 'int-inverted':
                     filterStyle.innerHTML = 'body > *:not(#shadow) { filter: invert(100%) !important; background: #fff !important; }' +
@@ -1646,26 +1212,16 @@ window.incloowe.init = function init() {
                     removeContrastClasses();
             }
 
-            const buttonsMap = {
-                1: invertedColorsButton,
-                2: intelligentInvertedColorsButton,
-                3: lightContrastColorsButton,
-                4: darkContrastColorsButton,
-                5: highContrastColorsButton,
-            };
-            const selectedButton = buttonsMap[indexActualColorContrast] || null;
-            const otherButtons = Object.values(buttonsMap).filter(button => button !== selectedButton);
-            changeStyleButtonSelectedAndDeselectOthers(selectedButton, otherButtons);
         }
     }
 
-    function loadSaturationColors() {
-        if (colorsSaturation != null) {
-            setColorSaturation(document.activeElement.parentElement);
+    function loadContrastColors() {
+        if (colorsContrast != null) {
+            setColorContrast();
         }
     }
 
-    function changeColorSaturation(saturation, html) {
+    function changeColorSaturation(saturation, btn) {
 
         let colorSaturationSaved = getItemFromLocalStorageWithExpiry(COLORS_SATURATION_KEY);
 
@@ -1675,19 +1231,21 @@ window.incloowe.init = function init() {
             indexActualColorSaturation = saturation;
         }
 
-        setColorSaturation(html);
+        setColorSaturation();
+        changeStyleButtonSelectedAndDeselectOthers(btn, COLORS_SATURATION_KEY);
 
         if (indexActualColorSaturation === 0) {
-            removeItemFromLocalStorage(COLORS_SATURATION_KEY);
+            removeItemFromLocalStorage(COLORS_SATURATION_KEY, btn.id);
         } else {
             setItemToLocalStorageWithExpiry(COLORS_SATURATION_KEY,
                 indexActualColorSaturation,
-                null);
+                null,
+                btn.id);
         }
 
     }
 
-    function setColorSaturation(html) {
+    function setColorSaturation() {
 
         if (indexActualColorSaturation !== null) {
             const selectedColorSaturation = saturations[indexActualColorSaturation];
@@ -1706,17 +1264,119 @@ window.incloowe.init = function init() {
                 default:
                     html.classList.remove("high", "low", "mono");
             }
-
-            const buttonsMap = {
-                1: highSaturationColorsButton,
-                2: lowSaturationColorsButton,
-                3: monochromaticColorsButton
-            };
-            const selectedButton = buttonsMap[indexActualColorSaturation] || null;
-            const otherButtons = Object.values(buttonsMap).filter(button => button !== selectedButton);
-            changeStyleButtonSelectedAndDeselectOthers(selectedButton, otherButtons);
         }
     }
+
+    function loadSaturationColors() {
+        if (colorsSaturation != null) {
+            setColorSaturation();
+        }
+    }
+
+    function changeDaltonismFilter(daltonismFilter, btn) {
+
+        let daltonismFilterSaved = getItemFromLocalStorageWithExpiry("daltonism-filter");
+
+        if (daltonismFilterSaved !== null && daltonismFilterSaved.value === daltonismFilter) {
+            indexActualDaltonismFilter = 0;
+        } else {
+            indexActualDaltonismFilter = daltonismFilter;
+        }
+
+        setDaltonismFilter();
+        changeStyleButtonSelectedAndDeselectOthers(btn, DALTONISM_FILTER_KEY);
+
+        if (indexActualDaltonismFilter === 0) {
+            removeItemFromLocalStorage(DALTONISM_FILTER_KEY, btn.id);
+        } else {
+            setItemToLocalStorageWithExpiry(DALTONISM_FILTER_KEY,
+                indexActualDaltonismFilter,
+                null,
+                btn.id);
+        }
+
+    }
+
+    function setDaltonismFilter() {
+
+        const prot = "0.817, 0.183, 0, 0, 0," +
+            "0.333, 0.667, 0, 0, 0," +
+            "0, 0.125, 0.875, 0, 0," +
+            "0, 0, 0, 1, 0";
+
+        const deut = "0.8, 0.2, 0, 0, 0," +
+            "0.258, 0.742, 0, 0, 0," +
+            "0, 0.142, 0.858, 0, 0," +
+            "0, 0, 0, 1, 0";
+
+        const trit = "0.967, 0.033, 0, 0, 0," +
+            "0, 0.733, 0.267, 0, 0," +
+            "0, 0.183, 0.817, 0, 0," +
+            "0, 0, 0, 1, 0";
+
+        const svgNS = "http://www.w3.org/2000/svg";
+        let svg = document.getElementById("daltonism-svg");
+
+        if (!svg) {
+            svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("id", "daltonism-svg");
+            svg.setAttribute("xmlns", svgNS);
+            svg.setAttribute("version", "1.1");
+            svg.style.display = "none";
+
+            const defs = document.createElementNS(svgNS, "defs");
+            svg.appendChild(defs);
+            document.body.appendChild(svg);
+        } else {
+            // Limpar filtros existentes ao mudar de opção
+            svg.querySelector("defs").innerHTML = "";
+        }
+
+        const defs = svg.querySelector("defs");
+        const filter = document.createElementNS(svgNS, "filter");
+        const feColorMatrix = document.createElementNS(svgNS, "feColorMatrix");
+        feColorMatrix.setAttribute("type", "matrix");
+
+        if (indexActualDaltonismFilter !== null) {
+            const selectedDaltonismFilter = daltonisms[indexActualDaltonismFilter];
+            html.classList.remove("protanomaly", "deuteranomaly", "tritanomaly");
+
+            switch (selectedDaltonismFilter) {
+                case 'protanomaly':
+                    filter.setAttribute("id", "protanomaly-filter");
+                    feColorMatrix.setAttribute("values", prot);
+                    html.classList.add("protanomaly");
+                    break;
+                case 'deuteranomaly':
+                    filter.setAttribute("id", "deuteranomaly-filter");
+                    feColorMatrix.setAttribute("values", deut);
+                    html.classList.add("deuteranomaly");
+                    break;
+                case 'tritanomaly':
+                    filter.setAttribute("id", "tritanomaly-filter");
+                    feColorMatrix.setAttribute("values", trit);
+                    html.classList.add("tritanomaly");
+                    break;
+                default:
+                    if (svg) {
+                        svg.parentNode.removeChild(svg);
+                    }
+                    html.classList.remove("protanomaly", "deuteranomaly", "tritanomaly");
+            }
+
+            filter.appendChild(feColorMatrix);
+            defs.appendChild(filter);
+
+        }
+    }
+
+    function loadDaltonismFilter() {
+        if (daltonismFilter != null) {
+            setDaltonismFilter();
+        }
+    }
+
+    //RADIO BUTTONS
 
     function loadTextColor() {
 
@@ -1765,86 +1425,6 @@ window.incloowe.init = function init() {
         }
 
     }
-
-
-    function assignDefaultButtonsAdjustColor() {
-
-        let defaultButtons = shadowR.querySelectorAll('.link-default-color')
-        defaultButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                e.preventDefault();
-                let dataTest = button.parentElement.getAttribute('data-test');
-                setAdjustColor(button, dataTest);
-            });
-        });
-
-    }
-
-    function assignAdjustColorsEventListeners() {
-        assignAdjustTextColor();
-        assignAdjustTitleColor();
-        assignAdjustBackgroundColor();
-        assignDefaultButtonsAdjustColor();
-
-        shadowR.querySelectorAll('.icon-tooltip').forEach(info => {
-            info.addEventListener('mouseenter', () => {
-                const tooltip = info.nextElementSibling.nextElementSibling.nextElementSibling;
-                if (tooltip?.classList.contains('tooltip-content')) {
-                    tooltip.style.visibility = 'visible';
-                    tooltip.style.opacity = '1';
-                }
-            });
-
-            info.addEventListener('mouseleave', () => {
-                const tooltip = info.nextElementSibling.nextElementSibling.nextElementSibling;
-                if (tooltip?.classList.contains('tooltip-content')) {
-                    tooltip.style.visibility = 'hidden';
-                    tooltip.style.opacity = '0';
-                }
-            });
-        });
-
-    }
-
-    function assignAdjustTextColor() {
-
-        let colorPickButtons = shadowR.querySelectorAll('div[data-test="adjustTextColor"]')[0]
-            .querySelectorAll('.color-pick');
-        colorPickButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                setAdjustColor(button, "adjustTextColor");
-            });
-        });
-
-    }
-
-    function assignAdjustTitleColor() {
-
-        let colorPickButtons = shadowR.querySelectorAll('div[data-test="adjustTitleColor"]')[0]
-            .querySelectorAll('.color-pick');
-        colorPickButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                setAdjustColor(button, "adjustTitleColor");
-            });
-        });
-
-    }
-
-    function assignAdjustBackgroundColor() {
-
-        let colorPickButtons = shadowR.querySelectorAll('div[data-test="adjustBackgroundColor"]')[0]
-            .querySelectorAll('.color-pick');
-        colorPickButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                setAdjustColor(button, "adjustBackgroundColor");
-            });
-        });
-
-    }
-
-    let lastSelectedTextColor;
-    let lastSelectedTitleColor;
-    let lastSelectedBackgroundColor;
 
     function setAdjustColor(button, fila) {
 
@@ -1932,195 +1512,6 @@ window.incloowe.init = function init() {
             currentSelected.innerHTML = '';
             currentSelected.classList.remove('color-pick-selected');
             removeAdjustColor(fila);
-        }
-    }
-
-
-    function loadDaltonismFilter() {
-        if (daltonismFilter != null) {
-            setDaltonismFilter(document.activeElement.parentElement);
-        }
-    }
-
-
-    function changeDaltonismFilter(daltonismFilter, html) {
-
-        let daltonismFilterSaved = getItemFromLocalStorageWithExpiry("daltonism-filter");
-
-        if (daltonismFilterSaved !== null && daltonismFilterSaved.value === daltonismFilter) {
-            indexActualDaltonismFilter = 0;
-        } else {
-            indexActualDaltonismFilter = daltonismFilter;
-        }
-
-        setDaltonismFilter(html);
-
-        if (indexActualDaltonismFilter === 0) {
-            removeItemFromLocalStorage(DALTONISM_FILTER_KEY);
-        } else {
-            setItemToLocalStorageWithExpiry(DALTONISM_FILTER_KEY,
-                indexActualDaltonismFilter,
-                null);
-        }
-
-    }
-
-    function setDaltonismFilter(html) {
-
-        const prot = "0.817, 0.183, 0, 0, 0," +
-            "0.333, 0.667, 0, 0, 0," +
-            "0, 0.125, 0.875, 0, 0," +
-            "0, 0, 0, 1, 0";
-
-        const deut = "0.8, 0.2, 0, 0, 0," +
-            "0.258, 0.742, 0, 0, 0," +
-            "0, 0.142, 0.858, 0, 0," +
-            "0, 0, 0, 1, 0";
-
-        const trit = "0.967, 0.033, 0, 0, 0," +
-            "0, 0.733, 0.267, 0, 0," +
-            "0, 0.183, 0.817, 0, 0," +
-            "0, 0, 0, 1, 0";
-
-        const svgNS = "http://www.w3.org/2000/svg";
-        let svg = document.getElementById("daltonism-svg");
-
-        if (!svg) {
-            svg = document.createElementNS(svgNS, "svg");
-            svg.setAttribute("id", "daltonism-svg");
-            svg.setAttribute("xmlns", svgNS);
-            svg.setAttribute("version", "1.1");
-            svg.style.display = "none";
-
-            const defs = document.createElementNS(svgNS, "defs");
-            svg.appendChild(defs);
-            document.body.appendChild(svg);
-        } else {
-            // Limpar filtros existentes ao mudar de opção
-            svg.querySelector("defs").innerHTML = "";
-        }
-
-        const defs = svg.querySelector("defs");
-        const filter = document.createElementNS(svgNS, "filter");
-        const feColorMatrix = document.createElementNS(svgNS, "feColorMatrix");
-        feColorMatrix.setAttribute("type", "matrix");
-
-        if (indexActualDaltonismFilter !== null) {
-            const selectedDaltonismFilter = daltonisms[indexActualDaltonismFilter];
-            html.classList.remove("protanomaly", "deuteranomaly", "tritanomaly");
-
-            switch (selectedDaltonismFilter) {
-                case 'protanomaly':
-                    filter.setAttribute("id", "protanomaly-filter");
-                    feColorMatrix.setAttribute("values", prot);
-                    html.classList.add("protanomaly");
-                    break;
-                case 'deuteranomaly':
-                    filter.setAttribute("id", "deuteranomaly-filter");
-                    feColorMatrix.setAttribute("values", deut);
-                    html.classList.add("deuteranomaly");
-                    break;
-                case 'tritanomaly':
-                    filter.setAttribute("id", "tritanomaly-filter");
-                    feColorMatrix.setAttribute("values", trit);
-                    html.classList.add("tritanomaly");
-                    break;
-                default:
-                    if (svg) {
-                        svg.parentNode.removeChild(svg);
-                    }
-                    html.classList.remove("protanomaly", "deuteranomaly", "tritanomaly");
-            }
-
-            filter.appendChild(feColorMatrix);
-            defs.appendChild(filter);
-
-            const buttonsMap = {
-                1: redDefButton,
-                2: greenDefButton,
-                3: blueDefButton
-            };
-            const selectedButton = buttonsMap[indexActualDaltonismFilter] || null;
-            const otherButtons = Object.values(buttonsMap).filter(button => button !== selectedButton);
-            changeStyleButtonSelectedAndDeselectOthers(selectedButton, otherButtons);
-        }
-    }
-
-    function setHighlightHover() {
-
-        let txtTags = getLastLeafElementsWithText();
-        let otherItens = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"], img');
-
-        let otherItensArray = Array.from(otherItens);
-        let combined = [...txtTags, ...otherItensArray];
-
-        const isHoverActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
-
-        if (isHoverActive && isHoverActive.value === 'true') {
-            combined.forEach(el => el.classList.remove('hover-active'));
-            setItemToLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY, 'false', null);
-        } else {
-            combined.forEach(el => el.classList.add('hover-active'));
-            setItemToLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY, 'true', null);
-
-        }
-
-        changeStyleButtonSelected(highlightHoverButton);
-
-    }
-
-    function loadHighlightHover() {
-        let txtTags = getLastLeafElementsWithText();
-        let otherItens = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"], img');
-
-        let otherItensArray = Array.from(otherItens);
-        let combined = [...txtTags, ...otherItensArray];
-        const isHoverActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
-
-        if (isHoverActive !== null && isHoverActive.value === 'true') {
-            combined.forEach(el => el.classList.add('hover-active'));
-            changeStyleButtonSelected(highlightHoverButton);
-        } else {
-            combined.forEach(el => el.classList.remove('hover-active'));
-        }
-
-    }
-
-    function setHighlightFocus() {
-
-        let allItens = document.querySelectorAll('body *');
-
-        // Verifica o estado do localStorage
-        const isFocusActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY);
-
-        if (isFocusActive && isFocusActive.value === 'true') {
-            // Remove a classe de focus de todos os elementos
-            allItens.forEach(el => el.classList.remove('focus-active'));
-            setItemToLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY, 'false', null);
-        } else {
-            // Adiciona a classe de focus a todos os elementos
-            allItens.forEach(el => el.classList.add('focus-active'));
-            setItemToLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY, 'true', null);
-        }
-
-        // Atualiza o estilo do botão (pode ser omitido se não houver um botão específico)
-        changeStyleButtonSelected(highlightFocusButton);
-    }
-
-    function loadHighlightFocus() {
-
-        let allItens = document.querySelectorAll('body *');
-
-        // Verifica o estado do localStorage
-        const isFocusActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY);
-
-        if (isFocusActive !== null && isFocusActive.value === 'true') {
-            // Adiciona a classe de focus a todos os elementos
-            allItens.forEach(el => el.classList.add('focus-active'));
-            changeStyleButtonSelected(highlightFocusButton);
-        } else {
-            // Remove a classe de focus de todos os elementos
-            allItens.forEach(el => el.classList.remove('focus-active'));
         }
     }
 

@@ -2,3 +2,7 @@
 - trocar textos dos tooltips para os corretos
 - implementar i18n
 - verificar quais alterações o usuario poderá fazer no Widget e colocar como parametros de inicialização
+
+-remover chaves expostas usando API Servless, ver antes se da pra fazer no vercel, se não, usar Edge Functions do supabase
+
+- trocar nome das functions de trigger, deixar generico. Pois no bundle de prod fica mto visivel

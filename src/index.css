@@ -1,3 +1,9 @@
+:host {
+    /*--lead-color: #1A6EFF;*/
+    --lead-color: #3B31F7;
+    --sup-color: #9B9BCC;
+}
+
 /* Estilos para o botão de acessibilidade */
 @media (max-width: 980px) {
 
@@ -30,7 +36,7 @@
     right: 40px;
     width: 60px;
     height: 60px;
-    background-color: #1A6EFF;
+    background-color: var(--lead-color);
     border: 2px solid #ffffff;
     border-radius: 50%;
     display: flex;
@@ -48,7 +54,7 @@
 
 .accessibility-button:hover {
     transform: scale(1.1);
-    background-color: #1038bd;
+    background-color: #2e26c4;
 }
 
 .accessibility-button:hover::before {
@@ -72,7 +78,6 @@
 
 /* Estilos gerais para a janela do aplicativo */
 .app-window {
-
     position: fixed;
     top: 10px;
     /*left: 0;*/
@@ -126,7 +131,7 @@
 
 /* Estilos para a barra de ferramentas superior */
 .toolbar {
-    background-color: #1A6EFF;
+    background-color: var(--lead-color);
     padding: 15px 10px;
     border-top-left-radius: 0; /* Para preencher totalmente o topo, você pode querer remover o arredondamento */
     border-top-right-radius: 0; /* Para preencher totalmente o topo, você pode querer remover o arredondamento */
@@ -179,7 +184,7 @@ button {
 
 /* Estilos para os botões da barra de ferramentas superior */
 .toolbar-button {
-    background-color: rgba(255, 255, 255, 0.213);
+    background-color: rgba(255, 255, 255, 0.11);
     border: 2px solid transparent;
     cursor: pointer;
     display: flex;
@@ -243,16 +248,16 @@ button {
 .scrollable-content {
     display: flex;
     flex-direction: column;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.content-buttons > * + * {
-    margin-top: 10px;
-}
+/*.content-buttons > * + * {*/
+/*    margin-top: 10px;*/
+/*}*/
 
-.container-buttons > * + * {
-    margin-left: 10px;
-}
+/*.container-buttons > * + * {*/
+/*    margin-left: 10px;*/
+/*}*/
 
 .container-buttons {
     display: flex;
@@ -285,24 +290,28 @@ button {
     border-radius: 10px;
     cursor: pointer;
     color: rgb(0, 0, 0);
-    width: 100%;
-    height: 100px;
     transition: border-color .15s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 0 20px;
+    flex: 1 1 calc(33.333% - 10px); /* Default: 3 items per row, taking gap into account */
+    min-width: 100px;
     text-align: center;
-
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: relative;
+    gap: 5px;
+    min-height: 109px;
+}
 
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-
+.full-width {
+    flex: 1 1 100%; /* Ocupa 100% da largura */
+    border-color: transparent !important;
 }
 
 .content-button:hover {
-    border-color: #1A6EFF;
+    border-color: var(--lead-color);
 }
 
 /* Adicione estados visuais para foco com contorno nos botões de conteúdo */
@@ -319,24 +328,42 @@ button {
 /* Estilos para o ícone dentro de cada botão da seção de ajustes de conteúdo */
 .content-button span {
     font-size: 16px;
-    margin-bottom: 5px;
+    /*margin-bottom: 5px;*/
 }
 
 
 /* Container principal do slider */
 .range-container {
-    width: 100%;
-    max-height: 100px;
+    /*width: 100%;*/
+    /*max-height: 100px;*/
+    /*background-color: #ffffff;*/
+    /*border: 2px solid transparent;*/
+    /*border-radius: 10px;*/
+    /*display: flex;*/
+    /*flex-direction: column; !* Organiza os elementos em coluna *!*/
+    /*justify-content: center;*/
+    /*padding: 20px;*/
+    /*box-sizing: border-box; !* Garante que as dimensões incluam a borda e o preenchimento *!*/
+    /*align-items: center;*/
+    /*position: relative;*/
+
     background-color: #ffffff;
     border: 2px solid transparent;
     border-radius: 10px;
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+    transition: border-color .15s ease;
     display: flex;
-    flex-direction: column; /* Organiza os elementos em coluna */
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     padding: 20px;
-    box-sizing: border-box; /* Garante que as dimensões incluam a borda e o preenchimento */
-    align-items: center;
+    flex: 1 1 calc(33.333% - 10px); /* Default: 3 items per row, taking gap into account */
+    min-width: 100px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: relative;
+
 
 }
 
@@ -378,7 +405,7 @@ button {
     width: 100%;
     height: 4px;
     border-radius: 20px;
-    background: #1A6EFF;
+    background: var(--lead-color);
     outline: none; /* Remove a borda padrão do foco, considere acessibilidade ao fazer isso */
 }
 
@@ -390,7 +417,7 @@ button {
     height: 20px;
     border-radius: 50%;
     background: #FFFFFF;
-    border: 1px solid #1A6EFF;
+    border: 1px solid var(--lead-color);
     cursor: pointer;
 }
 
@@ -400,7 +427,7 @@ button {
     height: 25px;
     border-radius: 50%;
     background: #FFFFFF;
-    border: 4px solid #1A6EFF;
+    border: 4px solid var(--lead-color);
     cursor: pointer;
 
 }
@@ -408,7 +435,7 @@ button {
 /* Valor do slider */
 .slider-value {
     font-size: 16px;
-    color: #1A6EFF;
+    color: var(--lead-color);
 
 }
 
@@ -421,7 +448,7 @@ button {
 .range {
     position: relative;
     width: 90%;
-    margin: auto;
+    /*margin: auto;*/
     margin-bottom: 13px;
 }
 
@@ -447,8 +474,8 @@ button {
     align-items: center;
     justify-content: center;
     color: white;
-    border-color: #1A6EFF;
-    background: #1A6EFF;
+    border-color: var(--lead-color);
+    background: var(--lead-color);
     border-style: solid;
     position: absolute;
     z-index: 200000000000;
@@ -478,14 +505,25 @@ button {
 }
 
 .content-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    /*flex-wrap: wrap;*/
     overflow: auto hidden;
     transition: max-height 0.4s ease 0s;
     max-height: 0;
-    padding: 0 8px;
+    /*padding: 0 8px;*/
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 600px;
+    padding: 20px;
+    padding-top:0;
+    padding-bottom: 0;
+    background-color: #f0f2f5;
+    border-radius: 8px;
+
 }
 
 .content-buttons.active {
@@ -521,7 +559,7 @@ button {
 }
 
 .button-submit-modal {
-    background: #1A6EFF;
+    background: var(--lead-color);
     color: #fff;
 }
 
@@ -597,7 +635,7 @@ button {
 }
 
 .color-pick-selected {
-    outline: 2px solid #1A6EFF;
+    outline: 2px solid var(--lead-color);
 }
 
 .link-default-color {
@@ -666,9 +704,13 @@ button {
 }
 
 .btn-active {
-    background: #1a6eff !important;
-    border-color: #1a6eff !important;
+    background: var(--lead-color) !important;
+    border-color: var(--lead-color) !important;
     color: #fff !important;
+}
+
+.btn-active .icon {
+    background: #fff;
 }
 
 
@@ -763,7 +805,7 @@ button {
     position: absolute;
     left: 10px;
     top: 8px;
-    background-color: #1A6EFF;
+    background-color: var(--lead-color);
     width: 16px;
     height: 16px;
 }
@@ -838,18 +880,18 @@ button {
 }
 
 .icon-light-contrast {
-    mask-image: url('data:image/svg+xml;utf-8,');
-    -webkit-mask-image: url('data:image/svg+xml;utf-8,');
+    mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun-medium"><circle cx="12" cy="12" r="4"/><path d="M12 3v1"/><path d="M12 20v1"/><path d="M3 12h1"/><path d="M20 12h1"/><path d="m18.364 5.636-.707.707"/><path d="m6.343 17.657-.707.707"/><path d="m5.636 5.636.707.707"/><path d="m17.657 17.657.707.707"/></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun-medium"><circle cx="12" cy="12" r="4"/><path d="M12 3v1"/><path d="M12 20v1"/><path d="M3 12h1"/><path d="M20 12h1"/><path d="m18.364 5.636-.707.707"/><path d="m6.343 17.657-.707.707"/><path d="m5.636 5.636.707.707"/><path d="m17.657 17.657.707.707"/></svg>');
 }
 
 .icon-dark-contrast {
-    mask-image: url('data:image/svg+xml;utf-8,');
-    -webkit-mask-image: url('data:image/svg+xml;utf-8,');
+    mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>');
 }
 
 .icon-high-contrast {
-    mask-image: url('data:image/svg+xml;utf-8,');
-    -webkit-mask-image: url('data:image/svg+xml;utf-8,');
+    mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-contrast"><circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12v12z"/></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-contrast"><circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12v12z"/></svg>');
 }
 
 .icon-high-saturation {
@@ -863,8 +905,8 @@ button {
 }
 
 .icon-monochromatic {
-    mask-image: url('data:image/svg+xml;utf-8,');
-    -webkit-mask-image: url('data:image/svg+xml;utf-8,');
+    mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-droplet"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-droplet"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>');
 }
 
 .icon-protanomaly {
@@ -903,23 +945,23 @@ button {
 }
 
 .icon-vlibras {
-    mask-image: url('data:image/svg+xml;utf-8,');
-    -webkit-mask-image: url('data:image/svg+xml;utf-8,');
+    mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hand"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hand"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>');
 }
 
 .icon-highlight-hover {
-    mask-image: url('data:image/svg+xml;utf-8,');
-    -webkit-mask-image: url('data:image/svg+xml;utf-8,');
+    mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed-mouse-pointer"><path d="M5 3a2 2 0 0 0-2 2"></path><path d="M19 3a2 2 0 0 1 2 2"></path><path d="m12 12 4 10 1.7-4.3L22 16Z"></path><path d="M5 21a2 2 0 0 1-2-2"></path><path d="M9 3h1"></path><path d="M9 21h2"></path><path d="M14 3h1"></path><path d="M3 9v1"></path><path d="M21 9v2"></path><path d="M3 14v1"></path></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed-mouse-pointer"><path d="M5 3a2 2 0 0 0-2 2"></path><path d="M19 3a2 2 0 0 1 2 2"></path><path d="m12 12 4 10 1.7-4.3L22 16Z"></path><path d="M5 21a2 2 0 0 1-2-2"></path><path d="M9 3h1"></path><path d="M9 21h2"></path><path d="M14 3h1"></path><path d="M3 9v1"></path><path d="M21 9v2"></path><path d="M3 14v1"></path></svg>');
 }
 
 .icon-highlight-button {
-    mask-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed-mouse-pointer"> <path d="M5 3a2 2 0 0 0-2 2"></path> <path d="M19 3a2 2 0 0 1 2 2"></path> <path d="m12 12 4 10 1.7-4.3L22 16Z"></path> <path d="M5 21a2 2 0 0 1-2-2"></path> <path d="M9 3h1"></path> <path d="M9 21h2"></path> <path d="M14 3h1"></path> <path d="M3 9v1"></path> <path d="M21 9v2"></path> <path d="M3 14v1"></path> </svg>');
-    -webkit-mask-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed-mouse-pointer"> <path d="M5 3a2 2 0 0 0-2 2"></path> <path d="M19 3a2 2 0 0 1 2 2"></path> <path d="m12 12 4 10 1.7-4.3L22 16Z"></path> <path d="M5 21a2 2 0 0 1-2-2"></path> <path d="M9 3h1"></path> <path d="M9 21h2"></path> <path d="M14 3h1"></path> <path d="M3 9v1"></path> <path d="M21 9v2"></path> <path d="M3 14v1"></path> </svg>');
+    mask-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rectangle-ellipsis"><rect width="20" height="12" x="2" y="6" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rectangle-ellipsis"><rect width="20" height="12" x="2" y="6" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>');
 }
 
 .icon-highlight-title {
-    mask-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-select"> <path d="M5 3a2 2 0 0 0-2 2"></path> <path d="M19 3a2 2 0 0 1 2 2"></path> <path d="M21 19a2 2 0 0 1-2 2"></path> <path d="M5 21a2 2 0 0 1-2-2"></path> <path d="M9 3h1"></path> <path d="M9 21h1"></path> <path d="M14 3h1"></path> <path d="M14 21h1"></path> <path d="M3 9v1"></path> <path d="M21 9v1"></path> <path d="M3 14v1"></path> <path d="M21 14v1"></path> <line x1="7" x2="15" y1="8" y2="8"></line> <line x1="7" x2="17" y1="12" y2="12"></line> <line x1="7" x2="13" y1="16" y2="16"></line> </svg>');
-    -webkit-mask-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-select"> <path d="M5 3a2 2 0 0 0-2 2"></path> <path d="M19 3a2 2 0 0 1 2 2"></path> <path d="M21 19a2 2 0 0 1-2 2"></path> <path d="M5 21a2 2 0 0 1-2-2"></path> <path d="M9 3h1"></path> <path d="M9 21h1"></path> <path d="M14 3h1"></path> <path d="M14 21h1"></path> <path d="M3 9v1"></path> <path d="M21 9v1"></path> <path d="M3 14v1"></path> <path d="M21 14v1"></path> <line x1="7" x2="15" y1="8" y2="8"></line> <line x1="7" x2="17" y1="12" y2="12"></line> <line x1="7" x2="13" y1="16" y2="16"></line> </svg>');
+    mask-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-select"><path d="M5 3a2 2 0 0 0-2 2"></path><path d="M19 3a2 2 0 0 1 2 2"></path><path d="M21 19a2 2 0 0 1-2 2"></path><path d="M5 21a2 2 0 0 1-2-2"></path><path d="M9 3h1"></path><path d="M9 21h1"></path><path d="M14 3h1"></path><path d="M14 21h1"></path><path d="M3 9v1"></path><path d="M21 9v1"></path><path d="M3 14v1"></path><path d="M21 14v1"></path><line x1="7" x2="15" y1="8" y2="8"></line><line x1="7" x2="17" y1="12" y2="12"></line><line x1="7" x2="13" y1="16" y2="16"></line></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-select"><path d="M5 3a2 2 0 0 0-2 2"></path><path d="M19 3a2 2 0 0 1 2 2"></path><path d="M21 19a2 2 0 0 1-2 2"></path><path d="M5 21a2 2 0 0 1-2-2"></path><path d="M9 3h1"></path><path d="M9 21h1"></path><path d="M14 3h1"></path><path d="M14 21h1"></path><path d="M3 9v1"></path><path d="M21 9v1"></path><path d="M3 14v1"></path><path d="M21 14v1"></path><line x1="7" x2="15" y1="8" y2="8"></line><line x1="7" x2="17" y1="12" y2="12"></line><line x1="7" x2="13" y1="16" y2="16"></line></svg>');
 }
 
 .icon-highlight-link {
@@ -927,7 +969,7 @@ button {
     -webkit-mask-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link-2"> <path d="M9 17H7A5 5 0 0 1 7 7h2"></path> <path d="M15 7h2a5 5 0 1 1 0 10h-2"></path> <line x1="8" x2="16" y1="12" y2="12"></line> </svg>');
 }
 
-.icon-highlight-focus {
-    mask-image: url('data:image/svg+xml;utf-8,');
-    -webkit-mask-image: url('data:image/svg+xml;utf-8,');
+.icon-highlight-target {
+    mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-dot-dashed"><path d="M10.1 2.18a9.93 9.93 0 0 1 3.8 0"/><path d="M17.6 3.71a9.95 9.95 0 0 1 2.69 2.7"/><path d="M21.82 10.1a9.93 9.93 0 0 1 0 3.8"/><path d="M20.29 17.6a9.95 9.95 0 0 1-2.7 2.69"/><path d="M13.9 21.82a9.94 9.94 0 0 1-3.8 0"/><path d="M6.4 20.29a9.95 9.95 0 0 1-2.69-2.7"/><path d="M2.18 13.9a9.93 9.93 0 0 1 0-3.8"/><path d="M3.71 6.4a9.95 9.95 0 0 1 2.7-2.69"/><circle cx="12" cy="12" r="1"/></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-dot-dashed"><path d="M10.1 2.18a9.93 9.93 0 0 1 3.8 0"/><path d="M17.6 3.71a9.95 9.95 0 0 1 2.69 2.7"/><path d="M21.82 10.1a9.93 9.93 0 0 1 0 3.8"/><path d="M20.29 17.6a9.95 9.95 0 0 1-2.7 2.69"/><path d="M13.9 21.82a9.94 9.94 0 0 1-3.8 0"/><path d="M6.4 20.29a9.95 9.95 0 0 1-2.69-2.7"/><path d="M2.18 13.9a9.93 9.93 0 0 1 0-3.8"/><path d="M3.71 6.4a9.95 9.95 0 0 1 2.7-2.69"/><circle cx="12" cy="12" r="1"/></svg>');
 }
