@@ -1,3 +1,5 @@
+- resolver problema de não conseguir usar css separado em prod
+
 - iniciar refatoração de codigos repetitivos
 - trocar textos dos tooltips para os corretos
 - implementar i18n

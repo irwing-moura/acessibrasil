@@ -37,7 +37,7 @@ module.exports = merge(common, {
         rules: [
             {
                 test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader'],
+                use: ['style-loader', 'css-loader'],
             },
         ]
     },
@@ -49,10 +49,10 @@ module.exports = merge(common, {
         new HtmlWebpackPlugin({
             template: './src/widget.html', // Caminho do template HTML
             filename: 'widget.html', // Nome do arquivo HTML gerado
-        })
-        ,
-        new MiniCssExtractPlugin({
-            filename: 'main.css'
         }),
+        // ,
+        // new MiniCssExtractPlugin({
+        //     filename: 'main.css'
+        // }),
     ],
 });

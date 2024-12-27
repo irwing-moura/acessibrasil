@@ -33,6 +33,7 @@ import {
 } from "./queries";
 
 import widgetHtml from './widget.html';
+import {getButtons, getContainers} from "./api";
 
 
 window.incloowe = window.incloowe || {};
@@ -165,7 +166,9 @@ window.incloowe.init = function init() {
         shadowRoot.innerHTML = widgetHtml; // Insere o HTML no shadowRoot
         document.body.appendChild(host);
 
-        let listaContainersCompleto = await fetchContainersWithContent();
+        // let listaContainersCompleto = await fetchContainersWithContent();
+        const domain = window.location.hostname;
+        const listaContainersCompleto = await getContainers(domain);
 
         for (const container of listaContainersCompleto) {
             let order = container.order - 1;
@@ -541,7 +544,9 @@ window.incloowe.init = function init() {
 
     async function setLocalStoregeButtonsId() {
 
-        let buttons = await fetchButtons();
+        // let buttons = await fetchButtons();
+        const domain = window.location.hostname;
+        let buttons = await getButtons(domain);
 
         for (const btn of buttons) {
 
