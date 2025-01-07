@@ -1,12 +1,7 @@
 import {
-    fetchButtons,
-    fetchContainersWithContent
-} from './supabase';
-import {
     openModalHideButtonOrNot,
     expandContent,
     showTooltip,
-    toggleExpandWindow,
     hideWidget,
     setShadowRoot,
     changeTextAndColorRangeValue,
@@ -22,8 +17,6 @@ import {
     setItemToLocalStorageWithExpiry,
     getItemFromLocalStorageWithExpiry,
     removeItemFromLocalStorage,
-    changeItemGroup,
-    setItemGroup,
     clearLocalStorage
 } from "./storage";
 import {
@@ -33,7 +26,7 @@ import {
 } from "./queries";
 
 import widgetHtml from './widget.html';
-import {getButtons, getContainers} from "./api";
+import {getButtons, getContainers, getQueries} from "./api";
 
 
 window.incloowe = window.incloowe || {};
@@ -55,9 +48,9 @@ window.incloowe.init = function init() {
     const FONT_FAMILY_KEY = "font-family";
     const COLORS_CONTRAST_KEY = "colors-contrast";
     const COLORS_SATURATION_KEY = "colors-saturation";
-    const ADJUST_TEXT_COLOR_KEY = "adjust-text-color"
-    const ADJUST_TITLE_COLOR_KEY = "adjust-title-color"
-    const ADJUST_BACKGROUND_COLOR_KEY = "adjust-background-color"
+    const ADJUST_TEXT_COLOR_KEY = "adjustTextColor"
+    const ADJUST_TITLE_COLOR_KEY = "adjustTitleColor"
+    const ADJUST_BACKGROUND_COLOR_KEY = "adjustBackgroundColor"
     const DALTONISM_FILTER_KEY = "daltonism-filter";
     const VLIBRAS_KEY = "vlibras";
 
@@ -118,6 +111,9 @@ window.incloowe.init = function init() {
 
     let html;
 
+    let contentLoaded = false;
+    let queries;
+
     if (widgetStatus === null) {
 
         initializeVlibras();
@@ -125,9 +121,9 @@ window.incloowe.init = function init() {
         window.addEventListener("load", async (event) => {
 
             html = document.activeElement.parentElement;
+            queries = await getQueries();
 
-            await createWidget();
-            await setLocalStoregeButtonsId();
+            createWidget();
             createStyleGlobal();
             assignSupportFunctions();
             loadFontSize();
@@ -156,7 +152,7 @@ window.incloowe.init = function init() {
 // ******************** CRIAÇÃO DO WIDGET ********************//
 
 
-    async function createWidget() {
+    function createWidget() {
 
         let host = document.createElement('widget-ui');
         host.id = 'shadow';
@@ -165,35 +161,6 @@ window.incloowe.init = function init() {
 
         shadowRoot.innerHTML = widgetHtml; // Insere o HTML no shadowRoot
         document.body.appendChild(host);
-
-        // let listaContainersCompleto = await fetchContainersWithContent();
-        const domain = window.location.hostname;
-        const listaContainersCompleto = await getContainers(domain);
-
-        for (const container of listaContainersCompleto) {
-            let order = container.order - 1;
-            let cont = shadowRoot.querySelectorAll('.scrollable-content')[order];
-
-            let titleContainer = createTitleContainer(container.title, order);
-
-            const contentButtons = document.createElement("div");
-            contentButtons.className = "content-buttons " + (container.order === 1 ? 'active' : '');
-
-            for (const item of container.funcionalidades) {
-                let botao1 = createButton(item.title,
-                    item.tooltip,
-                    item.action,
-                    item.order,
-                    item.icon,
-                    item.type,
-                    item.group,
-                    item?.buttons?.name);
-                contentButtons.appendChild(botao1);
-            }
-
-            cont.appendChild(titleContainer);
-            cont.appendChild(contentButtons);
-        }
 
         shadowR = document.getElementById("shadow").shadowRoot;
         setShadowRoot(shadowR);
@@ -204,6 +171,83 @@ window.incloowe.init = function init() {
                 toggleExpandWindow();
             }
         });
+
+    }
+
+    async function toggleExpandWindow() {
+
+        let appWindow = shadowR.querySelector('#appWindow');
+        let widget = shadowR.querySelector('#widget');
+        let button = shadowR.querySelector('#accessibilityButton');
+        let modal = shadowR.querySelector('#modal-hide');
+
+        if (appWindow.style.opacity === '0' || appWindow.style.opacity === '') {
+
+            if(!contentLoaded) {
+                await loadDynamicButtons();
+                await setLocalStoregeButtonsId();
+                //CARREGOU CONTEUDOS
+            }
+            widget.style.setProperty('transform', 'translate(0, 0)', 'important');
+
+            appWindow.style.setProperty('opacity', '1', 'important');
+            appWindow.style.setProperty('visibility', 'visible', 'important');
+            button.style.setProperty('display', 'none', 'important');
+
+            appWindow.style.setProperty('background', 'transparent', 'important');
+            modal.style.setProperty('opacity', '0', 'important');
+            modal.style.setProperty('visibility', 'hidden', 'important');
+            modal.style.setProperty('transform', 'translate(-50%, -100%)', 'important');
+
+        } else if (appWindow.style.opacity === '1') {
+
+
+            widget.style.setProperty('transform', 'translate(0, 50%)', 'important');
+
+            appWindow.style.setProperty('opacity', '0', 'important');
+            appWindow.style.setProperty('visibility', 'hidden', 'important');
+            button.style.setProperty('display', 'flex', 'important');
+            shadowR.querySelector(".content-container").scrollTo({top: 0});
+
+        }
+
+    }
+
+    async function loadDynamicButtons() {
+
+        const listaContainersCompleto = await getContainers();
+
+        for (const container of listaContainersCompleto) {
+            let order = container.order - 1;
+            let cont = shadowR.querySelectorAll('.scrollable-content')[order];
+
+            let titleContainer = createTitleContainer(container.title, order);
+
+            const contentButtons = document.createElement("div");
+            contentButtons.className = "content-buttons " + (container.order === 1 ? 'active' : '');
+
+            for (let i = 0; i < container.funcionalidades.length; i++) {
+                const item = container.funcionalidades[i];
+
+                let botao1 = createButton(item.title,
+                    item.tooltip,
+                    item.action,
+                    item.order,
+                    item.icon,
+                    item.type,
+                    item.group,
+                    item?.buttons?.name);
+
+                contentButtons.appendChild(botao1);
+
+                if (i === container.funcionalidades.length - 1) {
+                    contentLoaded = true;
+                }
+            }
+
+            cont.appendChild(titleContainer);
+            cont.appendChild(contentButtons);
+        }
 
     }
 
@@ -228,6 +272,8 @@ window.incloowe.init = function init() {
         // Cria o ícone dentro do contentButton
         const iconExpand = document.createElement("span");
         iconExpand.className = "icon icon-expand-content";
+
+        contentButton.onclick = () => expandContent(contentButton);
         contentButton.appendChild(iconExpand);
 
         titleContainer.appendChild(contentButton);
@@ -254,6 +300,8 @@ window.incloowe.init = function init() {
         // Cria o ícone de tooltip
         const iconTooltip = document.createElement("span");
         iconTooltip.className = "icon icon-tooltip";
+        iconTooltip.onmouseenter = () => showTooltip(iconTooltip);
+        iconTooltip.onmouseleave = () => showTooltip(iconTooltip);
         contentButton.appendChild(iconTooltip);
 
         // Cria o container de título
@@ -337,6 +385,8 @@ window.incloowe.init = function init() {
         // Cria a div do tooltip
         const iconTooltip = document.createElement('i');
         iconTooltip.className = 'icon icon-tooltip';
+        iconTooltip.onmouseenter = () => showTooltip(iconTooltip);
+        iconTooltip.onmouseleave = () => showTooltip(iconTooltip);
         botao.appendChild(iconTooltip);
 
         //Cria icone
@@ -378,6 +428,8 @@ window.incloowe.init = function init() {
         // Cria o ícone de tooltip
         const iconTooltip = document.createElement("span");
         iconTooltip.className = "icon icon-tooltip";
+        iconTooltip.onmouseenter = () => showTooltip(iconTooltip);
+        iconTooltip.onmouseleave = () => showTooltip(iconTooltip);
         contentButton.appendChild(iconTooltip);
 
         // Cria o container de título
@@ -446,10 +498,10 @@ window.incloowe.init = function init() {
         linkDefaultColor.className = "link-default-color";
         linkDefaultColor.textContent = "Default";
 
-        linkDefaultColor.onclick = () => setAdjustColor(linkDefaultColor, acaoClique);
-
-        // e.preventDefault();
-        // let dataTest = button.parentElement.getAttribute('data-test');
+        linkDefaultColor.onclick = (event) => {
+            event.preventDefault(); // Evita que a página role para o topo
+            setAdjustColor(linkDefaultColor, acaoClique);
+        };
 
         contentButton.appendChild(linkDefaultColor);
 
@@ -537,28 +589,25 @@ window.incloowe.init = function init() {
         triggerLineHeight: function () {changeRangeButton(this, LINE_HEIGHT_KEY, updateLineHeight);},
         triggerLetterSpacing: function () {changeRangeButton(this, LETTER_SPACING_KEY, updateLetterSpacing);}
 
-        //TODO:: CRIAR FUNCTION GENERICA PARA EXECUÇÃO DE CADA TIPO DE BOTÃO, POIS TEM MTA REGRA DUPLICADA
-        //TODO:: COLOCAR QUERIES DENTRO DO SUPABASE, PARA DIFICULTAR NA VISUALIZAÇÃO DO CONSOLE
-
     }
 
     async function setLocalStoregeButtonsId() {
 
-        // let buttons = await fetchButtons();
-        const domain = window.location.hostname;
-        let buttons = await getButtons(domain);
+        let buttons = await getButtons();
 
         for (const btn of buttons) {
 
             let value = localStorage.getItem(btn.name);
 
             if(value == null) {
+                //SETA VALORES ZERADOS AO INICIAR
                 localStorage.setItem(btn.name, 0);
             }else if(value == 1) {
+                //SETA BOTÕES ACTIVATE
                 let button = shadowR.querySelector('#' + btn.name);
                 button.classList.add("btn-active"); // Ativa o botão clicado
             }else if(value.includes('%')) {
-                //range
+                //SETA VALORES DE RANGE
                 let button = shadowR.querySelector('#' + btn.name);
 
                 if (value === '0%') {
@@ -568,6 +617,29 @@ window.incloowe.init = function init() {
                     button.style.setProperty('color', 'var(--lead-color)', 'important');
                     button.textContent = localStorage.getItem(btn.name);
                 }
+            }
+            else if(value.includes('rgb')) {
+                //ADJUST COLORS - RADIO
+                let a;
+
+                if(btn.description === 'Adjust Text Color') {
+                    a = 'adjustTextColor';
+                }else if (btn.description === 'Adjust Title Color') {
+                    a = 'adjustTitleColor';
+                }else if(btn.description === 'Adjust Background Color') {
+                    a = 'adjustBackgroundColor';
+                }
+
+                let btns = shadowR.querySelectorAll(`div[data-test=${a}]`)[0]
+                    .querySelectorAll('.color-pick');
+
+                btns.forEach(button => {
+                    if (button.style.backgroundColor === value) {
+                        changeAdjustColorButton(button, a)
+                    }
+                });
+
+
             }
 
         }
@@ -602,13 +674,6 @@ window.incloowe.init = function init() {
         submitHide = shadowR.querySelector("#submitHide");
         submitHide.addEventListener('click', hideWidget);
 
-        contentButton = shadowR.querySelectorAll('.contentButton');
-        contentButton.forEach(elemento => {
-            elemento.addEventListener('click', () => expandContent(elemento));
-        });
-
-        shadowR.querySelectorAll('.icon-tooltip').forEach(
-            info => showTooltip(info));
     }
 
 
@@ -898,9 +963,10 @@ window.incloowe.init = function init() {
 
     }
 
-    function setHighlightHeading() {
+    async function setHighlightHeading() {
 
-        let txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        let queryTitulos = queries[0]?.value;
+        let txtTags = document.querySelectorAll(queryTitulos);
 
         // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
         txtTags.forEach(function (txtTag) {
@@ -928,7 +994,9 @@ window.incloowe.init = function init() {
     }
 
     function setHighlightLinks() {
-        let txtTags = document.querySelectorAll('a');
+
+        let queryLinks = queries[1]?.value;
+        let txtTags = document.querySelectorAll(queryLinks);
 
         // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
         txtTags.forEach(function (txtTag) {
@@ -958,7 +1026,8 @@ window.incloowe.init = function init() {
 
     function setHighlightButtons() {
 
-        let txtTags = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"]');
+        let queryButtons = queries[2]?.value;
+        let txtTags = document.querySelectorAll(queryButtons);
 
         // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
         txtTags.forEach(function (txtTag) {
@@ -990,8 +1059,10 @@ window.incloowe.init = function init() {
     }
 
     function setHighlightHover() {
+
+        let queryButtonsAndImg = queries[3]?.value;
         let txtTags = getLastLeafElementsWithText();
-        let otherItens = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"], img');
+        let otherItens = document.querySelectorAll(queryButtonsAndImg);
 
         let otherItensArray = Array.from(otherItens);
         let combined = [...txtTags, ...otherItensArray];
@@ -1007,15 +1078,16 @@ window.incloowe.init = function init() {
 
     function loadHighlightHover() {
         if (hightlightHover != null) {
+            let queryButtonsAndImg = queries[3]?.value;
             let txtTags = getLastLeafElementsWithText();
-            let otherItens = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"], img');
+            let otherItens = document.querySelectorAll(queryButtonsAndImg);
 
             let otherItensArray = Array.from(otherItens);
             let combined = [...txtTags, ...otherItensArray];
 
             const isHoverActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
 
-            if (isHoverActive && isHoverActive.value === 'true') {
+            if (isHoverActive && isHoverActive.value) {
                 combined.forEach(el => el.classList.add('hover-active'));
             } else {
                 combined.forEach(el => el.classList.remove('hover-active'));
@@ -1024,12 +1096,13 @@ window.incloowe.init = function init() {
     }
 
     function setHighlightFocus() {
-        let allItens = document.querySelectorAll('body *');
+        let queryFullBody = queries[4]?.value;
+        let allItens = document.querySelectorAll(queryFullBody);
 
         // Verifica o estado do localStorage
         const isFocusActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY);
 
-        if (isFocusActive && isFocusActive.value === 'true') {
+        if (isFocusActive && isFocusActive.value) {
             allItens.forEach(el => el.classList.remove('focus-active'));
         } else {
             allItens.forEach(el => el.classList.add('focus-active'));
@@ -1038,11 +1111,12 @@ window.incloowe.init = function init() {
 
     function loadHighlightFocus() {
         if (hightlightFocus != null) {
-            let allItens = document.querySelectorAll('body *');
+            let queryFullBody = queries[4]?.value;
+            let allItens = document.querySelectorAll(queryFullBody);
             // Verifica o estado do localStorage
             const isFocusActive = getItemFromLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY);
 
-            if (isFocusActive && isFocusActive.value === 'true') {
+            if (isFocusActive && isFocusActive.value) {
                 allItens.forEach(el => el.classList.add('focus-active'));
             } else {
                 allItens.forEach(el => el.classList.remove('focus-active'));
@@ -1080,9 +1154,10 @@ window.incloowe.init = function init() {
 
         if (indexActualFontFamily !== null) {
 
+            let queryFontFamily = queries[5]?.value;
             let selectedFontFamily = fontes[indexActualFontFamily];
             let elements = document
-                .querySelectorAll('li, a, p, h1, span, h2, h3, h4, h5, h6, input[type="button"], button, input[type="submit"]');
+                .querySelectorAll(queryFontFamily);
             for (let element of elements) {
 
                 if (!element.closest('.app-window') && !element.closest('.accessibility-button')) {
@@ -1150,9 +1225,11 @@ window.incloowe.init = function init() {
         const filterStyle = document.getElementById('filter-incloowe');
 
         if (indexActualColorContrast !== null) {
+            let queryContrast = queries[6]?.value;
+            let queryButtons = queries[2]?.value;
             const selectedColorContrast = contrasts[indexActualColorContrast];
-            const txtTags = document.querySelectorAll('h1, h2, h3, h4, h5, h6, a, span, blockquote, code, dd, dt, input, label, legend, li, p, pre, select, textarea');
-            const buttons = document.querySelectorAll('button');
+            const txtTags = document.querySelectorAll(queryContrast);
+            const buttons = document.querySelectorAll(queryButtons);
 
             const removeContrastClasses = () => {
 
@@ -1386,15 +1463,7 @@ window.incloowe.init = function init() {
     function loadTextColor() {
 
         if (adjustTextColor != null) {
-
-            let buttons = shadowR.querySelectorAll('div[data-test="adjustTextColor"]')[0]
-                .querySelectorAll('.color-pick');
-
-            buttons.forEach(button => {
-                if (button.style.backgroundColor === adjustTextColor.value) {
-                    setAdjustColor(button, "adjustTextColor");
-                }
-            });
+            changeAdjustColorValue('adjustTextColor', adjustTextColor.value);
         }
 
     }
@@ -1402,36 +1471,37 @@ window.incloowe.init = function init() {
     function loadTitleColor() {
 
         if (adjustTitleColor != null) {
-
-            let buttons = shadowR.querySelectorAll('div[data-test="adjustTitleColor"]')[0]
-                .querySelectorAll('.color-pick');
-
-            buttons.forEach(button => {
-                if (button.style.backgroundColor === adjustTitleColor.value) {
-                    setAdjustColor(button, "adjustTitleColor");
-                }
-            });
+            changeAdjustColorValue('adjustTitleColor', adjustTitleColor.value);
         }
-
     }
 
     function loadBackgroundColor() {
 
         if (adjustBackgroundColor != null) {
-
-            let buttons = shadowR.querySelectorAll('div[data-test="adjustBackgroundColor"]')[0]
-                .querySelectorAll('.color-pick');
-
-            buttons.forEach(button => {
-                if (button.style.backgroundColor === adjustBackgroundColor.value) {
-                    setAdjustColor(button, "adjustBackgroundColor");
-                }
-            });
+            changeAdjustColorValue('adjustBackgroundColor', adjustBackgroundColor.value);
         }
 
     }
 
     function setAdjustColor(button, fila) {
+
+        let selectedColor = changeAdjustColorButton(button, fila) != null ? changeAdjustColorButton(button, fila) : '' ;
+        let selectedId;
+
+        if(fila === 'adjustTextColor') {
+            selectedId = 'ic_28';
+        }else if(fila === 'adjustTitleColor') {
+            selectedId = 'ic_29';
+        }else if(fila === 'adjustBackgroundColor') {
+            selectedId = 'ic_30';
+        }
+
+        setItemToLocalStorageWithExpiry(fila, selectedColor, null, selectedId, true);
+        changeAdjustColorValue(fila, selectedColor);
+    }
+
+
+    function changeAdjustColorButton(button, fila) {
 
         const isDefault = button.classList.contains('link-default-color');
 
@@ -1455,47 +1525,6 @@ window.incloowe.init = function init() {
             </svg>`;
         };
 
-        const adjustColor = (fila, selectedColor) => {
-            if (fila === 'adjustTitleColor') {
-                let titleColorStyle = document.getElementById('title-color-incloowe') || document.createElement('style');
-                titleColorStyle.id = 'title-color-incloowe';
-                titleColorStyle.innerHTML = `body :not(#shadow) h1, body :not(#shadow) h2, body :not(#shadow) h3, body :not(#shadow) h4,
-                body :not(#shadow) h5, body :not(#shadow) h6 { color: ${selectedColor} !important }`;
-
-                document.head.appendChild(titleColorStyle);
-                setItemToLocalStorageWithExpiry(ADJUST_TITLE_COLOR_KEY, selectedColor, null);
-
-            } else if (fila === 'adjustTextColor') {
-                let textColorStyle = document.getElementById('text-color-incloowe') || document.createElement('style');
-                textColorStyle.id = 'text-color-incloowe';
-                textColorStyle.innerHTML = `body :not(#shadow) a, body :not(#shadow) p, body :not(#shadow) li, body :not(#shadow) label,
-                body :not(#shadow) input, body :not(#shadow) select, body :not(#shadow) textarea, body :not(#shadow) legend,
-                body :not(#shadow) code, body :not(#shadow) pre, body :not(#shadow) dd, body :not(#shadow) dt, body :not(#shadow) span,
-                body :not(#shadow) blockquote { color: ${selectedColor} !important }`;
-                document.head.appendChild(textColorStyle);
-                setItemToLocalStorageWithExpiry(ADJUST_TEXT_COLOR_KEY, selectedColor, null);
-            } else if (fila === 'adjustBackgroundColor') {
-                document.body.style.setProperty('background-color', selectedColor, 'important');
-                setItemToLocalStorageWithExpiry(ADJUST_BACKGROUND_COLOR_KEY, selectedColor, null);
-            }
-        };
-
-        const removeAdjustColor = (fila) => {
-            if (fila === 'adjustTitleColor') {
-                const titleColorStyle = document.getElementById('title-color-incloowe');
-                titleColorStyle.innerHTML = '';
-                removeItemFromLocalStorage(ADJUST_TITLE_COLOR_KEY);
-
-            } else if (fila === 'adjustTextColor') {
-                const textColorStyle = document.getElementById('text-color-incloowe');
-                textColorStyle.innerHTML = '';
-                removeItemFromLocalStorage(ADJUST_TEXT_COLOR_KEY);
-            } else if (fila === 'adjustBackgroundColor') {
-                document.body.style.backgroundColor = '';
-                removeItemFromLocalStorage(ADJUST_BACKGROUND_COLOR_KEY);
-            }
-        };
-
         if (!isDefault) {
             if (fila === 'adjustTitleColor') {
                 lastSelectedTitleColor = updateSelectedButton(lastSelectedTitleColor, button);
@@ -1510,14 +1539,68 @@ window.incloowe.init = function init() {
             const selectedColor = window.getComputedStyle(currentSelected).backgroundColor;
 
             setSVG(button, selectedColor);
-            adjustColor(fila, selectedColor);
 
-        } else {
-            const currentSelected = shadowR.querySelector(`div[data-test=${fila}] .color-pick-selected`);
+            return selectedColor;
+
+        }
+
+        const currentSelected = shadowR.querySelector(`div[data-test=${fila}] .color-pick-selected`);
+        if(currentSelected != null) {
             currentSelected.innerHTML = '';
             currentSelected.classList.remove('color-pick-selected');
+        }
+        return null;
+
+    }
+
+    function changeAdjustColorValue(fila, selectedColor) {
+
+        const adjustColor = (fila, selectedColor) => {
+            if (fila === 'adjustTitleColor') {
+                let titleColorStyle = document.getElementById('title-color-incloowe') || document.createElement('style');
+                titleColorStyle.id = 'title-color-incloowe';
+                titleColorStyle.innerHTML = `body :not(#shadow) h1, body :not(#shadow) h2, body :not(#shadow) h3, body :not(#shadow) h4,
+                body :not(#shadow) h5, body :not(#shadow) h6 { color: ${selectedColor} !important }`;
+                document.head.appendChild(titleColorStyle);
+            } else if (fila === 'adjustTextColor') {
+                let textColorStyle = document.getElementById('text-color-incloowe') || document.createElement('style');
+                textColorStyle.id = 'text-color-incloowe';
+                textColorStyle.innerHTML = `body :not(#shadow) a, body :not(#shadow) p, body :not(#shadow) li, body :not(#shadow) label,
+                body :not(#shadow) input, body :not(#shadow) select, body :not(#shadow) textarea, body :not(#shadow) legend,
+                body :not(#shadow) code, body :not(#shadow) pre, body :not(#shadow) dd, body :not(#shadow) dt, body :not(#shadow) span,
+                body :not(#shadow) blockquote { color: ${selectedColor} !important }`;
+                document.head.appendChild(textColorStyle);
+            } else if (fila === 'adjustBackgroundColor') {
+                document.body.style.setProperty('background-color', selectedColor, 'important');
+            }
+        };
+
+        const removeAdjustColor = (fila) => {
+            if (fila === 'adjustTitleColor') {
+                const titleColorStyle = document.getElementById('title-color-incloowe');
+                if(titleColorStyle != null) {
+                    titleColorStyle.innerHTML = '';
+                    removeItemFromLocalStorage(ADJUST_TITLE_COLOR_KEY);
+                }
+
+            } else if (fila === 'adjustTextColor') {
+                const textColorStyle = document.getElementById('text-color-incloowe');
+                if(textColorStyle != null) {
+                    textColorStyle.innerHTML = '';
+                    removeItemFromLocalStorage(ADJUST_TEXT_COLOR_KEY);
+                }
+            } else if (fila === 'adjustBackgroundColor') {
+                document.body.style.backgroundColor = '';
+                removeItemFromLocalStorage(ADJUST_BACKGROUND_COLOR_KEY);
+            }
+        };
+
+        if(selectedColor !== null) {
+            adjustColor(fila, selectedColor);
+        }else {
             removeAdjustColor(fila);
         }
+
     }
 
 }

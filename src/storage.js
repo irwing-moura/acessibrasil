@@ -1,6 +1,6 @@
 // ******************** LOCAL STORAGE ********************//
 
-export function setItemToLocalStorageWithExpiry(key, value, percentage, btnid, isRange) {
+export function setItemToLocalStorageWithExpiry(key, value, percentage, btnid, isRangeOrRadio) {
 
     const newDate = addDays(new Date(), 2);
 
@@ -11,7 +11,7 @@ export function setItemToLocalStorageWithExpiry(key, value, percentage, btnid, i
     }
     localStorage.setItem(key, JSON.stringify(item))
     if(btnid != null) {
-        if(isRange){
+        if(isRangeOrRadio){
             //RANGE
             localStorage.setItem(btnid, value);
         }else {

@@ -80,58 +80,16 @@ export function expandContent(elemento) {
 
 export function showTooltip(info) {
 
-    info.addEventListener('mouseenter', () => {
         const tooltip = info.nextElementSibling.nextElementSibling.nextElementSibling;
         if (tooltip?.classList.contains('tooltip-content')) {
-            tooltip.style.visibility = 'visible';
-            tooltip.style.opacity = '1';
+            if(tooltip.style.visibility !== 'visible') {
+                tooltip.style.visibility = 'visible';
+                tooltip.style.opacity = '1';
+            }else {
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.opacity = '0';
+            }
         }
-    });
-
-    info.addEventListener('mouseleave', () => {
-        const tooltip = info.nextElementSibling.nextElementSibling.nextElementSibling;
-        if (tooltip?.classList.contains('tooltip-content')) {
-            tooltip.style.visibility = 'hidden';
-            tooltip.style.opacity = '0';
-        }
-    });
-}
-
-
-export function toggleExpandWindow() {
-
-    let appWindow = shadowR.querySelector('#appWindow');
-    let widget = shadowR.querySelector('#widget');
-    let button = shadowR.querySelector('#accessibilityButton');
-    let modal = shadowR.querySelector('#modal-hide');
-
-    if (appWindow.style.opacity === '0' || appWindow.style.opacity === '') {
-
-
-        widget.style.setProperty('transform', 'translate(0, 0)', 'important');
-
-
-        appWindow.style.setProperty('opacity', '1', 'important');
-        appWindow.style.setProperty('visibility', 'visible', 'important');
-        button.style.setProperty('display', 'none', 'important');
-
-        appWindow.style.setProperty('background', 'transparent', 'important');
-        modal.style.setProperty('opacity', '0', 'important');
-        modal.style.setProperty('visibility', 'hidden', 'important');
-        modal.style.setProperty('transform', 'translate(-50%, -100%)', 'important');
-
-    } else if (appWindow.style.opacity === '1') {
-
-
-        widget.style.setProperty('transform', 'translate(0, 50%)', 'important');
-
-        appWindow.style.setProperty('opacity', '0', 'important');
-        appWindow.style.setProperty('visibility', 'hidden', 'important');
-        button.style.setProperty('display', 'flex', 'important');
-        shadowR.querySelector(".content-container").scrollTo({top: 0});
-
-    }
-
 }
 
 export function hideWidget() {
