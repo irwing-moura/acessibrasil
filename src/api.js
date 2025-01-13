@@ -35,3 +35,16 @@ export const getQueries = async () => {
         throw error; // Opcional: lançar o erro para tratar em outro lugar
     }
 };
+
+export const check = async () => {
+    try {
+        // Adiciona o cabeçalho X-Host com o host da aplicação X
+        const response = await axios.get(hostBackend + '/check');
+        console.log(response);
+        return response.data.message;
+    } catch (error) {
+        console.error("Error fetching containers:", error);
+        throw error; // Opcional: lançar o erro para tratar em outro lugar
+    }
+};
+

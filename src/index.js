@@ -17,7 +17,7 @@ import {
     setItemToLocalStorageWithExpiry,
     getItemFromLocalStorageWithExpiry,
     removeItemFromLocalStorage,
-    clearLocalStorage
+    clearLocalStorage, needToLoadFuctions
 } from "./storage";
 import {
     getLineHeightInPixelsIfText,
@@ -26,7 +26,7 @@ import {
 } from "./queries";
 
 import widgetHtml from './widget.html';
-import {getButtons, getContainers, getQueries} from "./api";
+import {getButtons, getContainers, getQueries, check} from "./api";
 
 
 window.incloowe = window.incloowe || {};
@@ -116,37 +116,40 @@ window.incloowe.init = function init() {
 
     if (widgetStatus === null) {
 
-        initializeVlibras();
+        createWidget();
+        createStyleGlobal();
+        assignSupportFunctions();
 
-        window.addEventListener("load", async (event) => {
+        if(needToLoadFuctions()) {
+            initializeVlibras();
 
-            html = document.activeElement.parentElement;
-            queries = await getQueries();
+            window.addEventListener("load", async (event) => {
 
-            createWidget();
-            createStyleGlobal();
-            assignSupportFunctions();
-            loadFontSize();
-            loadContentScaling();
-            loadLineHeight();
-            loadLetterSpacing();
-            loadTextMagnifier()
-            loadHighlightHeadings();
-            loadHighlightLinks();
-            loadHighlightButtons();
-            loadHighlightHover();
-            loadHighlightFocus();
-            loadVlibras();
-            setFontFamily();
-            setAlignText();
-            loadContrastColors();
-            loadSaturationColors();
-            loadTextColor();
-            loadTitleColor();
-            loadBackgroundColor();
-            loadDaltonismFilter();
+                html = document.activeElement.parentElement;
+                queries = await getQueries();
 
-        });
+                loadFontSize();
+                loadContentScaling();
+                loadLineHeight();
+                loadLetterSpacing();
+                loadTextMagnifier()
+                loadHighlightHeadings();
+                loadHighlightLinks();
+                loadHighlightButtons();
+                loadHighlightHover();
+                loadHighlightFocus();
+                loadVlibras();
+                setFontFamily();
+                setAlignText();
+                loadContrastColors();
+                loadSaturationColors();
+                loadTextColor();
+                loadTitleColor();
+                loadBackgroundColor();
+                loadDaltonismFilter();
+
+            });
+        }
     }
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
@@ -662,7 +665,7 @@ window.incloowe.init = function init() {
         resetButton.addEventListener('click', clearLocalStorage);
 
         createshortcutsButton = shadowR.querySelector("#createshortcuts");
-        createshortcutsButton.onclick = () => alert('Não esta pronto ainda, meu chapinha!');
+        createshortcutsButton.onclick = async () => alert( await check());
 
         //MODAL HIDE
         hideButton = shadowR.querySelector("#hideButton");

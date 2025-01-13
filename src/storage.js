@@ -78,3 +78,18 @@ function addDays(date, days) {
     return date;
 }
 
+export function needToLoadFuctions() {
+
+    let key;
+
+    for(let i = 1; i <= 30; i++) {
+        key = 'ic_' + i;
+        let item = localStorage.getItem(key);
+        if(item != null && item !== "" && item !== "0") {
+            return true;
+        }
+    }
+
+    return false;
+
+}
