@@ -11,7 +11,7 @@ import {
     calculateLetterSpacingInPixels,
     getElementCursorHover,
     criarBalao,
-    createStyleGlobal
+    createStyleGlobal, showToast, closeToast
 } from "./support";
 import {
     setItemToLocalStorageWithExpiry,
@@ -25,13 +25,16 @@ import {
     getFirstChildElementsBelowBody
 } from "./queries";
 
-import widgetHtml from './widget.html';
-import {getButtons, getContainers, getQueries, check} from "./api";
+import lottie from 'lottie-web';
 
+import widgetHtml from './widget.html';
+import {getButtons, getContainers, getQueries, check, auth} from "./api";
+import fonteUrl from "./assets/svg/data.json";
+import path from "./assets/svg/data.json";
 
 window.incloowe = window.incloowe || {};
 
-window.incloowe.init = function init() {
+window.incloowe.init = async function init() {
 
     const WIDGET_STATUS_KEY = "widget-status";
     const FONT_SIZE_KEY = "font-size";
@@ -83,6 +86,17 @@ window.incloowe.init = function init() {
     let contentButton;
     let cancelHide;
     let submitHide;
+
+    let btnSettings;
+    let btnConfigBack;
+
+
+    let modalLanguage;
+    let btnCloseModalLanguage;
+
+
+    let anim;
+
     let shadowR;
 
     let lastSelectedTextColor;
@@ -116,44 +130,61 @@ window.incloowe.init = function init() {
 
     if (widgetStatus === null) {
 
-        createWidget();
-        createStyleGlobal();
-        assignSupportFunctions();
+        initializeVlibras();
+        let acessoPermitido = await auth();
 
-        if(needToLoadFuctions()) {
-            initializeVlibras();
+        if(acessoPermitido) {
+            createWidget();
+            createStyleGlobal();
+            assignSupportFunctions();
+            setOriginalFontSizeOnLoading();
+            html = document.activeElement.parentElement;
 
-            window.addEventListener("load", async (event) => {
+            if (needToLoadFuctions()) {
+                if (document.readyState === 'complete') {
+                    // A página já foi carregada, chame as funções diretamente
+                    await (async () => {
+                        queries = await getQueries();
+                        loadFunctions(); // Coloque todas as funções de carregamento aqui
+                    })();
+                } else {
+                    // A página ainda não foi carregada, adicione o listener
+                    window.addEventListener("load", async (event) => {
+                        queries = await getQueries();
+                        loadFunctions(); // Coloque todas as funções de carregamento aqui
+                    });
+                }
 
-                html = document.activeElement.parentElement;
-                queries = await getQueries();
+            }
 
-                loadFontSize();
-                loadContentScaling();
-                loadLineHeight();
-                loadLetterSpacing();
-                loadTextMagnifier()
-                loadHighlightHeadings();
-                loadHighlightLinks();
-                loadHighlightButtons();
-                loadHighlightHover();
-                loadHighlightFocus();
-                loadVlibras();
-                setFontFamily();
-                setAlignText();
-                loadContrastColors();
-                loadSaturationColors();
-                loadTextColor();
-                loadTitleColor();
-                loadBackgroundColor();
-                loadDaltonismFilter();
-
-            });
         }
+
+
     }
 
 // ******************** CRIAÇÃO DO WIDGET ********************//
 
+    function loadFunctions() {
+        loadFontSize();
+        loadContentScaling();
+        loadLineHeight();
+        loadLetterSpacing();
+        loadTextMagnifier()
+        loadHighlightHeadings();
+        loadHighlightLinks();
+        // loadHighlightButtons();
+        loadHighlightHover();
+        loadHighlightFocus();
+        loadVlibras();
+        setFontFamily();
+        setAlignText();
+        loadContrastColors();
+        loadSaturationColors();
+        loadTextColor();
+        loadTitleColor();
+        loadBackgroundColor();
+        loadDaltonismFilter();
+    }
 
     function createWidget() {
 
@@ -175,7 +206,34 @@ window.incloowe.init = function init() {
             }
         });
 
+        let path = require('./assets/svg/data.json');
+        anim = loadLottieAnimation(path);
+
+        // // Inicia a primeira execução
+        // animationInstance.play();
+
+        // Agenda a repetição a cada 5 segundos
+        // setInterval(() => {
+        //     // animationInstance.stop(); // Reinicia a animação
+        //     // animationInstance.play();
+        //     anim.destroy();
+        //     anim = loadLottieAnimation("data.json");
+        // }, 15000); // 5000 ms = 5 segundos
+
+        // animation.play();
+
     }
+
+    function loadLottieAnimation(path) {
+        return lottie.loadAnimation({
+            container: shadowR.querySelector('#accessibilityButton'),
+            renderer: "svg",
+            loop: false,
+            autoplay: false,
+            animationData: path,
+        });
+    }
+
 
     async function toggleExpandWindow() {
 
@@ -186,10 +244,26 @@ window.incloowe.init = function init() {
 
         if (appWindow.style.opacity === '0' || appWindow.style.opacity === '') {
 
-            if(!contentLoaded) {
+            if (!contentLoaded) {
+                //todo:: RESOLVER, ESTA COM PROBLEMA NO CARREGAMENTO, ELE BUSCA MAS ESTA PASSANDO PARA O PROXIMO ANTES DESSE TERMINAR
                 await loadDynamicButtons();
                 await setLocalStoregeButtonsId();
+                if (queries === undefined) {
+                    queries = await getQueries();
+                }
                 //CARREGOU CONTEUDOS
+
+
+                let btnsReset = shadowR.querySelectorAll(".button-reset-func");
+
+                btnsReset.forEach(btn => {
+                    btn.addEventListener('click', showToast);
+                });
+
+                let closeBtn = shadowR.querySelector(".close-btn");
+                closeBtn.addEventListener('click', closeToast);
+
+
             }
             widget.style.setProperty('transform', 'translate(0, 0)', 'important');
 
@@ -198,12 +272,13 @@ window.incloowe.init = function init() {
             button.style.setProperty('display', 'none', 'important');
 
             appWindow.style.setProperty('background', 'transparent', 'important');
-            modal.style.setProperty('opacity', '0', 'important');
-            modal.style.setProperty('visibility', 'hidden', 'important');
-            modal.style.setProperty('transform', 'translate(-50%, -100%)', 'important');
+            // modal.style.setProperty('opacity', '0', 'important');
+            // modal.style.setProperty('visibility', 'hidden', 'important');
+            // modal.style.setProperty('transform', 'translate(-50%, -100%)', 'important');
 
         } else if (appWindow.style.opacity === '1') {
 
+            closeModal();
 
             widget.style.setProperty('transform', 'translate(0, 50%)', 'important');
 
@@ -224,10 +299,11 @@ window.incloowe.init = function init() {
             let order = container.order - 1;
             let cont = shadowR.querySelectorAll('.scrollable-content')[order];
 
-            let titleContainer = createTitleContainer(container.title, order);
+            let titleContainer = createTitleContainer(container.title, container.description, order);
 
             const contentButtons = document.createElement("div");
-            contentButtons.className = "content-buttons " + (container.order === 1 ? 'active' : '');
+            // contentButtons.className = "content-buttons " + (container.order === 1 ? 'active' : '');
+            contentButtons.className = "content-buttons active";
 
             for (let i = 0; i < container.funcionalidades.length; i++) {
                 const item = container.funcionalidades[i];
@@ -254,27 +330,40 @@ window.incloowe.init = function init() {
 
     }
 
-    function createTitleContainer(title, order) {
+    function createTitleContainer(title, description, order) {
         // Cria o container principal
         const titleContainer = document.createElement("div");
         titleContainer.className = "title";
 
+        const divContainerTitle = document.createElement("div");
+        divContainerTitle.className = "container-title-desc";
+        titleContainer.appendChild(divContainerTitle);
+
         // Cria o primeiro span com o texto "Content"
-        const contentText = document.createElement("span");
+        const contentText = document.createElement("h2");
         contentText.textContent = title;
-        titleContainer.appendChild(contentText);
+        divContainerTitle.appendChild(contentText);
+
+        // Cria o primeiro span com o texto "Content"
+        const contentTextDesc = document.createElement("span");
+        contentTextDesc.textContent = description;
+        divContainerTitle.appendChild(contentTextDesc);
 
         // Cria o span com a classe "contentButton active"
-        const contentButton = document.createElement("span");
-        if(order == 0){
-            contentButton.className = "contentButton active";
-        }else {
-            contentButton.className = "contentButton";
-        }
+        const contentButton = document.createElement("button");
+        // if (order == 0) {
+        contentButton.className = "contentButton";
+        // } else {
+        //     contentButton.className = "contentButton";
+        // }
 
         // Cria o ícone dentro do contentButton
-        const iconExpand = document.createElement("span");
-        iconExpand.className = "icon icon-expand-content";
+        const iconExpand = document.createElement("i");
+        if (order == 0) {
+            iconExpand.className = "icon icon-expand-content active";
+        } else {
+            iconExpand.className = "icon icon-expand-content";
+        }
 
         contentButton.onclick = () => expandContent(contentButton);
         contentButton.appendChild(iconExpand);
@@ -290,19 +379,21 @@ window.incloowe.init = function init() {
         } else if (type === 'activate') {
             return createButtonActivate(texto, textoTooltip, acaoClique, order, classe, group, id);
         } else if (type === 'radio') {
-            return createButtonRadio(texto, textoTooltip, acaoClique);
+            return createButtonRadio(texto, textoTooltip, acaoClique, id);
         }
     }
 
-    function createButtonRange(texto, classe, textoTooltip, id, acaoClique){
+    function createButtonRange(texto, classe, textoTooltip, id, acaoClique) {
         // Cria o container principal
         const contentButton = document.createElement("div");
+        contentButton.id = id;
         contentButton.className = "content-button full-width";
         // contentButton.setAttribute("func", "font-size");
 
         // Cria o ícone de tooltip
         const iconTooltip = document.createElement("span");
         iconTooltip.className = "icon icon-tooltip";
+        iconTooltip.textContent="i";
         iconTooltip.onmouseenter = () => showTooltip(iconTooltip);
         iconTooltip.onmouseleave = () => showTooltip(iconTooltip);
         contentButton.appendChild(iconTooltip);
@@ -329,49 +420,117 @@ window.incloowe.init = function init() {
         titleContainer.appendChild(sliderIconTitle);
         contentButton.appendChild(titleContainer);
 
-        // Cria o container de range
-        const rangeContainer = document.createElement("div");
-        rangeContainer.className = "range";
+        // Criando o container do input
 
-        // Botão de diminuir
+        const container = document.createElement("div");
+        container.classList.add("container-button-range");
+
+        const content = document.createElement("div");
+        content.classList.add("content-button-range");
+
+        // Criando o botão de diminuir (-)
         const minusButton = document.createElement("button");
-        minusButton.className = "arrow left minus-button";
-        const iconArrowDown = document.createElement("span");
-        iconArrowDown.className = "icon icon-arrow-down";
+        minusButton.classList.add("arrow", "minus-button");
         minusButton.onclick = funcoes[acaoClique];
-        minusButton.appendChild(iconArrowDown);
-        rangeContainer.appendChild(minusButton);
 
-        // Base range com texto "Default"
-        const baseRange = document.createElement("div");
-        baseRange.className = "base-range";
-        baseRange.style.color = "rgb(104, 104, 104)";
-        baseRange.textContent = "Default";
-        baseRange.id = id;
-        rangeContainer.appendChild(baseRange);
+        const minusIcon = document.createElement("span");
+        minusIcon.classList.add("icon", "icon-minus");
 
-        // Botão de aumentar
+        minusButton.appendChild(minusIcon);
+
+        // Criando o span do valor
+        const valueSpan = document.createElement("span");
+        valueSpan.classList.add("button-range-value");
+        valueSpan.textContent = "Default";
+
+        // Criando o botão de aumentar (+)
         const plusButton = document.createElement("button");
-        plusButton.className = "arrow right plus-button";
-        const iconArrowUp = document.createElement("span");
-        iconArrowUp.className = "icon icon-arrow-up";
+        plusButton.classList.add("arrow", "plus-button");
         plusButton.onclick = funcoes[acaoClique];
-        plusButton.appendChild(iconArrowUp);
-        rangeContainer.appendChild(plusButton);
 
-        contentButton.appendChild(rangeContainer);
+        const plusIcon = document.createElement("span");
+        plusIcon.classList.add("icon", "icon-plus");
 
-        // Cria o conteúdo do tooltip
-        const tooltipContent = document.createElement("div");
-        tooltipContent.className = "tooltip-content";
-        tooltipContent.textContent = textoTooltip;
+        plusButton.appendChild(plusIcon);
 
-        // Adiciona a seta do tooltip
-        const tooltipArrow = document.createElement("span");
-        tooltipArrow.className = "tooltip-arrow";
-        tooltipContent.appendChild(tooltipArrow);
+        // Adicionando os elementos ao container
+        content.appendChild(minusButton);
+        content.appendChild(valueSpan);
+        content.appendChild(plusButton);
+        container.appendChild(content);
 
-        contentButton.appendChild(tooltipContent);
+
+        const button = document.createElement("button");
+        button.classList.add("button-reset-func");
+        button.onclick = funcoes[acaoClique];
+
+        button.disabled = true;
+        button.setAttribute("role", "button");
+        button.setAttribute("title", "Reiniciar Configurações");
+
+        const icon = document.createElement("span");
+        icon.classList.add("icon", "icon-refresh");
+        button.appendChild(icon);
+
+        const desc = document.createElement("div");
+        desc.classList.add("desc-refresh");
+        const spanDesc = document.createElement("span");
+        spanDesc.textContent = 'Restaurar';
+        desc.appendChild(spanDesc);
+        button.appendChild(desc);
+
+
+        container.appendChild(button);
+
+        contentButton.appendChild(container);
+
+        //Cria container do tooltip
+        const tooltipContainer = document.createElement('div');
+        tooltipContainer.className = 'tooltip-container';
+
+        //Cria balão do tooltip
+        const tooltipContent = document.createElement('div');
+        tooltipContent.className = 'tooltip-content';
+
+        // Cria título
+        const title = document.createElement('h3');
+        title.className = 'tooltip-title';
+        title.textContent = texto;
+
+        // Cria texto descritivo
+        const text = document.createElement('span');
+        text.className = 'tooltip-text';
+        text.textContent = textoTooltip;
+
+        // Cria container de atalhos
+        const shortcutContainer = document.createElement('div');
+        shortcutContainer.className = 'tooltip-shortcut-container';
+
+        // Cria elementos dos atalhos
+        const shortcutText = document.createTextNode('Atalho da funcão: ');
+        const ctrlButton = document.createElement('span');
+        ctrlButton.className = 'tooltip-shortcut-button';
+        ctrlButton.textContent = 'Ctrl';
+
+        const plusSign = document.createTextNode(' + ');
+
+        const uButton = document.createElement('span');
+        uButton.className = 'tooltip-shortcut-button';
+        uButton.textContent = 'U';
+
+        // Monta container de atalhos
+        shortcutContainer.appendChild(shortcutText);
+        shortcutContainer.appendChild(ctrlButton);
+        shortcutContainer.appendChild(plusSign);
+        shortcutContainer.appendChild(uButton);
+
+        // Monta estrutura completa
+        tooltipContent.appendChild(title);
+        tooltipContent.appendChild(text);
+        tooltipContent.appendChild(shortcutContainer);
+
+        tooltipContainer.appendChild(tooltipContent)
+        contentButton.appendChild(tooltipContainer);
 
         return contentButton;
 
@@ -380,14 +539,15 @@ window.incloowe.init = function init() {
     function createButtonActivate(texto, textoTooltip, acaoClique, order, classe, group, id) {
         const botao = document.createElement('button');
         botao.id = id;
-        botao.className = group == null ? 'content-button': 'content-button ' + group;
+        botao.className = group == null ? 'content-button' : 'content-button ' + group;
         botao.role = 'button'
         botao.ariaLabel = texto;
         botao.tabIndex = order;
 
         // Cria a div do tooltip
-        const iconTooltip = document.createElement('i');
+        const iconTooltip = document.createElement('span');
         iconTooltip.className = 'icon icon-tooltip';
+        iconTooltip.textContent="i";
         iconTooltip.onmouseenter = () => showTooltip(iconTooltip);
         iconTooltip.onmouseleave = () => showTooltip(iconTooltip);
         botao.appendChild(iconTooltip);
@@ -397,21 +557,68 @@ window.incloowe.init = function init() {
         icon.className = 'icon ' + classe;
         botao.appendChild(icon);
 
-        // Cria o span com o texto
+        // Cria texto
+
+        const divTexto = document.createElement('div');
+        divTexto.className = 'text-desc-func';
+
         const span = document.createElement('span');
         span.textContent = texto;
-        botao.appendChild(span);
+        divTexto.appendChild(span);
+
+        const small = document.createElement('small');
+        small.textContent = "Desligado";
+        divTexto.appendChild(small);
+        botao.appendChild(divTexto);
+
+        //Cria container do tooltip
+        const tooltipContainer = document.createElement('div');
+        tooltipContainer.className = 'tooltip-container';
 
         //Cria balão do tooltip
-        const divTooltip = document.createElement('div');
-        divTooltip.className = 'tooltip-content';
-        divTooltip.textContent = textoTooltip;
+        const tooltipContent = document.createElement('div');
+        tooltipContent.className = 'tooltip-content';
 
-        const spanArrowToltip = document.createElement('span');
-        spanArrowToltip.className = 'tooltip-arrow';
-        divTooltip.appendChild(spanArrowToltip);
+        // Cria título
+        const title = document.createElement('h3');
+        title.className = 'tooltip-title';
+        title.textContent = texto;
 
-        botao.appendChild(divTooltip);
+        // Cria texto descritivo
+        const text = document.createElement('span');
+        text.className = 'tooltip-text';
+        text.textContent = textoTooltip;
+
+        // Cria container de atalhos
+        const shortcutContainer = document.createElement('div');
+        shortcutContainer.className = 'tooltip-shortcut-container';
+
+        // Cria elementos dos atalhos
+        const shortcutText = document.createTextNode('Atalho da funcão: ');
+        const ctrlButton = document.createElement('span');
+        ctrlButton.className = 'tooltip-shortcut-button';
+        ctrlButton.textContent = 'Ctrl';
+
+        const plusSign = document.createTextNode(' + ');
+
+        const uButton = document.createElement('span');
+        uButton.className = 'tooltip-shortcut-button';
+        uButton.textContent = 'U';
+
+        // Monta container de atalhos
+        shortcutContainer.appendChild(shortcutText);
+        shortcutContainer.appendChild(ctrlButton);
+        shortcutContainer.appendChild(plusSign);
+        shortcutContainer.appendChild(uButton);
+
+        // Monta estrutura completa
+        tooltipContent.appendChild(title);
+        tooltipContent.appendChild(text);
+        tooltipContent.appendChild(shortcutContainer);
+
+        tooltipContainer.appendChild(tooltipContent)
+        botao.appendChild(tooltipContainer);
+
 
         // Adiciona o evento de clique ao botão
         botao.onclick = funcoes[acaoClique];
@@ -420,20 +627,27 @@ window.incloowe.init = function init() {
         return botao;
     }
 
-    function createButtonRadio(texto, textoTooltip, acaoClique) {
+    function createButtonRadio(texto, textoTooltip, acaoClique, id) {
 
         // Cria o container principal
         const contentButton = document.createElement("div");
+        contentButton.id = id;
         // contentButton.setAttribute("data-test", "adjustTextColor");
         contentButton.className = "content-button full-width";
+        contentButton.style.paddingLeft = '24px';
         contentButton.setAttribute("data-test", acaoClique);
 
         // Cria o ícone de tooltip
         const iconTooltip = document.createElement("span");
         iconTooltip.className = "icon icon-tooltip";
+        iconTooltip.textContent = "i";
         iconTooltip.onmouseenter = () => showTooltip(iconTooltip);
         iconTooltip.onmouseleave = () => showTooltip(iconTooltip);
         contentButton.appendChild(iconTooltip);
+
+        //Cria flexbox radio
+        const flexBoxRadio = document.createElement("div");
+        flexBoxRadio.className = "flexbox-radio";
 
         // Cria o container de título
         const titleContainer = document.createElement("div");
@@ -451,7 +665,11 @@ window.incloowe.init = function init() {
         sliderIconTitle.appendChild(sliderTitle);
 
         titleContainer.appendChild(sliderIconTitle);
-        contentButton.appendChild(titleContainer);
+        flexBoxRadio.appendChild(titleContainer);
+
+        // Cria o container para os botões de seleção de cor
+        const flexBoxContainerRadio = document.createElement("div");
+        flexBoxContainerRadio.className = "flexbox-container-radio";
 
         // Cria o container para os botões de seleção de cor
         const colorPicker = document.createElement("div");
@@ -481,32 +699,84 @@ window.incloowe.init = function init() {
         colorPicker.appendChild(createColorButton("#fff", "White"));
         colorPicker.appendChild(createColorButton("#000", "Black"));
 
-        contentButton.appendChild(colorPicker);
+        flexBoxContainerRadio.appendChild(colorPicker);
 
-        // Cria o conteúdo do tooltip
-        const tooltipContent = document.createElement("div");
-        tooltipContent.className = "tooltip-content";
-        tooltipContent.textContent = textoTooltip;
+        //Cria container do tooltip
+        const tooltipContainer = document.createElement('div');
+        tooltipContainer.className = 'tooltip-container';
 
-        // Adiciona a seta do tooltip
-        const tooltipArrow = document.createElement("span");
-        tooltipArrow.className = "tooltip-arrow";
-        tooltipContent.appendChild(tooltipArrow);
+        //Cria balão do tooltip
+        const tooltipContent = document.createElement('div');
+        tooltipContent.className = 'tooltip-content';
 
-        contentButton.appendChild(tooltipContent);
+        // Cria título
+        const title = document.createElement('h3');
+        title.className = 'tooltip-title';
+        title.textContent = texto;
 
-        // Cria o link de "Default"
-        const linkDefaultColor = document.createElement("a");
-        linkDefaultColor.href = "#";
-        linkDefaultColor.className = "link-default-color";
-        linkDefaultColor.textContent = "Default";
+        // Cria texto descritivo
+        const text = document.createElement('span');
+        text.className = 'tooltip-text';
+        text.textContent = textoTooltip;
 
-        linkDefaultColor.onclick = (event) => {
+        // Cria container de atalhos
+        const shortcutContainer = document.createElement('div');
+        shortcutContainer.className = 'tooltip-shortcut-container';
+
+        // Cria elementos dos atalhos
+        const shortcutText = document.createTextNode('Atalho da funcão: ');
+        const ctrlButton = document.createElement('span');
+        ctrlButton.className = 'tooltip-shortcut-button';
+        ctrlButton.textContent = 'Ctrl';
+
+        const plusSign = document.createTextNode(' + ');
+
+        const uButton = document.createElement('span');
+        uButton.className = 'tooltip-shortcut-button';
+        uButton.textContent = 'U';
+
+        // Monta container de atalhos
+        shortcutContainer.appendChild(shortcutText);
+        shortcutContainer.appendChild(ctrlButton);
+        shortcutContainer.appendChild(plusSign);
+        shortcutContainer.appendChild(uButton);
+
+        // Monta estrutura completa
+        tooltipContent.appendChild(title);
+        tooltipContent.appendChild(text);
+        tooltipContent.appendChild(shortcutContainer);
+
+        tooltipContainer.appendChild(tooltipContent)
+        contentButton.appendChild(tooltipContainer);
+
+        // Cria o botao de refresh (Default)
+        // <button className="button-reset-func" role="button" title="Reiniciar Configurações"><span
+        //     className="icon icon-refresh"></span></button>
+        const btnReset = document.createElement("button");
+        btnReset.className = "button-reset-func";
+        btnReset.role = 'button';
+        btnReset.disabled = true;
+        btnReset.onclick = (event) => {
+            // showToast();
             event.preventDefault(); // Evita que a página role para o topo
-            setAdjustColor(linkDefaultColor, acaoClique);
+            setAdjustColor(btnReset, acaoClique);
         };
 
-        contentButton.appendChild(linkDefaultColor);
+        //Cria icone
+        const icon = document.createElement('span');
+        icon.className = 'icon icon-refresh';
+        btnReset.appendChild(icon);
+
+        const desc = document.createElement("div");
+        desc.classList.add("desc-refresh");
+        const spanDesc = document.createElement("span");
+        spanDesc.textContent = 'Restaurar';
+        desc.appendChild(spanDesc);
+        btnReset.appendChild(desc);
+
+        flexBoxContainerRadio.appendChild(btnReset);
+        flexBoxRadio.appendChild(flexBoxContainerRadio);
+        contentButton.appendChild(flexBoxRadio);
 
         return contentButton;
 
@@ -559,39 +829,97 @@ window.incloowe.init = function init() {
         //todo:: CRIAR AS FUNCTIONS DOS OUTROS TIPOS DE BOTAO E SETAR NO SUPABASE
 
         //ACTIVATE
-        triggerReadableFont: function () {changeFontFamily(1, this);},
-        triggerDyslexiaFont: function () {changeFontFamily(2, this);},
-        triggerAlignLeft: function () {changeAlignText(1, this);},
-        triggerAlignCenter: function () {changeAlignText(2, this);},
-        triggerAlignRight: function () {changeAlignText(3, this);},
+        triggerReadableFont: function () {
+            changeFontFamily(1, this);
+        },
+        triggerDyslexiaFont: function () {
+            changeFontFamily(2, this);
+        },
+        triggerAlignLeft: function () {
+            changeAlignText(1, this);
+        },
+        triggerAlignCenter: function () {
+            changeAlignText(2, this);
+        },
+        triggerAlignRight: function () {
+            changeAlignText(3, this);
+        },
 
-        triggerInvertedColors: function () {changeColorContrast(1,this);},
-        triggerInteligentInvertedColors: function (){changeColorContrast(2,this);},
-        triggerLightContrast: function (){changeColorContrast(3,this);},
-        triggerDarkContrast: function (){changeColorContrast(4,this);},
-        triggerHighContrast: function (){changeColorContrast(5,this);},
-        triggerHighSaturation: function (){changeColorSaturation(1, this);},
-        triggerLowSaturation: function (){changeColorSaturation(2, this);},
-        triggerMonochromatic: function (){changeColorSaturation(3, this);},
-        triggerProtanomaly: function (){changeDaltonismFilter(1, this);},
-        triggerDeutaronomaly: function (){changeDaltonismFilter(2, this);},
-        triggerTritanomaly: function (){changeDaltonismFilter(3, this);},
+        triggerInvertedColors: function () {
+            changeColorContrast(1, this);
+        },
+        triggerInteligentInvertedColors: function () {
+            changeColorContrast(2, this);
+        },
+        triggerLightContrast: function () {
+            changeColorContrast(3, this);
+        },
+        triggerDarkContrast: function () {
+            changeColorContrast(4, this);
+        },
+        triggerHighContrast: function () {
+            changeColorContrast(5, this);
+        },
+        triggerHighSaturation: function () {
+            changeColorSaturation(1, this);
+        },
+        triggerLowSaturation: function () {
+            changeColorSaturation(2, this);
+        },
+        triggerMonochromatic: function () {
+            changeColorSaturation(3, this);
+        },
+        triggerProtanomaly: function () {
+            changeDaltonismFilter(1, this);
+        },
+        triggerDeutaronomaly: function () {
+            changeDaltonismFilter(2, this);
+        },
+        triggerTritanomaly: function () {
+            changeDaltonismFilter(3, this);
+        },
 
-        triggerTextMagnifier: function (){changeIndividualActivateButton(this, TEXT_MAGNIFIER_KEY, setTextMagnifier);},
-        triggerVlibras: function (){changeIndividualActivateButton(this, VLIBRAS_KEY, setVlibras);},
-        triggerHighlightHover: function (){changeIndividualActivateButton(this, HIGHLIGHT_HOVER_KEY, setHighlightHover);},
-        triggerHighlightButtons: function (){changeIndividualActivateButton(this, HIGHLIGHT_BUTTONS_KEY, setHighlightButtons);},
-        triggerHighlightTitles: function (){changeIndividualActivateButton(this, HIGHLIGHT_HEADINGS_KEY, setHighlightHeading);},
-        triggerHighlightLinks: function (){changeIndividualActivateButton(this, HIGHLIGHT_LINKS_KEY, setHighlightLinks);},
-        triggerHighlightFocus: function (){changeIndividualActivateButton(this, HIGHLIGHT_FOCUS_KEY, setHighlightFocus);},
+        triggerTextMagnifier: function () {
+            changeIndividualActivateButton(this, TEXT_MAGNIFIER_KEY, setTextMagnifier);
+        },
+        triggerVlibras: function () {
+            changeIndividualActivateButton(this, VLIBRAS_KEY, setVlibras);
+        },
+        triggerHighlightHover: function () {
+            changeIndividualActivateButton(this, HIGHLIGHT_HOVER_KEY, setHighlightHover);
+        },
+        // triggerHighlightButtons: function () {
+        //     changeIndividualActivateButton(this, HIGHLIGHT_BUTTONS_KEY, setHighlightButtons);
+        // },
+        triggerHighlightTitles: function () {
+            changeIndividualActivateButton(this, HIGHLIGHT_HEADINGS_KEY, setHighlightHeading);
+        },
+        triggerHighlightLinks: function () {
+            changeIndividualActivateButton(this, HIGHLIGHT_LINKS_KEY, setHighlightLinks);
+        },
+        triggerHighlightFocus: function () {
+            changeIndividualActivateButton(this, HIGHLIGHT_FOCUS_KEY, setHighlightFocus);
+        },
 
 
         //RANGE
-        triggerFontSize: function () {changeRangeButton(this, FONT_SIZE_KEY, updateFontSize);},
-        triggerContentScaling: function () {changeRangeButton(this, ZOOM_KEY, updateContentScaling);},
-        triggerLineHeight: function () {changeRangeButton(this, LINE_HEIGHT_KEY, updateLineHeight);},
-        triggerLetterSpacing: function () {changeRangeButton(this, LETTER_SPACING_KEY, updateLetterSpacing);}
+        triggerFontSize: function () {
+            changeRangeButton(this, FONT_SIZE_KEY, updateFontSize);
+        },
+        triggerContentScaling: function () {
+            changeRangeButton(this, ZOOM_KEY, updateContentScaling);
+        },
+        triggerLineHeight: function () {
+            changeRangeButton(this, LINE_HEIGHT_KEY, updateLineHeight);
+        },
+        triggerLetterSpacing: function () {
+            changeRangeButton(this, LETTER_SPACING_KEY, updateLetterSpacing);
+        }
 
+    }
+
+    function toInteger(str) {
+        return str ? parseInt(str, 10) || 0 : 0;
     }
 
     async function setLocalStoregeButtonsId() {
@@ -602,34 +930,28 @@ window.incloowe.init = function init() {
 
             let value = localStorage.getItem(btn.name);
 
-            if(value == null) {
+            if (value == null) {
                 //SETA VALORES ZERADOS AO INICIAR
                 localStorage.setItem(btn.name, 0);
-            }else if(value == 1) {
+            } else if (value == 1) {
                 //SETA BOTÕES ACTIVATE
                 let button = shadowR.querySelector('#' + btn.name);
                 button.classList.add("btn-active"); // Ativa o botão clicado
-            }else if(value.includes('%')) {
-                //SETA VALORES DE RANGE
-                let button = shadowR.querySelector('#' + btn.name);
+                button.querySelector('small').textContent = 'Ligado';
+            } else if (value.includes('%')) {
+                let btnDiv = shadowR.querySelector('#' + btn.name);
+                changeTextAndColorRangeValue(toInteger(value),
+                    btnDiv);
 
-                if (value === '0%') {
-                    button.style.setProperty('color', '#686868', 'important');
-                    button.textContent = 'Default';
-                } else {
-                    button.style.setProperty('color', 'var(--lead-color)', 'important');
-                    button.textContent = localStorage.getItem(btn.name);
-                }
-            }
-            else if(value.includes('rgb')) {
+            } else if (value.includes('rgb')) {
                 //ADJUST COLORS - RADIO
                 let a;
 
-                if(btn.description === 'Adjust Text Color') {
+                if (btn.description === 'Adjust Text Color') {
                     a = 'adjustTextColor';
-                }else if (btn.description === 'Adjust Title Color') {
+                } else if (btn.description === 'Adjust Title Color') {
                     a = 'adjustTitleColor';
-                }else if(btn.description === 'Adjust Background Color') {
+                } else if (btn.description === 'Adjust Background Color') {
                     a = 'adjustBackgroundColor';
                 }
 
@@ -657,26 +979,78 @@ window.incloowe.init = function init() {
         expandButton = shadowR.querySelector("#accessibilityButton");
         expandButton.addEventListener('click', toggleExpandWindow);
 
+
+        // let path = require('./assets/svg/data.json');
+        // anim = loadLottieAnimation(path);
+
+        expandButton.addEventListener('mouseenter', function(){
+            // expandButton.style.width = '230.5px';
+            // expandButton.style.left = '50px';
+            // anim.destroy();
+            // anim = loadLottieAnimation(path);
+            anim.playSegments([0, 75], true);
+        });
+
+
+        expandButton.addEventListener('mouseleave', function(){
+            // expandButton.style.width = '120px';
+            // expandButton.style.left = '40px';
+            // anim.destroy();
+            // let path = require('./assets/svg/data.json');
+            // anim = loadLottieAnimation(path);
+            // anim.playSegments([60, 75], true);
+        });
+
+
         //HEADER
-        closeButton = shadowR.querySelector("#closeButton");
-        closeButton.addEventListener('click', toggleExpandWindow);
+        closeButton = shadowR.querySelectorAll(".close-button");
+        closeButton.forEach(function (btn) {
+            btn.addEventListener('click', toggleExpandWindow);
+        });
 
         resetButton = shadowR.querySelector("#resetButton");
         resetButton.addEventListener('click', clearLocalStorage);
 
-        createshortcutsButton = shadowR.querySelector("#createshortcuts");
-        createshortcutsButton.onclick = async () => alert( await check());
 
-        //MODAL HIDE
-        hideButton = shadowR.querySelector("#hideButton");
-        hideButton.addEventListener('click', openModalHideButtonOrNot);
+        btnSettings = shadowR.querySelector("#settings");
+        btnSettings.addEventListener('click', function() {
+            shadowR.querySelector('.app-window').classList.add('pagina-ativa');
+            // Desabilita scroll na página que está saindo
+            shadowR.querySelector('.main-page').style.overflowY = 'hidden';
+        });
 
-        cancelHide = shadowR.querySelector("#cancelHide");
-        cancelHide.addEventListener('click', toggleExpandWindow);
+        btnConfigBack = shadowR.querySelector('#backButton');
+        btnConfigBack.addEventListener('click', function () {
+            shadowR.querySelector('.app-window').classList.remove('pagina-ativa');
+            // Restaura scroll após a transição
+            // setTimeout(() => {
+            shadowR.querySelector('.main-page').style.overflowY = 'scroll';
+            // }, 500);
+        })
 
-        submitHide = shadowR.querySelector("#submitHide");
-        submitHide.addEventListener('click', hideWidget);
 
+        modalLanguage = shadowR.querySelector('.modal-overlay');
+        btnCloseModalLanguage = shadowR.querySelector('#closeLngButton');
+
+        btnCloseModalLanguage.addEventListener('click',closeModal);
+        modalLanguage.addEventListener('click',  function (e) {
+            if(e.target === this){
+                closeModal();
+            }
+        });
+
+        shadowR.querySelector('.btn-language').addEventListener('click', openModal);
+
+
+    }
+
+    // Controle do modal
+    function openModal() {
+        modalLanguage.classList.add('active');
+    }
+
+    function closeModal(e) {
+        modalLanguage.classList.remove('active');
     }
 
 
@@ -685,23 +1059,29 @@ window.incloowe.init = function init() {
     function changeRangeButton(btn, key, updateFunction) {
         const activeProperty = getItemFromLocalStorageWithExpiry(key);
 
-        let percentChange = btn.className.includes('minus-button') ? -10 : 10;
+        let percentChange;
+        let btnDiv;
 
-        let currentPercentage = activeProperty ? parseFloat(activeProperty.value.replace('%', '')) : 0;
-        percentChange += currentPercentage;
+        if( btn.className.includes('button-reset-func')) {
+            percentChange = 0;
+            btnDiv = btn.parentElement.parentElement;
+        }else {
+            btnDiv = btn.parentElement.parentElement.parentElement;
+            percentChange = btn.className.includes('minus-button') ? -10 : 10;
+            let currentPercentage = activeProperty ? parseFloat(activeProperty.value.replace('%', '')) : 0;
+            percentChange += currentPercentage;
+        }
 
         if (percentChange > 200 || percentChange < -200) return;
 
         updateFunction(percentChange);
-
-        let textElement = btn.parentElement.children[1];
-        changeTextAndColorRangeValue(percentChange, textElement);
+        changeTextAndColorRangeValue(percentChange, btnDiv);
 
         setItemToLocalStorageWithExpiry(
             key,
             `${percentChange}%`,
             null,
-            textElement.id,
+            btnDiv.id,
             true
         );
     }
@@ -724,16 +1104,26 @@ window.incloowe.init = function init() {
 
     }
 
+    function setOriginalFontSizeOnLoading() {
+        const lastLeafElementsWithText = getLastLeafElementsWithText();
+        lastLeafElementsWithText.forEach(function (txtTag) {
+            let attName = txtTag.getAttribute('original-size');
+            if (attName == null) {
+                txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
+            }
+        });
+    }
+
     function loadFontSize() {
 
         const lastLeafElementsWithText = getLastLeafElementsWithText();
 
         lastLeafElementsWithText.forEach(function (txtTag) {
-
-            let attName = txtTag.getAttribute('original-size');
-            if (attName == null) {
-                txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
-            }
+            //
+            // let attName = txtTag.getAttribute('original-size');
+            // if (attName == null) {
+            //     txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
+            // }
 
             if (currentFontSize != null) {
                 if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
@@ -741,7 +1131,7 @@ window.incloowe.init = function init() {
                     let newSize = initialSize + (initialSize * currentFontSize.percentage / 100);
                     txtTag.style.setProperty('font-size', newSize + 'px', 'important');
                 }
-                let porcentagem =  parseFloat(currentFontSize.value.replace('%', ''));
+                let porcentagem = parseFloat(currentFontSize.value.replace('%', ''));
                 updateFontSize(porcentagem);
             }
 
@@ -865,7 +1255,7 @@ window.incloowe.init = function init() {
                 true,
                 null,
                 btn.id);
-        }else {
+        } else {
             removeItemFromLocalStorage(key, btn.id);
         }
 
@@ -906,6 +1296,10 @@ window.incloowe.init = function init() {
 
         // Se a funcionalidade for desativada, esconde o balão
         let balao = document.querySelector(".balao");
+        if(balao === null || balao === undefined || balao === ''){
+            balao = criarBalao();
+        }
+
         if (balao.style.display === 'block') {
             balao.style.setProperty('display', 'none', 'important');
         } else {
@@ -915,8 +1309,6 @@ window.incloowe.init = function init() {
     }
 
     function loadTextMagnifier() {
-
-        criarBalao();
 
         if (textMagnifier !== null) {
             setTextMagnifier();
@@ -1027,39 +1419,39 @@ window.incloowe.init = function init() {
 
     }
 
-    function setHighlightButtons() {
+    // function setHighlightButtons() {
+    //
+    //     let queryButtons = queries[2]?.value;
+    //     let txtTags = document.querySelectorAll(queryButtons);
+    //
+    //     // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
+    //     txtTags.forEach(function (txtTag) {
+    //         let attName = txtTag.getAttribute('data-inclowee-hlb-styled');
+    //         if (attName == null) {
+    //
+    //             if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
+    //                 txtTag.style.setProperty('outline', '2px solid rgba(255, 114, 22, 0.5)', 'important');
+    //                 txtTag.style.setProperty('outline-offset', '2px', 'important');
+    //                 txtTag.setAttribute('data-inclowee-hlb-styled', 'true');
+    //             }
+    //
+    //         } else {
+    //             txtTag.style.outline = '';
+    //             txtTag.style.outlineOffset = '';
+    //             txtTag.removeAttribute("data-inclowee-hlb-styled");
+    //         }
+    //
+    //     });
+    //
+    // }
 
-        let queryButtons = queries[2]?.value;
-        let txtTags = document.querySelectorAll(queryButtons);
-
-        // Iterar sobre cada tag <h1> e alterar sua cor para vermelho
-        txtTags.forEach(function (txtTag) {
-            let attName = txtTag.getAttribute('data-inclowee-hlb-styled');
-            if (attName == null) {
-
-                if (!txtTag.closest('.app-window') && !txtTag.closest('.accessibility-button')) {
-                    txtTag.style.setProperty('outline', '2px solid rgba(255, 114, 22, 0.5)', 'important');
-                    txtTag.style.setProperty('outline-offset', '2px', 'important');
-                    txtTag.setAttribute('data-inclowee-hlb-styled', 'true');
-                }
-
-            } else {
-                txtTag.style.outline = '';
-                txtTag.style.outlineOffset = '';
-                txtTag.removeAttribute("data-inclowee-hlb-styled");
-            }
-
-        });
-
-    }
-
-    function loadHighlightButtons() {
-
-        if (hightlightButtons != null) {
-            setHighlightButtons();
-        }
-
-    }
+    // function loadHighlightButtons() {
+    //
+    //     if (hightlightButtons != null) {
+    //         setHighlightButtons();
+    //     }
+    //
+    // }
 
     function setHighlightHover() {
 
@@ -1129,6 +1521,8 @@ window.incloowe.init = function init() {
 
     function changeFontFamily(font, btn) {
 
+        // showToast();
+
         let fontFam = getItemFromLocalStorageWithExpiry(FONT_FAMILY_KEY);
 
         if (fontFam !== null && fontFam.value === font) {
@@ -1172,20 +1566,20 @@ window.incloowe.init = function init() {
 
     }
 
-    function setVlibras(){
+    function setVlibras() {
 
         let display = document.getElementById("vlibras").style.display;
         if (display === 'block') {
             let btnClose = document.querySelector('.vpw-header-btn-close');
-            if(btnClose == null) {
+            if (btnClose == null) {
                 return false;
             }
             btnClose.click();
             document.getElementById("vlibras").style.display = "none";
 
         } else {
+            toggleExpandWindow();
             document.getElementById("vlibras").style.display = "block";
-            // toggleExpandWindow();
             document.getElementById("vlibrasclick").click();
         }
 
@@ -1195,7 +1589,20 @@ window.incloowe.init = function init() {
 
     function loadVlibras() {
         if (vLibras != null) {
-            setVlibras();
+            let display = document.getElementById("vlibras").style.display;
+            if (display === 'block') {
+                let btnClose = document.querySelector('.vpw-header-btn-close');
+                if (btnClose == null) {
+                    return false;
+                }
+                btnClose.click();
+                document.getElementById("vlibras").style.display = "none";
+
+            } else {
+                document.getElementById("vlibras").style.display = "block";
+            }
+
+            return true;
         }
     }
 
@@ -1407,7 +1814,9 @@ window.incloowe.init = function init() {
             svg.setAttribute("id", "daltonism-svg");
             svg.setAttribute("xmlns", svgNS);
             svg.setAttribute("version", "1.1");
-            svg.style.display = "none";
+            // svg.style.display = "none";
+            svg.style.absolute = "absolute";
+            svg.style.height = "0";
 
             const defs = document.createElementNS(svgNS, "defs");
             svg.appendChild(defs);
@@ -1488,47 +1897,49 @@ window.incloowe.init = function init() {
 
     function setAdjustColor(button, fila) {
 
-        let selectedColor = changeAdjustColorButton(button, fila) != null ? changeAdjustColorButton(button, fila) : '' ;
+        let selectedColor = changeAdjustColorButton(button, fila) != null ? changeAdjustColorButton(button, fila) : '';
         let selectedId;
 
-        if(fila === 'adjustTextColor') {
+        if (fila === 'adjustTextColor') {
             selectedId = 'ic_28';
-        }else if(fila === 'adjustTitleColor') {
+        } else if (fila === 'adjustTitleColor') {
             selectedId = 'ic_29';
-        }else if(fila === 'adjustBackgroundColor') {
+        } else if (fila === 'adjustBackgroundColor') {
             selectedId = 'ic_30';
         }
 
         setItemToLocalStorageWithExpiry(fila, selectedColor, null, selectedId, true);
         changeAdjustColorValue(fila, selectedColor);
+
     }
 
 
     function changeAdjustColorButton(button, fila) {
 
-        const isDefault = button.classList.contains('link-default-color');
+        let btnReset = shadowR.querySelector(`[data-test="${fila}"]`).querySelector('.button-reset-func');
+        const isReset = button.classList.contains('button-reset-func');
 
         const updateSelectedButton = (lastSelectedButton, button) => {
             if (lastSelectedButton && lastSelectedButton !== button) {
                 lastSelectedButton.innerHTML = ''; // Remove o SVG
                 lastSelectedButton.classList.remove('color-pick-selected');
+                lastSelectedButton.style.border = '';
             }
             return button;
         };
 
+
+
         const setSVG = (button, selectedColor) => {
             button.innerHTML = selectedColor === 'rgb(255, 255, 255)' ?
-                `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-chevron-down">
-                <path d="m6 9 6 6 6-6"/>
-            </svg>` :
-                `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
-                <path d="m6 9 6 6 6-6"></path>
-            </svg>`;
+                `<span style=" width: 12px; height: 12px; background: black; border-radius: 50%;"></span>` :
+                `<span style=" width: 12px; height: 12px; background: white; border-radius: 50%;"></span>`;
         };
 
-        if (!isDefault) {
+        if (!isReset) {
+
+            btnReset.disabled = false;
+
             if (fila === 'adjustTitleColor') {
                 lastSelectedTitleColor = updateSelectedButton(lastSelectedTitleColor, button);
             } else if (fila === 'adjustTextColor') {
@@ -1541,17 +1952,24 @@ window.incloowe.init = function init() {
             const currentSelected = shadowR.querySelector(`div[data-test=${fila}] .color-pick-selected`);
             const selectedColor = window.getComputedStyle(currentSelected).backgroundColor;
 
+            button.style.border = 'solid 3px ' + selectedColor;
+
             setSVG(button, selectedColor);
 
             return selectedColor;
 
+        }else {
+            btnReset.disabled = true;
         }
 
         const currentSelected = shadowR.querySelector(`div[data-test=${fila}] .color-pick-selected`);
-        if(currentSelected != null) {
+        if (currentSelected != null) {
             currentSelected.innerHTML = '';
             currentSelected.classList.remove('color-pick-selected');
+            currentSelected.style.border = '';
         }
+
+
         return null;
 
     }
@@ -1562,16 +1980,16 @@ window.incloowe.init = function init() {
             if (fila === 'adjustTitleColor') {
                 let titleColorStyle = document.getElementById('title-color-incloowe') || document.createElement('style');
                 titleColorStyle.id = 'title-color-incloowe';
-                titleColorStyle.innerHTML = `body :not(#shadow) h1, body :not(#shadow) h2, body :not(#shadow) h3, body :not(#shadow) h4,
-                body :not(#shadow) h5, body :not(#shadow) h6 { color: ${selectedColor} !important }`;
+                titleColorStyle.innerHTML = `h1, h2, h3, h4, h5, h6 { color: ${selectedColor} !important }`;
                 document.head.appendChild(titleColorStyle);
             } else if (fila === 'adjustTextColor') {
                 let textColorStyle = document.getElementById('text-color-incloowe') || document.createElement('style');
                 textColorStyle.id = 'text-color-incloowe';
-                textColorStyle.innerHTML = `body :not(#shadow) a, body :not(#shadow) p, body :not(#shadow) li, body :not(#shadow) label,
-                body :not(#shadow) input, body :not(#shadow) select, body :not(#shadow) textarea, body :not(#shadow) legend,
-                body :not(#shadow) code, body :not(#shadow) pre, body :not(#shadow) dd, body :not(#shadow) dt, body :not(#shadow) span,
-                body :not(#shadow) blockquote { color: ${selectedColor} !important }`;
+                // textColorStyle.innerHTML = `a, p, li, label, input, select, textarea, legend, code, pre, dd, dt, span,
+                //  blockquote { color: ${selectedColor} !important }`;
+                textColorStyle.innerHTML = `h1, h2, h3, h4, h5, h6, p, li, label, input, select, textarea, legend, code, pre, dd, dt, span,
+                 blockquote { color: ${selectedColor} !important }`;
+
                 document.head.appendChild(textColorStyle);
             } else if (fila === 'adjustBackgroundColor') {
                 document.body.style.setProperty('background-color', selectedColor, 'important');
@@ -1581,14 +1999,14 @@ window.incloowe.init = function init() {
         const removeAdjustColor = (fila) => {
             if (fila === 'adjustTitleColor') {
                 const titleColorStyle = document.getElementById('title-color-incloowe');
-                if(titleColorStyle != null) {
+                if (titleColorStyle != null) {
                     titleColorStyle.innerHTML = '';
                     removeItemFromLocalStorage(ADJUST_TITLE_COLOR_KEY);
                 }
 
             } else if (fila === 'adjustTextColor') {
                 const textColorStyle = document.getElementById('text-color-incloowe');
-                if(textColorStyle != null) {
+                if (textColorStyle != null) {
                     textColorStyle.innerHTML = '';
                     removeItemFromLocalStorage(ADJUST_TEXT_COLOR_KEY);
                 }
@@ -1598,9 +2016,9 @@ window.incloowe.init = function init() {
             }
         };
 
-        if(selectedColor !== null) {
+        if (selectedColor !== null && selectedColor !== "") {
             adjustColor(fila, selectedColor);
-        }else {
+        } else {
             removeAdjustColor(fila);
         }
 

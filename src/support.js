@@ -17,12 +17,37 @@ export function createStyleGlobal() {
     let estiloGlobal = document.createElement('style');
     estiloGlobal.setAttribute("id", "incloowe-style")
     let fonteUrl = require('./assets/fonts/OpenDyslexic-Regular.woff');
+    let fonteUrlWix = require('./assets/fonts/WixMadeforText-Regular.woff');
+    let fonteUrlWixExtraBold = require('./assets/fonts/WixMadeforText-ExtraBold.woff');
+    let fonteUrlWixMedium = require('./assets/fonts/WixMadeforText-Medium.woff');
     let estilo = document.createTextNode(' @font-face { ' +
         '            font-family: \'OpenDyslexic\'; ' +
         `            src: url(${fonteUrl}) format(\'woff\'); ` +
         '            font-weight: normal; ' +
         '            font-style: normal; ' +
         '        } ' +
+
+        ' @font-face { ' +
+        '            font-family: \'Wix\'; ' +
+        `            src: url(${fonteUrlWix}) format(\'woff\'); ` +
+        '            font-weight: normal; ' +
+        '            font-style: normal; ' +
+        '        } ' +
+
+        ' @font-face { ' +
+        '            font-family: \'WixExtraBold\'; ' +
+        `            src: url(${fonteUrlWixExtraBold}) format(\'woff\'); ` +
+        '            font-weight: normal; ' +
+        '            font-style: normal; ' +
+        '        } ' +
+
+        ' @font-face { ' +
+        '            font-family: \'WixMedium\'; ' +
+        `            src: url(${fonteUrlWixMedium}) format(\'woff\'); ` +
+        '            font-weight: normal; ' +
+        '            font-style: normal; ' +
+        '        } ' +
+
         '.inverted { filter: invert(100%) !important; background: #fff !important; } ' +
 
         '.light-contrast { background-color: #fff !important; color: #181818 !important; } ' +
@@ -71,25 +96,64 @@ export function expandContent(elemento) {
     let content = elemento.parentElement.parentElement.children[1];
     if (content.classList.contains('active')) {
         content.classList.remove('active')
-        elemento.style.setProperty('transform', 'rotate(90deg)', 'important');
+        elemento.children[0].style.setProperty('transform', 'rotate(0deg)', 'important');
     } else {
         content.classList.toggle('active');
-        elemento.style.setProperty('transform', 'rotate(0deg)', 'important');
+        elemento.children[0].style.setProperty('transform', 'rotate(180deg)', 'important');
     }
+
+
+    // let a = shadowR.querySelectorAll('.content-buttons');
+    //
+    // let algumAtivo = Array.from(a).some(el => el.classList.contains('active'));
+    // let contentContainer = shadowR.querySelector('.content-container');
+    //
+    // if(!algumAtivo) {
+    //     contentContainer.style.height = '100%';
+    // }else {
+    //     contentContainer.style.height = '';
+    // }
+
+
 }
 
 export function showTooltip(info) {
 
-        const tooltip = info.nextElementSibling.nextElementSibling.nextElementSibling;
-        if (tooltip?.classList.contains('tooltip-content')) {
-            if(tooltip.style.visibility !== 'visible') {
-                tooltip.style.visibility = 'visible';
-                tooltip.style.opacity = '1';
-            }else {
-                tooltip.style.visibility = 'hidden';
-                tooltip.style.opacity = '0';
-            }
+    //todo:: COLOCAR ESSE VISIBLE AO ABRIR O CONTAINER DE BUTTONS
+
+    let a = info.closest('.content-buttons');
+    const tooltip = info.parentElement.querySelector('.tooltip-container');
+    if (tooltip?.classList.contains('tooltip-container')) {
+        if(tooltip.style.visibility !== 'visible') {
+            a.style.overflow = 'visible';
+            tooltip.style.visibility = 'visible';
+            tooltip.style.opacity = '1';
+        }else {
+            a.style.overflow = 'hidden';
+            tooltip.style.visibility = 'hidden';
+            tooltip.style.opacity = '0';
         }
+    }
+
+
+    // Calcular posição relativa ao container
+    const container = shadowR.querySelector('.scroll');
+    const containerRect = container.getBoundingClientRect();
+    const itemRect = info.getBoundingClientRect();
+
+    const tooltipRect = tooltip.getBoundingClientRect();
+
+    // Verifica se o tooltip ultrapassa a borda direita
+    if (tooltipRect.right > window.innerWidth) {
+        tooltip.style.left = 'auto'; // Remove posição à esquerda
+        tooltip.style.right = '0'; // Alinha à direita do botão
+    } else {
+        tooltip.style.left = '0'; // Volta à posição original
+        tooltip.style.right = 'auto';
+    }
+
+
+
 }
 
 export function hideWidget() {
@@ -109,23 +173,33 @@ export function hideWidget() {
 
 
 //MUDA O TEXTO DO INPUT DE RANGE PARA AS PORCENTAGENS OU 'DEFAULT'
-export function changeTextAndColorRangeValue(percentAcrescentar, percentageElement) {
+export function changeTextAndColorRangeValue(percentAcrescentar, btnDiv) {
+
+    let percentageElement = btnDiv.querySelector('.button-range-value');
+    let btnReset = btnDiv.querySelector('.button-reset-func');
+
     if (percentAcrescentar === 0) {
         percentageElement.style.setProperty('color', '#686868', 'important');
         percentageElement.textContent = 'Default';
+        btnReset.disabled = true;
     } else {
-        percentageElement.style.setProperty('color', 'var(--lead-color)', 'important');
+        percentageElement.style.setProperty('color', '#000', 'important');
         percentageElement.textContent = percentAcrescentar + '%';
+        btnReset.disabled = false;
     }
 }
 
 //ALTERA O ESTILO DO BOTÃO PARA SELECIONADO
 export function changeStyleButtonSelected(btn) {
 
+    let txt = btn.querySelector('small');
+
     if (!btn.classList.contains('btn-active')) {
         btn.classList.add("btn-active");
+        txt.textContent = 'Ligado';
     } else {
         btn.classList.remove("btn-active");
+        txt.textContent = 'Desligado';
     }
 
 }
@@ -138,17 +212,22 @@ export function changeStyleButtonSelectedAndDeselectOthers(btn, key) {
     // Seleciona todos os botões do mesmo grupo
     let buttons = shadowR.querySelectorAll('.' + group);
 
+    let txt = btn.querySelector('small');
+
     // Verifica se o botão clicado já está ativo
     if (btn.classList.contains('btn-active')) {
         // Se o botão já estiver ativo, desativa ele
         btn.classList.remove("btn-active");
+        txt.textContent = 'Desligado';
     } else {
         // Caso contrário, ativa o botão clicado e desativa os outros
         buttons.forEach(button => {
             button.classList.remove("btn-active"); // Desativa todos do grupo
             removeItemFromLocalStorage(key, button.id);
+            button.querySelector('small').textContent = 'Desligado';
             // changeItemGroup(button.id);
         });
+        txt.textContent = 'Ligado';
         btn.classList.add("btn-active"); // Ativa o botão clicado
     }
 }
@@ -301,4 +380,30 @@ function esconderBalao() {
         // Remove o evento de movimento do mouse
         document.removeEventListener("mousemove", atualizarPosicaoBalao);
     }
+}
+
+
+// Função para mostrar o Toast
+export function showToast() {
+    let toast = shadowR.querySelector(".toast");
+    // Exibe o toast com animação
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+
+    // Remove o toast automaticamente após 5 segundos
+    setTimeout(() => {
+        closeToast(toast);
+    }, 5000);
+}
+
+// Função para fechar o Toast
+export function closeToast() {
+
+    let toast = shadowR.querySelector(".toast");
+
+    setTimeout(() => {
+        // element.remove();
+        toast.classList.remove('show');
+    }, 100); // Tempo para animação de saída
 }

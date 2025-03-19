@@ -1,7 +1,8 @@
 import axios from 'axios';
+axios.defaults.withCredentials = true;
 
-const hostBackend = 'https://api-incloowe.vercel.app/api/v1'
-// const hostBackend = 'http://localhost:5000/api/v1'
+// const hostBackend = 'https://api-incloowe.vercel.app/api/v1'
+const hostBackend = 'http://localhost:5000/api/v1'
 
 export const getContainers = async () => {
     try {
@@ -48,3 +49,14 @@ export const check = async () => {
     }
 };
 
+export const auth = async () => {
+    try {
+        // Adiciona o cabeçalho X-Host com o host da aplicação X
+        const response = await axios.get(hostBackend + '/auth');
+        console.log(response);
+        return true;
+    } catch (error) {
+        console.error("Error authentication:", error);
+        return false;
+    }
+};

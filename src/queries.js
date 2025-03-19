@@ -25,7 +25,7 @@ export function getLastLeafElementsWithText() {
         // Verifica se o elemento é uma folha e tem texto
         // QUANDO FOR ULTIMO FILHO, COM CONTEUDO
         if ((!shouldBeRemoved(element) && element.children.length === 0 && element.textContent.trim() !== "")
-            || (element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'LABEL')) {
+            || (element.tagName.toUpperCase() === 'INPUT' || element.tagName.toUpperCase() === 'LABEL' || element.tagName.toUpperCase() === 'TEXTAREA')) {
             elementsWithText.push(element);
         }
         //QUANDO POSSUIR FILHOS

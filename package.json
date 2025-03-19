@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.46.1",
-    "axios": "^1.7.7"
+    "axios": "^1.7.7",
+    "lottie-web": "^5.12.2"
   }
 }
