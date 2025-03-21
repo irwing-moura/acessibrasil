@@ -71,7 +71,6 @@
             background: var(--background-main);
             position: fixed;
             top: 10px;
-            right: 20px;
             max-width: 554px;
             width: 100%;
             border-radius: 31px;
@@ -640,11 +639,11 @@
         }
 
         .left {
-            left: 10px
+            left: 20px
         }
 
         .right {
-            right: 10px
+            right: 20px
         }
 
         .title {
@@ -1098,7 +1097,7 @@
                 pointer-events:none;
                 opacity:0;
                 /*transition:opacity .3s ease;*/
-                transition: opacity .2s ease .2s, background-color 0.2s ease 0.2s, color 0.2s ease 0.2s;
+                transition: .2s, background-color 0.2s ease 0.2s, color 0.2s ease 0.2s;
 
             }
             .footer-inc{
@@ -1489,7 +1488,7 @@
             content:"";
             height:28px;
             width:28px;
-            left:6px;
+            left:5px;
             bottom:6px;
             background-color:#fff;
             -webkit-transition:.4s;
@@ -1501,7 +1500,9 @@
         }
 
         input:checked+.slider:hover {
-            box-shadow: inset 0 0 0 2px #fff;
+            /*box-shadow: inset 0 0 0 2px #fff;*/
+            outline: 2px solid rgba(255, 255, 255, 1);
+            outline-offset: -4px;
         }
 
         input:focus+.slider{
@@ -1538,7 +1539,7 @@
 <i id="accessibilityButton" class="accessibility-button"></i>
 
 <div id="appWindow">
-    <div id="widget" class="app-window" role="application" aria-label="Janela do Widget">
+    <div id="widget" class="app-window right" role="application" aria-label="Janela do Widget">
         <div class="scroll main-page">
             <div class="toolbar">
                 <div class="toolbar-actions">
@@ -1591,7 +1592,14 @@
                         <div class="container-title-desc" style="max-width:286px">
                             <h2>Mover Widget</h2><span>Reposicione o Widget da maneira que preferir</span>
                         </div>
-                        <div style="display:flex;justify-content:center;align-items:center;gap:12px"><button class="contentButton" style="width:48px;height:48px;transform:rotate(180deg)"><i class="icon icon-move-widget"></i></button><button class="contentButton" style="width:48px;height:48px"><i class="icon icon-move-widget"></i></button></div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:12px">
+                            <button class="contentButton dir" style="width:48px;height:48px;transform:rotate(180deg)">
+                                <i class="icon icon-move-widget"></i>
+                            </button>
+                            <button class="contentButton dir active" style="width:48px;height:48px">
+                                <i class="icon icon-move-widget"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="scrollable-content">

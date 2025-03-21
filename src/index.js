@@ -56,6 +56,8 @@ window.incloowe.init = async function init() {
     const ADJUST_BACKGROUND_COLOR_KEY = "adjustBackgroundColor"
     const DALTONISM_FILTER_KEY = "daltonism-filter";
     const VLIBRAS_KEY = "vlibras";
+    const WIDGET_POSITION_KEY = "widget-position";
+
 
     let widgetStatus = getItemFromLocalStorageWithExpiry(WIDGET_STATUS_KEY);
     let currentFontSize = getItemFromLocalStorageWithExpiry(FONT_SIZE_KEY);
@@ -66,7 +68,6 @@ window.incloowe.init = async function init() {
     let textAlign = getItemFromLocalStorageWithExpiry(TEXT_ALIGN_KEY);
     let hightlightHeadings = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HEADINGS_KEY);
     let hightlightLinks = getItemFromLocalStorageWithExpiry(HIGHLIGHT_LINKS_KEY);
-    let hightlightButtons = getItemFromLocalStorageWithExpiry(HIGHLIGHT_BUTTONS_KEY);
     let hightlightHover = getItemFromLocalStorageWithExpiry(HIGHLIGHT_HOVER_KEY);
     let hightlightFocus = getItemFromLocalStorageWithExpiry(HIGHLIGHT_FOCUS_KEY);
     let fontFamily = getItemFromLocalStorageWithExpiry(FONT_FAMILY_KEY);
@@ -78,25 +79,23 @@ window.incloowe.init = async function init() {
     let daltonismFilter = getItemFromLocalStorageWithExpiry(DALTONISM_FILTER_KEY);
     let vLibras = getItemFromLocalStorageWithExpiry(VLIBRAS_KEY);
 
+    let widgetPosition = getItemFromLocalStorageWithExpiry(WIDGET_POSITION_KEY);
+
+
     let expandButton;
     let closeButton;
     let resetButton;
-    let createshortcutsButton;
-    let hideButton;
-    let contentButton;
-    let cancelHide;
-    let submitHide;
 
     let btnSettings;
     let btnConfigBack;
 
-
     let modalLanguage;
     let btnCloseModalLanguage;
 
+    let btnsDirect;
+
 
     let anim;
-
     let shadowR;
 
     let lastSelectedTextColor;
@@ -122,6 +121,11 @@ window.incloowe.init = async function init() {
 //DALTONISM FILTERS
     let daltonisms = ['', 'protanomaly', 'deuteranomaly', 'tritanomaly'];
     let indexActualDaltonismFilter = daltonismFilter != null ? daltonismFilter.value : daltonismFilter;
+
+    //WIDGET POSITION
+    let positions = ['left', 'right'];
+    let indexActualWidgetPosition = widgetPosition != null ? widgetPosition.value : widgetPosition;
+
 
     let html;
 
@@ -230,7 +234,7 @@ window.incloowe.init = async function init() {
             renderer: "svg",
             loop: false,
             autoplay: false,
-            animationData: path,
+            path: path,
         });
     }
 
@@ -988,7 +992,7 @@ window.incloowe.init = async function init() {
             // expandButton.style.left = '50px';
             // anim.destroy();
             // anim = loadLottieAnimation(path);
-            anim.playSegments([0, 75], true);
+            // anim.playSegments([0, 75], true);
         });
 
 
@@ -1008,10 +1012,12 @@ window.incloowe.init = async function init() {
             btn.addEventListener('click', toggleExpandWindow);
         });
 
+        //BOTAO DE RESET
         resetButton = shadowR.querySelector("#resetButton");
         resetButton.addEventListener('click', clearLocalStorage);
 
 
+        //CONFIGURAÇÕES
         btnSettings = shadowR.querySelector("#settings");
         btnSettings.addEventListener('click', function() {
             shadowR.querySelector('.app-window').classList.add('pagina-ativa');
@@ -1019,6 +1025,7 @@ window.incloowe.init = async function init() {
             shadowR.querySelector('.main-page').style.overflowY = 'hidden';
         });
 
+        //VOLTAR PARA PRIMEIRA PAGINA
         btnConfigBack = shadowR.querySelector('#backButton');
         btnConfigBack.addEventListener('click', function () {
             shadowR.querySelector('.app-window').classList.remove('pagina-ativa');
@@ -1028,6 +1035,9 @@ window.incloowe.init = async function init() {
             // }, 500);
         })
 
+
+        //MODAL DE LINGUAGEM
+        shadowR.querySelector('.btn-language').addEventListener('click', openModal);
 
         modalLanguage = shadowR.querySelector('.modal-overlay');
         btnCloseModalLanguage = shadowR.querySelector('#closeLngButton');
@@ -1039,8 +1049,12 @@ window.incloowe.init = async function init() {
             }
         });
 
-        shadowR.querySelector('.btn-language').addEventListener('click', openModal);
+        //POSICAO WIDGET
 
+        btnsDirect = shadowR.querySelectorAll(".dir");
+        btnsDirect.forEach(function (btn) {
+            btn.addEventListener('click', ()=> setWidgetPosition(btn));
+        });
 
     }
 
@@ -1666,8 +1680,8 @@ window.incloowe.init = async function init() {
                     widget.style.background = '#fff';
                     break;
                 case 'int-inverted':
-                    filterStyle.innerHTML = 'body > *:not(#shadow) { filter: invert(100%) !important; background: #fff !important; }' +
-                        ' img, video, iframe, picture, svg { filter: invert(1); }';
+                    filterStyle.innerHTML = 'body > *:not(#shadow):not(img):not(video):not(iframe):not(picture):not(svg)' +
+                        ' { filter: invert(100%) !important; background: #fff !important; }';
                     widget.style.filter = 'invert(100%)';
                     widget.style.background = '#fff';
 
@@ -2023,5 +2037,68 @@ window.incloowe.init = async function init() {
         }
 
     }
+
+    // function changeWidgetPosition(btn) {
+    //
+    //     let widgetPositionSaved = getItemFromLocalStorageWithExpiry(WIDGET_POSITION_KEY);
+    //     let direction;
+    //
+    //     let widget = shadowR.querySelector('#widget');
+    //     if(widget.classList.contains('right')){
+    //         direction = 0;
+    //     }else {
+    //         direction = 1;
+    //     }
+    //
+    //     if (widgetPositionSaved !== null && widgetPositionSaved.value === direction) {
+    //         indexActualWidgetPosition = 0;
+    //     } else {
+    //         indexActualWidgetPosition = direction;
+    //     }
+    //
+    //     setWidgetPosition();
+    //     changeStyleButtonSelectedAndDeselectOthers(btn, WIDGET_POSITION_KEY);
+    //
+    //     if (indexActualWidgetPosition === 0) {
+    //         removeItemFromLocalStorage(WIDGET_POSITION_KEY, btn.id);
+    //     } else {
+    //         setItemToLocalStorageWithExpiry(WIDGET_POSITION_KEY,
+    //             indexActualWidgetPosition,
+    //             null,
+    //             btn.id);
+    //     }
+    //
+    // }
+
+    function setWidgetPosition(btnSelected) {
+
+        // if (indexActualWidgetPosition !== null) {
+
+        let widget = shadowR.querySelector('#widget');
+        // let selectedWidgetPosition = positions[indexActualWidgetPosition];
+        let selectedWidgetPosition;
+
+        if (widget.classList.contains('right')) {
+            selectedWidgetPosition = 'left';
+            widget.classList.remove('right');
+            widget.classList.add(selectedWidgetPosition);
+        } else {
+            selectedWidgetPosition = 'right';
+            widget.classList.remove('left');
+            widget.classList.add(selectedWidgetPosition);
+        }
+
+        btnSelected.parentElement.querySelector(".active").classList.remove('active');
+        btnSelected.classList.add("active");
+
+        setItemToLocalStorageWithExpiry(WIDGET_POSITION_KEY,
+            indexActualWidgetPosition,
+            null,
+            null);
+
+        // }
+
+    }
+
 
 }

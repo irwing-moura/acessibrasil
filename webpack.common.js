@@ -55,6 +55,15 @@ module.exports = {
                     filename: 'fonts/[name][ext]', // Coloca as fontes na pasta "fonts"
                 },
             },
+
+            // Regra para JSONs dos SVGS
+            {
+                test: /\.json$/,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'svg/[name][ext]', // Ou 'svg/[name][ext]' se quiser na pasta "svg"
+                },
+            },
         ],
     }
 };
