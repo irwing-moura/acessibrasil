@@ -142,6 +142,7 @@ window.incloowe.init = async function init() {
             createStyleGlobal();
             assignSupportFunctions();
             setOriginalFontSizeOnLoading();
+            loadWidgetPosition();
             html = document.activeElement.parentElement;
 
             if (needToLoadFuctions()) {
@@ -2070,29 +2071,65 @@ window.incloowe.init = async function init() {
     //
     // }
 
+    function loadWidgetPosition() {
+        let widget = shadowR.querySelector('#widget');
+        let btnWidget = shadowR.querySelector('#accessibilityButton');
+
+        let def = JSON.parse(localStorage.getItem('configs'));
+        console.log(def.default_position);
+
+        let selectedWidgetPosition = getItemFromLocalStorageWithExpiry(WIDGET_POSITION_KEY)?.value;
+
+        if(selectedWidgetPosition === null || selectedWidgetPosition === undefined) {
+            selectedWidgetPosition = def.default_position;
+        }
+
+        let btns = shadowR.querySelectorAll('.dir');
+
+        widget.classList.add(selectedWidgetPosition);
+        btnWidget.classList.add(selectedWidgetPosition);
+
+        if (selectedWidgetPosition.value === 'left') {
+            btns[0].classList.add("active");
+        } else {
+            btns[1].classList.add("active");
+        }
+
+
+    }
+
     function setWidgetPosition(btnSelected) {
 
-        // if (indexActualWidgetPosition !== null) {
+
+        if(btnSelected.classList.contains('active')) return;
 
         let widget = shadowR.querySelector('#widget');
-        // let selectedWidgetPosition = positions[indexActualWidgetPosition];
+        let btnWidget = shadowR.querySelector('#accessibilityButton');
         let selectedWidgetPosition;
 
         if (widget.classList.contains('right')) {
             selectedWidgetPosition = 'left';
             widget.classList.remove('right');
             widget.classList.add(selectedWidgetPosition);
+
+            btnWidget.classList.remove('right');
+            btnWidget.classList.add(selectedWidgetPosition);
+
+
         } else {
             selectedWidgetPosition = 'right';
             widget.classList.remove('left');
             widget.classList.add(selectedWidgetPosition);
+
+            btnWidget.classList.remove('left');
+            btnWidget.classList.add(selectedWidgetPosition);
         }
 
-        btnSelected.parentElement.querySelector(".active").classList.remove('active');
+        btnSelected.parentElement.querySelector(".active")?.classList.remove('active');
         btnSelected.classList.add("active");
 
         setItemToLocalStorageWithExpiry(WIDGET_POSITION_KEY,
-            indexActualWidgetPosition,
+            selectedWidgetPosition,
             null,
             null);
 

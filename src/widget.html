@@ -58,10 +58,19 @@
             z-index: 1000;
             cursor: pointer;
             bottom: 0;
-            right: -170px;
+            /*right: -170px;*/
             height: 120px;
             pointer-events: none;
         }
+
+        .accessibility-button.left {
+            left: 20px;
+        }
+
+        .accessibility-button.right {
+            right: -170px;
+        }
+
 
         .accessibility-button svg g {
             pointer-events: all;
@@ -1272,6 +1281,13 @@
             mask-image:url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right-to-line"><path d="M17 12H3M11 18l6-6-6-6M21 5v14"/></svg>');
             -webkit-mask-image:url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right-to-line"><path d="M17 12H3M11 18l6-6-6-6M21 5v14"/></svg>')
             }
+
+            .icon-move-widget-left {
+                mask-image:url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right-to-line"><path d="M17 12H3M11 18l6-6-6-6M21 5v14"/></svg>');
+                -webkit-mask-image:url('data:image/svg+xml;utf-8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right-to-line"><path d="M17 12H3M11 18l6-6-6-6M21 5v14"/></svg>');
+                transform: rotate(180deg);
+            }
+
             svg:hover [id^="_R_G"]{
             animation-play-state:running
             }
@@ -1539,7 +1555,7 @@
 <i id="accessibilityButton" class="accessibility-button"></i>
 
 <div id="appWindow">
-    <div id="widget" class="app-window right" role="application" aria-label="Janela do Widget">
+    <div id="widget" class="app-window" role="application" aria-label="Janela do Widget">
         <div class="scroll main-page">
             <div class="toolbar">
                 <div class="toolbar-actions">
@@ -1593,10 +1609,10 @@
                             <h2>Mover Widget</h2><span>Reposicione o Widget da maneira que preferir</span>
                         </div>
                         <div style="display:flex;justify-content:center;align-items:center;gap:12px">
-                            <button class="contentButton dir" style="width:48px;height:48px;transform:rotate(180deg)">
-                                <i class="icon icon-move-widget"></i>
+                            <button class="contentButton dir" style="width:48px;height:48px;">
+                                <i class="icon icon-move-widget-left"></i>
                             </button>
-                            <button class="contentButton dir active" style="width:48px;height:48px">
+                            <button class="contentButton dir" style="width:48px;height:48px">
                                 <i class="icon icon-move-widget"></i>
                             </button>
                         </div>

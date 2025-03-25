@@ -54,6 +54,9 @@ export const auth = async () => {
         // Adiciona o cabeçalho X-Host com o host da aplicação X
         const response = await axios.get(hostBackend + '/auth');
         console.log(response);
+
+        localStorage.setItem('configs', JSON.stringify(response.data.data[0].assinaturas.configuracoes));
+
         return true;
     } catch (error) {
         console.error("Error authentication:", error);
