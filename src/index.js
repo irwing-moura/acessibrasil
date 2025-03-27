@@ -17,7 +17,7 @@ import {
     setItemToLocalStorageWithExpiry,
     getItemFromLocalStorageWithExpiry,
     removeItemFromLocalStorage,
-    clearLocalStorage, needToLoadFuctions
+    clearLocalStorage, needToLoadFuctions, setInclooweState, getInclooweState, setDefaultConfigs
 } from "./storage";
 import {
     getLineHeightInPixelsIfText,
@@ -92,7 +92,11 @@ window.incloowe.init = async function init() {
     let modalLanguage;
     let btnCloseModalLanguage;
 
+    //botões config
     let btnsDirect;
+    let btnDarkMode;
+    let btnHideInterface;
+    let btnShortcutKeyboard;
 
 
     let anim;
@@ -132,17 +136,24 @@ window.incloowe.init = async function init() {
     let contentLoaded = false;
     let queries;
 
+    let configsDefault;
+
     if (widgetStatus === null) {
 
         initializeVlibras();
-        let acessoPermitido = await auth();
+        configsDefault = await auth();
+        setDefaultConfigs(configsDefault);
 
-        if(acessoPermitido) {
+        if(configsDefault) {
             createWidget();
             createStyleGlobal();
             assignSupportFunctions();
             setOriginalFontSizeOnLoading();
             loadWidgetPosition();
+            loadWidgetDarkMode();
+            loadWidgetHideInterface();
+            loadWidgetShortcutKeyboard();
+
             html = document.activeElement.parentElement;
 
             if (needToLoadFuctions()) {
@@ -313,8 +324,13 @@ window.incloowe.init = async function init() {
             for (let i = 0; i < container.funcionalidades.length; i++) {
                 const item = container.funcionalidades[i];
 
-                let botao1 = createButton(item.title,
-                    item.tooltip,
+                const languageToFind = "es_ES"; // Defina o idioma que deseja buscar
+                const textos = item.translations.find(item => item.language === languageToFind);
+
+                let botao1 = createButton(
+                    textos.title_text,
+                    textos.tooltip_title_text,
+                    textos.tooltip_text,
                     item.action,
                     item.order,
                     item.icon,
@@ -378,17 +394,17 @@ window.incloowe.init = async function init() {
         return titleContainer;
     }
 
-    function createButton(texto, textoTooltip, acaoClique, order, classe, type, group, id) {
+    function createButton(titulo, tituloTooltip, textoTooltip, acaoClique, order, classe, type, group, id) {
         if (type === 'range') {
-            return createButtonRange(texto, classe, textoTooltip, id, acaoClique);
+            return createButtonRange(titulo, classe, textoTooltip, id, acaoClique, tituloTooltip);
         } else if (type === 'activate') {
-            return createButtonActivate(texto, textoTooltip, acaoClique, order, classe, group, id);
+            return createButtonActivate(titulo, textoTooltip, acaoClique, order, classe, group, id, tituloTooltip);
         } else if (type === 'radio') {
-            return createButtonRadio(texto, textoTooltip, acaoClique, id);
+            return createButtonRadio(titulo, textoTooltip, acaoClique, id, tituloTooltip);
         }
     }
 
-    function createButtonRange(texto, classe, textoTooltip, id, acaoClique) {
+    function createButtonRange(texto, classe, textoTooltip, id, acaoClique, tituloTooltip) {
         // Cria o container principal
         const contentButton = document.createElement("div");
         contentButton.id = id;
@@ -500,7 +516,7 @@ window.incloowe.init = async function init() {
         // Cria título
         const title = document.createElement('h3');
         title.className = 'tooltip-title';
-        title.textContent = texto;
+        title.textContent = tituloTooltip;
 
         // Cria texto descritivo
         const text = document.createElement('span');
@@ -541,7 +557,7 @@ window.incloowe.init = async function init() {
 
     }
 
-    function createButtonActivate(texto, textoTooltip, acaoClique, order, classe, group, id) {
+    function createButtonActivate(texto, textoTooltip, acaoClique, order, classe, group, id, tituloTooltip) {
         const botao = document.createElement('button');
         botao.id = id;
         botao.className = group == null ? 'content-button' : 'content-button ' + group;
@@ -587,7 +603,7 @@ window.incloowe.init = async function init() {
         // Cria título
         const title = document.createElement('h3');
         title.className = 'tooltip-title';
-        title.textContent = texto;
+        title.textContent = tituloTooltip;
 
         // Cria texto descritivo
         const text = document.createElement('span');
@@ -632,7 +648,7 @@ window.incloowe.init = async function init() {
         return botao;
     }
 
-    function createButtonRadio(texto, textoTooltip, acaoClique, id) {
+    function createButtonRadio(texto, textoTooltip, acaoClique, id, tituloTooltip) {
 
         // Cria o container principal
         const contentButton = document.createElement("div");
@@ -717,7 +733,7 @@ window.incloowe.init = async function init() {
         // Cria título
         const title = document.createElement('h3');
         title.className = 'tooltip-title';
-        title.textContent = texto;
+        title.textContent = tituloTooltip;
 
         // Cria texto descritivo
         const text = document.createElement('span');
@@ -1051,11 +1067,23 @@ window.incloowe.init = async function init() {
         });
 
         //POSICAO WIDGET
-
         btnsDirect = shadowR.querySelectorAll(".dir");
         btnsDirect.forEach(function (btn) {
             btn.addEventListener('click', ()=> setWidgetPosition(btn));
         });
+
+
+        //DARK MODE
+        btnDarkMode = shadowR.querySelector("#dM");
+        btnDarkMode.addEventListener('click', ()=> setWidgetDarkMode());
+
+        //HIDE INTERFACE
+        btnHideInterface = shadowR.querySelector("#hI");
+        btnHideInterface.addEventListener('click', ()=> setWidgetHideInterface());
+
+        //SHORTCUT KEYBOARD
+        btnShortcutKeyboard = shadowR.querySelector("#sK");
+        btnShortcutKeyboard.addEventListener('click', ()=> setWidgetShortcutKeyboard());
 
     }
 
@@ -2039,49 +2067,15 @@ window.incloowe.init = async function init() {
 
     }
 
-    // function changeWidgetPosition(btn) {
-    //
-    //     let widgetPositionSaved = getItemFromLocalStorageWithExpiry(WIDGET_POSITION_KEY);
-    //     let direction;
-    //
-    //     let widget = shadowR.querySelector('#widget');
-    //     if(widget.classList.contains('right')){
-    //         direction = 0;
-    //     }else {
-    //         direction = 1;
-    //     }
-    //
-    //     if (widgetPositionSaved !== null && widgetPositionSaved.value === direction) {
-    //         indexActualWidgetPosition = 0;
-    //     } else {
-    //         indexActualWidgetPosition = direction;
-    //     }
-    //
-    //     setWidgetPosition();
-    //     changeStyleButtonSelectedAndDeselectOthers(btn, WIDGET_POSITION_KEY);
-    //
-    //     if (indexActualWidgetPosition === 0) {
-    //         removeItemFromLocalStorage(WIDGET_POSITION_KEY, btn.id);
-    //     } else {
-    //         setItemToLocalStorageWithExpiry(WIDGET_POSITION_KEY,
-    //             indexActualWidgetPosition,
-    //             null,
-    //             btn.id);
-    //     }
-    //
-    // }
-
     function loadWidgetPosition() {
         let widget = shadowR.querySelector('#widget');
         let btnWidget = shadowR.querySelector('#accessibilityButton');
 
-        let def = JSON.parse(localStorage.getItem('configs'));
-        console.log(def.default_position);
-
-        let selectedWidgetPosition = getItemFromLocalStorageWithExpiry(WIDGET_POSITION_KEY)?.value;
+        let defaultPosition = configsDefault.data.data[0].assinaturas.configuracoes.defaultPosition;
+        let selectedWidgetPosition = getInclooweState("position");
 
         if(selectedWidgetPosition === null || selectedWidgetPosition === undefined) {
-            selectedWidgetPosition = def.default_position;
+            selectedWidgetPosition = defaultPosition;
         }
 
         let btns = shadowR.querySelectorAll('.dir');
@@ -2089,7 +2083,7 @@ window.incloowe.init = async function init() {
         widget.classList.add(selectedWidgetPosition);
         btnWidget.classList.add(selectedWidgetPosition);
 
-        if (selectedWidgetPosition.value === 'left') {
+        if (selectedWidgetPosition === 'left') {
             btns[0].classList.add("active");
         } else {
             btns[1].classList.add("active");
@@ -2099,7 +2093,6 @@ window.incloowe.init = async function init() {
     }
 
     function setWidgetPosition(btnSelected) {
-
 
         if(btnSelected.classList.contains('active')) return;
 
@@ -2128,13 +2121,64 @@ window.incloowe.init = async function init() {
         btnSelected.parentElement.querySelector(".active")?.classList.remove('active');
         btnSelected.classList.add("active");
 
-        setItemToLocalStorageWithExpiry(WIDGET_POSITION_KEY,
-            selectedWidgetPosition,
-            null,
-            null);
+        setInclooweState("position", selectedWidgetPosition)
 
-        // }
+    }
 
+    function loadWidgetDarkMode() {
+
+        let defaultDarkMode = configsDefault.data.data[0].assinaturas.configuracoes.defaultDarkMode;
+        let stateDarkMode = getInclooweState("darkMode");
+
+        if(stateDarkMode === null || stateDarkMode === undefined) {
+            stateDarkMode = defaultDarkMode;
+        }
+
+
+        shadowR.querySelector("#dM").checked = stateDarkMode != null ? stateDarkMode : false;
+    }
+
+    function setWidgetDarkMode() {
+        let stateDarkMode = getInclooweState("darkMode");
+        setInclooweState("darkMode", stateDarkMode != null ? !stateDarkMode : false);
+
+    }
+
+    function loadWidgetHideInterface() {
+
+        let defaultHideInterface = configsDefault.data.data[0].assinaturas.configuracoes.defaultHideInterface;
+        let stateHideInterface = getInclooweState("hideInterface");
+
+        if(stateHideInterface === null || stateHideInterface === undefined) {
+            stateHideInterface = defaultHideInterface;
+        }
+
+
+        shadowR.querySelector("#hI").checked = stateHideInterface != null ? stateHideInterface : false;
+    }
+
+    function setWidgetHideInterface() {
+        let stateHideInterface = getInclooweState("hideInterface");
+        setInclooweState("hideInterface", stateHideInterface != null ? !stateHideInterface : false);
+
+    }
+
+    function loadWidgetShortcutKeyboard() {
+
+        let defaultShortcutKeyboard = configsDefault.data.data[0].assinaturas.configuracoes.defaultShortcutKeyboard;
+        let stateShortcutKeyboard = getInclooweState("shortcutKeyboard");
+
+        if(stateShortcutKeyboard === null || stateShortcutKeyboard === undefined) {
+            stateShortcutKeyboard = defaultShortcutKeyboard;
+        }
+
+
+        shadowR.querySelector("#sK").checked = stateShortcutKeyboard != null ? stateShortcutKeyboard : false;
+    }
+
+    function setWidgetShortcutKeyboard() {
+        let stateShortcutKeyboard = getInclooweState("shortcutKeyboard");
+        setInclooweState("shortcutKeyboard", stateShortcutKeyboard != null ? !stateShortcutKeyboard : false);
     }
 
 

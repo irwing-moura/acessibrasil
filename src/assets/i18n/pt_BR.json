@@ -1,0 +1,40 @@
+{
+  "configHeader": "Configurações",
+  "resetButton": "Restaurar",
+  "closeButton": "Fechar",
+  "backButton": "Voltar",
+  "welcomeMainPageTitle": "Bem vindo aos ajustes de acessibilidade!",
+  "welcomeMainPageSubtitle": "Use as opções de ajuste abaixo para que o nosso site atenda todas as suas necessidades de acessibilidade.",
+
+  "welcomeConfigPageTitle": "Configurações da aplicação",
+  "welcomeConfigPageSubtitle": "Use as opções abaixo para configurar e obter informações sobre a nossa aplicação de ajustes de acessibilidade.",
+  "darkModeTitle": "Modo Escuro",
+  "darkModeSubtitle": "Mude a interface para o modo escuro",
+  "hideInterfaceTitle": "Ocultar Interface",
+  "hideInterfaceSubtitle": "Oculte a interface da aplicação",
+  "shortcutKeyTitle": "Atalhos do Teclado",
+  "shortcutKeySubtitle": "Ative ou desative atalhos pelo teclado",
+  "moveWidgetTitle": "Mover Widget",
+  "moveWidgetSubTitle": "Reposicione o Widget da maneira que preferir",
+
+  "shortcutListTitle": "Lista de Atalhos",
+  "shortcutListSubtitle": "Veja a lista de atalhos pelo teclado",
+  "aboutUsTitle": "Sobre a aplicação",
+  "aboutUsSubtitle": "Saiba mais sobre a nossa aplicação",
+  "certifiesTitle": "Certificados de Confiança",
+  "certifiesSubtitle": "Veja nossos comprovantes de qualidade",
+  "questionsTitle": "Perguntas Frequentes",
+  "questionsSubtitle": "Veja as dúvidas comuns sobre a aplicação",
+  "talkToUsTitle": "Fale Conosco",
+  "talkToUsSubtitle": "Alguma dúvida ou dica? Fale Conosco",
+  "searchTitle": "Pesquisas",
+  "searchSubtitle": "Nos ajude a melhorar nossa aplicação",
+
+  "switchOn": "Ligado",
+  "switchOff": "Desligado",
+
+  "tooltip": "Atalho da função",
+
+  "footer": "Acessibilidade na Web por",
+  "footerLink": "Saiba mais >"
+}

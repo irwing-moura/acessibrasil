@@ -1,3 +1,9 @@
+let defaultConfigs;  // Variável privada
+
+export function setDefaultConfigs(root) {
+    defaultConfigs = root;
+}
+
 // ******************** LOCAL STORAGE ********************//
 
 export function setItemToLocalStorageWithExpiry(key, value, percentage, btnid, isRangeOrRadio) {
@@ -20,22 +26,6 @@ export function setItemToLocalStorageWithExpiry(key, value, percentage, btnid, i
         }
     }
 }
-
-// export function setItemGroup(btnId) {
-//
-//     localStorage.setItem(btnId, 1);
-//
-//     if(btnid != null) {
-//         if(isRange){
-//             //RANGE
-//             localStorage.setItem(btnid, value);
-//         }else {
-//             //ACTIVATE
-//             localStorage.setItem(btnid, 1);
-//         }
-//     }
-//
-// }
 
 export function getItemFromLocalStorageWithExpiry(key) {
     const itemStr = localStorage.getItem(key)
@@ -62,12 +52,6 @@ export function removeItemFromLocalStorage(key, btnId) {
     }
 }
 
-// export function changeItemGroup(btnId) {
-//     if(btnId != null) {
-//         localStorage.setItem(btnId, 0);
-//     }
-// }
-
 export function clearLocalStorage() {
     localStorage.clear();
     location.reload(true);
@@ -92,4 +76,33 @@ export function needToLoadFuctions() {
 
     return false;
 
+}
+
+
+export function setInclooweState(chave, valor) {
+
+    // Obtém o item 'inclooweState' do localStorage caso ja tenha sido alterado ou busca o padrão setado pro dominio
+    let inclooweState = JSON.parse(localStorage.getItem('inclooweState')) ||
+        {
+            language: defaultConfigs.data.data[0].assinaturas.configuracoes.defaultLanguage,
+            darkMode: defaultConfigs.data.data[0].assinaturas.configuracoes.defaultDarkMode,
+            shortcutKeyboard: defaultConfigs.data.data[0].assinaturas.configuracoes.defaultShortcutKeyboard,
+            position: defaultConfigs.data.data[0].assinaturas.configuracoes.defaultPosition,
+            hideInterface: defaultConfigs.data.data[0].assinaturas.configuracoes.defaultHideInterface,
+        };
+
+    // Atualiza o valor da chave especificada
+    inclooweState[chave] = valor;
+
+    // Salva de volta no localStorage
+    localStorage.setItem('inclooweState', JSON.stringify(inclooweState));
+}
+
+export function getInclooweState(chave) {
+
+    // Recupera o estado atual ou usa o padrão se não existir
+    const estadoAtual = JSON.parse(localStorage.getItem('inclooweState'));
+
+    // Retorna o valor da chave especificada
+    return estadoAtual != null ? estadoAtual[chave] : null;
 }
