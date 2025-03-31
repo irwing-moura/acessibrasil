@@ -10,7 +10,7 @@ import {
     DALTONISM_FILTER_KEY, ZOOM_KEY
 } from "../core/constants";
 import {calculateZoomPercentageInPixels, changeStyleButtonSelectedAndDeselectOthers} from "../utils/support";
-import {getFirstChildElementsBelowBody} from "../queries";
+import {getFirstChildElementsBelowBody} from "../utils/queries";
 import {getQueriesLoaded, getShadowRoot} from "../core/widget";
 import {toggleExpandWindow} from "../core/components";
 

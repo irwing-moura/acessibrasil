@@ -5,7 +5,7 @@ import {
     setItemToLocalStorageWithExpiry
 } from './storage.js';
 import fonteUrl from "../assets/fonts/OpenDyslexic-Regular.woff";
-import {getLastLeafElementsWithText} from "../queries";
+import {getLastLeafElementsWithText} from "./queries";
 import {getShadowRoot} from "../core/widget";
 
 export function toInteger(str) {

@@ -1,4 +1,4 @@
-import {getLastLeafElementsWithText} from "../queries";
+import {getLastLeafElementsWithText} from "../utils/queries";
 import {getItemFromLocalStorageWithExpiry} from "../utils/storage";
 import {HIGHLIGHT_FOCUS_KEY, HIGHLIGHT_HEADINGS_KEY, HIGHLIGHT_HOVER_KEY, HIGHLIGHT_LINKS_KEY} from "../core/constants";
 import {getQueriesLoaded} from "../core/widget";

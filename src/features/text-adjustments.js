@@ -1,4 +1,4 @@
-import {getLastLeafElementsWithText, getLineHeightInPixelsIfText} from "../queries";
+import {getLastLeafElementsWithText, getLineHeightInPixelsIfText} from "../utils/queries";
 import {
     getItemFromLocalStorageWithExpiry,
     removeItemFromLocalStorage,

@@ -6,8 +6,6 @@ import {
 import {auth, getButtons, getContainers, getQueries} from "../api";
 import {
     triggerFixedButtons,
-    createButton,
-    createTitleContainer,
     toggleExpandWindow,
     createDynamicButtons
 } from "./components";
