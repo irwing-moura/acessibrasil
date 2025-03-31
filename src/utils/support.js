@@ -4,22 +4,32 @@ import {
     removeItemFromLocalStorage,
     setItemToLocalStorageWithExpiry
 } from './storage.js';
-import fonteUrl from "./assets/fonts/OpenDyslexic-Regular.woff";
+import fonteUrl from "../assets/fonts/OpenDyslexic-Regular.woff";
+import {getLastLeafElementsWithText} from "../queries";
+import {getShadowRoot} from "../core/widget";
 
-let shadowR;  // Variável privada
+export function toInteger(str) {
+    return str ? parseInt(str, 10) || 0 : 0;
+}
 
-export function setShadowRoot(root) {
-    shadowR = root;
+export function setOriginalFontSizeOnLoading() {
+    const lastLeafElementsWithText = getLastLeafElementsWithText();
+    lastLeafElementsWithText.forEach(function (txtTag) {
+        let attName = txtTag.getAttribute('original-size');
+        if (attName == null) {
+            txtTag.setAttribute('original-size', parseInt(window.getComputedStyle(txtTag).fontSize));
+        }
+    });
 }
 
 export function createStyleGlobal() {
     // Cria um elemento <style>
     let estiloGlobal = document.createElement('style');
     estiloGlobal.setAttribute("id", "incloowe-style")
-    let fonteUrl = require('./assets/fonts/OpenDyslexic-Regular.woff');
-    let fonteUrlWix = require('./assets/fonts/WixMadeforText-Regular.woff');
-    let fonteUrlWixExtraBold = require('./assets/fonts/WixMadeforText-ExtraBold.woff');
-    let fonteUrlWixMedium = require('./assets/fonts/WixMadeforText-Medium.woff');
+    let fonteUrl = require('../assets/fonts/OpenDyslexic-Regular.woff');
+    let fonteUrlWix = require('../assets/fonts/WixMadeforText-Regular.woff');
+    let fonteUrlWixExtraBold = require('../assets/fonts/WixMadeforText-ExtraBold.woff');
+    let fonteUrlWixMedium = require('../assets/fonts/WixMadeforText-Medium.woff');
     let estilo = document.createTextNode(' @font-face { ' +
         '            font-family: \'OpenDyslexic\'; ' +
         `            src: url(${fonteUrl}) format(\'woff\'); ` +
@@ -82,16 +92,6 @@ export function createStyleGlobal() {
     document.head.appendChild(estiloFilter);
 }
 
-export function openModalHideButtonOrNot() {
-    const appWindow = shadowR.querySelector("#appWindow");
-    appWindow.style.setProperty('background', 'rgb(0 0 0 / 30%)', 'important');
-
-    const modal = shadowR.querySelector("#modal-hide");
-    modal.style.setProperty('opacity', '1', 'important');
-    modal.style.setProperty('visibility', 'visible', 'important');
-    modal.style.setProperty('transform', 'translate(-50%, -20%)', 'important');
-}
-
 export function expandContent(elemento) {
     let content = elemento.parentElement.parentElement.children[1];
     if (content.classList.contains('active')) {
@@ -120,6 +120,8 @@ export function expandContent(elemento) {
 export function showTooltip(info) {
 
     //todo:: COLOCAR ESSE VISIBLE AO ABRIR O CONTAINER DE BUTTONS
+
+    let shadowR = getShadowRoot();  // Variável privada
 
     let a = info.closest('.content-buttons');
     const tooltip = info.parentElement.querySelector('.tooltip-container');
@@ -171,6 +173,18 @@ export function hideWidget() {
 
 }
 
+// Controle do modal
+export function openModal() {
+    let shadowR = getShadowRoot();  // Variável privada
+    let modalLanguage = shadowR.querySelector('.modal-overlay');
+    modalLanguage.classList.add('active');
+}
+
+export function closeModal(e) {
+    let shadowR = getShadowRoot();  // Variável privada
+    let modalLanguage = shadowR.querySelector('.modal-overlay');
+    modalLanguage.classList.remove('active');
+}
 
 //MUDA O TEXTO DO INPUT DE RANGE PARA AS PORCENTAGENS OU 'DEFAULT'
 export function changeTextAndColorRangeValue(percentAcrescentar, btnDiv) {
@@ -206,6 +220,7 @@ export function changeStyleButtonSelected(btn) {
 
 //ALTERA O ESTILO DO BOTÃO PARA SELECIONADO E DESSELECIONA OUTROS
 export function changeStyleButtonSelectedAndDeselectOthers(btn, key) {
+    let shadowR = getShadowRoot();  // Variável privada
     // Identifica o grupo do botão clicado com a classe que inicia com 'i' seguida de números
     const group = Array.from(btn.classList).find(classe => /^i\d+$/.test(classe));
 
@@ -385,6 +400,7 @@ function esconderBalao() {
 
 // Função para mostrar o Toast
 export function showToast() {
+    let shadowR = getShadowRoot();  // Variável privada
     let toast = shadowR.querySelector(".toast");
     // Exibe o toast com animação
     setTimeout(() => {
@@ -399,7 +415,7 @@ export function showToast() {
 
 // Função para fechar o Toast
 export function closeToast() {
-
+    let shadowR = getShadowRoot();  // Variável privada
     let toast = shadowR.querySelector(".toast");
 
     setTimeout(() => {
@@ -407,3 +423,5 @@ export function closeToast() {
         toast.classList.remove('show');
     }, 100); // Tempo para animação de saída
 }
+
+

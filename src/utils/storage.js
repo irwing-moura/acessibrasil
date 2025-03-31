@@ -1,8 +1,7 @@
-let defaultConfigs;  // Variável privada
-
-export function setDefaultConfigs(root) {
-    defaultConfigs = root;
-}
+import {getButtons} from "../api";
+import {changeTextAndColorRangeValue, toInteger} from "./support";
+import {getDefaultConfig, getShadowRoot} from "../core/widget";
+import {changeAdjustColorButton} from "../features/visual-adjustments";
 
 // ******************** LOCAL STORAGE ********************//
 
@@ -81,6 +80,8 @@ export function needToLoadFuctions() {
 
 export function setInclooweState(chave, valor) {
 
+    let defaultConfigs = getDefaultConfig();
+
     // Obtém o item 'inclooweState' do localStorage caso ja tenha sido alterado ou busca o padrão setado pro dominio
     let inclooweState = JSON.parse(localStorage.getItem('inclooweState')) ||
         {
@@ -105,4 +106,54 @@ export function getInclooweState(chave) {
 
     // Retorna o valor da chave especificada
     return estadoAtual != null ? estadoAtual[chave] : null;
+}
+
+export async function setLocalStoregeButtonsId() {
+
+    let buttons = await getButtons();
+
+    for (const btn of buttons) {
+
+        let value = localStorage.getItem(btn.name);
+        let shadowR = getShadowRoot();
+
+        if (value == null) {
+            //SETA VALORES ZERADOS AO INICIAR
+            localStorage.setItem(btn.name, 0);
+        } else if (value == 1) {
+            //SETA BOTÕES ACTIVATE
+            let button = shadowR.querySelector('#' + btn.name);
+            button.classList.add("btn-active"); // Ativa o botão clicado
+            button.querySelector('small').textContent = 'Ligado';
+        } else if (value.includes('%')) {
+            let btnDiv = shadowR.querySelector('#' + btn.name);
+            changeTextAndColorRangeValue(toInteger(value),
+                btnDiv);
+
+        } else if (value.includes('rgb')) {
+            //ADJUST COLORS - RADIO
+            let a;
+
+            if (btn.description === 'Adjust Text Color') {
+                a = 'adjustTextColor';
+            } else if (btn.description === 'Adjust Title Color') {
+                a = 'adjustTitleColor';
+            } else if (btn.description === 'Adjust Background Color') {
+                a = 'adjustBackgroundColor';
+            }
+
+            let btns = shadowR.querySelectorAll(`div[data-test=${a}]`)[0]
+                .querySelectorAll('.color-pick');
+
+            btns.forEach(button => {
+                if (button.style.backgroundColor === value) {
+                    changeAdjustColorButton(button, a)
+                }
+            });
+
+
+        }
+
+    }
+
 }
