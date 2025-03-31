@@ -1,4 +1,4 @@
-import {getButtons} from "../api";
+import {getButtons} from "../api/api";
 import {changeTextAndColorRangeValue, toInteger} from "./support";
 import {getDefaultConfig, getShadowRoot} from "../core/widget";
 import {changeAdjustColorButton} from "../features/visual-adjustments";

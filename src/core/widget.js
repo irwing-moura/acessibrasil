@@ -3,7 +3,7 @@ import {
     createStyleGlobal,
     setOriginalFontSizeOnLoading,
 } from "../utils/support";
-import {auth, getButtons, getContainers, getQueries} from "../api";
+import {auth, getButtons, getContainers, getQueries} from "../api/api";
 import {
     triggerFixedButtons,
     toggleExpandWindow,
