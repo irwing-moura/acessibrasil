@@ -1,6 +1,6 @@
 import {getButtons} from "../api/api";
 import {changeTextAndColorRangeValue, toInteger} from "./support";
-import {getDefaultConfig, getShadowRoot} from "../core/widget";
+import {getDefaultConfig, getJson, getShadowRoot} from "../core/widget";
 import {changeAdjustColorButton} from "../features/visual-adjustments";
 
 // ******************** LOCAL STORAGE ********************//
@@ -116,6 +116,7 @@ export async function setLocalStoregeButtonsId() {
 
         let value = localStorage.getItem(btn.name);
         let shadowR = getShadowRoot();
+        let json = getJson();
 
         if (value == null) {
             //SETA VALORES ZERADOS AO INICIAR
@@ -124,7 +125,7 @@ export async function setLocalStoregeButtonsId() {
             //SETA BOTÕES ACTIVATE
             let button = shadowR.querySelector('#' + btn.name);
             button.classList.add("btn-active"); // Ativa o botão clicado
-            button.querySelector('small').textContent = 'Ligado';
+            button.querySelector('small').textContent = json.switchOn;
         } else if (value.includes('%')) {
             let btnDiv = shadowR.querySelector('#' + btn.name);
             changeTextAndColorRangeValue(toInteger(value),

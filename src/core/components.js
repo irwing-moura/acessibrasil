@@ -18,15 +18,15 @@ import {
     VLIBRAS_KEY, ZOOM_KEY
 } from "./constants";
 import {
-    clearLocalStorage,
+    clearLocalStorage, getInclooweState,
     getItemFromLocalStorageWithExpiry,
     removeItemFromLocalStorage,
     setItemToLocalStorageWithExpiry
 } from "../utils/storage";
-import {getContainersLoaded, getShadowRoot} from "./widget";
+import {getContainersLoaded, getDefaultConfig, getJson, getShadowRoot} from "./widget";
 import {
     applyWidgetDarkMode,
-    applyWidgetHideInterface,
+    applyWidgetHideInterface, applyWidgetLanguage,
     applyWidgetPosition,
     applyWidgetShortcutKeyboard
 } from "../features/configuration";
@@ -51,6 +51,7 @@ import {
 } from "../features/highlight-features";
 import {applyVLibras} from "../features/vlibras";
 
+let json;
 
 const funcoes = {
 
@@ -187,10 +188,19 @@ export function createDynamicButtons() {
     let containers = getContainersLoaded();
     if (!containers) return;
     let shadowR = getShadowRoot();
-    const scrollableContents = shadowR.querySelectorAll('.scrollable-content');
+    // const scrollableContents = shadowR.querySelectorAll('.scrollable-content');
     // scrollableContents.forEach(content => {
     //     content.innerHTML = ''; // Clear existing content
     // });
+
+    let defaultLanguage = getDefaultConfig().data.data[0].assinaturas.configuracoes.defaultLanguage;
+    let languageToFind = getInclooweState("language"); // Defina o idioma que deseja buscar
+
+    if(languageToFind === null || languageToFind === undefined) {
+        languageToFind = defaultLanguage;
+    }
+
+    json = getJson();
 
     containers.forEach((container) => {
         let order = container.order - 1;
@@ -198,7 +208,10 @@ export function createDynamicButtons() {
 
         if (cont) {
             // Create container title
-            const titleContainer = createTitleContainer(container.title, container.description, order);
+
+            const textosContainer = container.translations_container.find(item => item.language === languageToFind);
+
+            const titleContainer = createTitleContainer(textosContainer.title, textosContainer.subtitle, order);
             cont.appendChild(titleContainer);
 
             // Create buttons container
@@ -208,7 +221,6 @@ export function createDynamicButtons() {
             // Add buttons
             container.funcionalidades.forEach((item, i) => {
 
-                const languageToFind = "pt_BR"; // Defina o idioma que deseja buscar
                 const textos = item.translations.find(item => item.language === languageToFind);
 
                 let botao = createButton(
@@ -287,7 +299,7 @@ export function triggerFixedButtons() {
         // }, 500);
     })
 
-    //MODAL DE LINGUAGEM
+    //LANGUAGE
     shadowR.querySelector('.btn-language').addEventListener('click', openModal);
 
     let modalLanguage = shadowR.querySelector('.modal-overlay');
@@ -298,6 +310,12 @@ export function triggerFixedButtons() {
         if(e.target === this){
             closeModal();
         }
+    });
+
+    let btnsLanguages = shadowR.querySelectorAll(".language-button");
+    btnsLanguages.forEach(function (btn) {
+        let lng = btn.getAttribute("data-language");
+        btn.addEventListener('click', () => applyWidgetLanguage(btn, lng));
     });
 
     //POSICAO WIDGET
@@ -431,7 +449,7 @@ function createButtonRange(texto, classe, textoTooltip, id, acaoClique, tituloTo
     // Criando o span do valor
     const valueSpan = document.createElement("span");
     valueSpan.classList.add("button-range-value");
-    valueSpan.textContent = "Default";
+    valueSpan.textContent = json.defaultRangeButton;
 
     // Criando o botão de aumentar (+)
     const plusButton = document.createElement("button");
@@ -465,7 +483,7 @@ function createButtonRange(texto, classe, textoTooltip, id, acaoClique, tituloTo
     const desc = document.createElement("div");
     desc.classList.add("desc-refresh");
     const spanDesc = document.createElement("span");
-    spanDesc.textContent = 'Restaurar';
+    spanDesc.textContent = json.resetButton;
     desc.appendChild(spanDesc);
     button.appendChild(desc);
 
@@ -497,7 +515,7 @@ function createButtonRange(texto, classe, textoTooltip, id, acaoClique, tituloTo
     shortcutContainer.className = 'tooltip-shortcut-container';
 
     // Cria elementos dos atalhos
-    const shortcutText = document.createTextNode('Atalho da funcão: ');
+    const shortcutText = document.createTextNode(json.tooltip);
     const ctrlButton = document.createElement('span');
     ctrlButton.className = 'tooltip-shortcut-button';
     ctrlButton.textContent = 'Ctrl';
@@ -557,7 +575,7 @@ function createButtonActivate(texto, textoTooltip, acaoClique, order, classe, gr
     divTexto.appendChild(span);
 
     const small = document.createElement('small');
-    small.textContent = "Desligado";
+    small.textContent = json.switchOff;
     divTexto.appendChild(small);
     botao.appendChild(divTexto);
 
@@ -584,7 +602,7 @@ function createButtonActivate(texto, textoTooltip, acaoClique, order, classe, gr
     shortcutContainer.className = 'tooltip-shortcut-container';
 
     // Cria elementos dos atalhos
-    const shortcutText = document.createTextNode('Atalho da funcão: ');
+    const shortcutText = document.createTextNode(json.tooltip);
     const ctrlButton = document.createElement('span');
     ctrlButton.className = 'tooltip-shortcut-button';
     ctrlButton.textContent = 'Ctrl';
@@ -714,7 +732,7 @@ function createButtonRadio(texto, textoTooltip, acaoClique, id, tituloTooltip) {
     shortcutContainer.className = 'tooltip-shortcut-container';
 
     // Cria elementos dos atalhos
-    const shortcutText = document.createTextNode('Atalho da funcão: ');
+    const shortcutText = document.createTextNode(json.tooltip);
     const ctrlButton = document.createElement('span');
     ctrlButton.className = 'tooltip-shortcut-button';
     ctrlButton.textContent = 'Ctrl';
@@ -760,7 +778,7 @@ function createButtonRadio(texto, textoTooltip, acaoClique, id, tituloTooltip) {
     const desc = document.createElement("div");
     desc.classList.add("desc-refresh");
     const spanDesc = document.createElement("span");
-    spanDesc.textContent = 'Restaurar';
+    spanDesc.textContent = json.resetButton;
     desc.appendChild(spanDesc);
     btnReset.appendChild(desc);
 

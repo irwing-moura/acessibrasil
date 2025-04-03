@@ -1,7 +1,15 @@
-import {getInclooweState, setInclooweState} from "../utils/storage";
+import {getInclooweState, removeItemFromLocalStorage, setInclooweState} from "../utils/storage";
 import {getDefaultConfig, getShadowRoot} from "../core/widget";
 
-export function loadWidgetPosition() {
+export function loadConfigurations() {
+    loadWidgetPosition();
+    loadWidgetDarkMode();
+    loadWidgetHideInterface();
+    loadWidgetShortcutKeyboard();
+    loadWidgetLanguage();
+}
+
+function loadWidgetPosition() {
     let shadowR = getShadowRoot();
     let configsDefault = getDefaultConfig();
     let widget = shadowR.querySelector('#widget');
@@ -28,7 +36,7 @@ export function loadWidgetPosition() {
 
 }
 
-export function loadWidgetDarkMode() {
+function loadWidgetDarkMode() {
 
     let shadowR = getShadowRoot();
     let configsDefault = getDefaultConfig();
@@ -44,7 +52,7 @@ export function loadWidgetDarkMode() {
     shadowR.querySelector("#dM").checked = stateDarkMode != null ? stateDarkMode : false;
 }
 
-export function loadWidgetHideInterface() {
+function loadWidgetHideInterface() {
 
     let shadowR = getShadowRoot();
     let configsDefault = getDefaultConfig();
@@ -60,7 +68,7 @@ export function loadWidgetHideInterface() {
     shadowR.querySelector("#hI").checked = stateHideInterface != null ? stateHideInterface : false;
 }
 
-export function loadWidgetShortcutKeyboard() {
+function loadWidgetShortcutKeyboard() {
 
     let shadowR = getShadowRoot();
     let configsDefault = getDefaultConfig();
@@ -74,6 +82,25 @@ export function loadWidgetShortcutKeyboard() {
 
 
     shadowR.querySelector("#sK").checked = stateShortcutKeyboard != null ? stateShortcutKeyboard : false;
+}
+
+function loadWidgetLanguage() {
+
+    let configsDefault = getDefaultConfig();
+    let defaultLanguage = configsDefault.data.data[0].assinaturas.configuracoes.defaultLanguage;
+    let language = getInclooweState("language"); // Defina o idioma que deseja buscar
+
+    if(language === null || language === undefined) {
+        language = defaultLanguage;
+    }
+
+    let shadowR = getShadowRoot();
+    let btns = shadowR.querySelectorAll('.language-button');
+    btns.forEach(button => {
+        if(button.getAttribute("data-language") === language){
+            button.classList.add("selected");
+        }
+    });
 }
 
 export function applyWidgetPosition(btnSelected) {
@@ -126,4 +153,22 @@ export function applyWidgetHideInterface() {
 export function applyWidgetShortcutKeyboard() {
     let stateShortcutKeyboard = getInclooweState("shortcutKeyboard");
     setInclooweState("shortcutKeyboard", stateShortcutKeyboard != null ? !stateShortcutKeyboard : false);
+}
+
+export function applyWidgetLanguage(btn, lngSelected) {
+
+    if(btn.classList.contains('selected')) return;
+
+    let shadowR = getShadowRoot();
+    let btns = shadowR.querySelectorAll('.language-button');
+    btns.forEach(button => {
+            button.classList.remove("selected");
+    });
+
+    btn.classList.add("selected");
+
+    setInclooweState("language", lngSelected);
+    // localStorage.setItem("justUpdatedLanguage", true);
+
+    location.reload(true);
 }

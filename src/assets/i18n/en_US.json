@@ -33,7 +33,23 @@
   "switchOn": "On",
   "switchOff": "Off",
 
-  "tooltip": "Function shortcut",
+  "tooltip": "Function shortcut:",
+
+  "toast": "Default settings have been restored",
+
+  "defaultRangeButton": "Default",
+
+  "modalLanguageTitle": "Choose the language of the application",
+  "modalLanguageSubtitle": "Select the language to be used in the accessibility settings interface",
+
+  "contentAndScreenAdjustTitle": "Content and Screen Adjustments",
+  "contentAndScreenAdjustSubtitle": "Align and organize content your way",
+
+  "colorAdjustTitle": "Color Adjustments",
+  "colorAdjustSubtitle": "Change the website colors as per your needs",
+
+  "orientationAdjustTitle": "Orientation Adjustments",
+  "orientationAdjustSubtitle": "Stay focused on what's important to you",
 
   "footer": "Web Accessibility by",
   "footerLink": "Learn More >"

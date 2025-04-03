@@ -33,7 +33,23 @@
   "switchOn": "Conectado",
   "switchOff": "Apagado",
 
-  "tooltip": "Atajo de función",
+  "tooltip": "Atajo de función:",
+
+  "toast": "Se han restaurado los ajustes predeterminados",
+
+  "defaultRangeButton": "Predeterminado",
+
+  "modalLanguageTitle": "Elija el idioma de la aplicación",
+  "modalLanguageSubtitle": "Seleccione el idioma que se debe utilizar en la interfaz de configuración de accesibilidad",
+
+  "contentAndScreenAdjustTitle": "Ajustes de Contenido y Pantalla",
+  "contentAndScreenAdjustSubtitle": "Alinea y organiza el contenido a tu manera",
+
+  "colorAdjustTitle": "Ajustes de Color",
+  "colorAdjustSubtitle": "Cambie los colores del sitio web según sus necesidades",
+
+  "orientationAdjustTitle": "Ajustes de Orientación",
+  "orientationAdjustSubtitle": "Mantente enfocado en lo que es importante para ti",
 
   "footer": "Accesibilidad Web por",
   "footerLink": "Más Información >"

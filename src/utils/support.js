@@ -6,7 +6,7 @@ import {
 } from './storage.js';
 import fonteUrl from "../assets/fonts/OpenDyslexic-Regular.woff";
 import {getLastLeafElementsWithText} from "./queries";
-import {getShadowRoot} from "../core/widget";
+import {getJson, getShadowRoot} from "../core/widget";
 
 export function toInteger(str) {
     return str ? parseInt(str, 10) || 0 : 0;
@@ -191,10 +191,11 @@ export function changeTextAndColorRangeValue(percentAcrescentar, btnDiv) {
 
     let percentageElement = btnDiv.querySelector('.button-range-value');
     let btnReset = btnDiv.querySelector('.button-reset-func');
+    let json = getJson();
 
     if (percentAcrescentar === 0) {
         percentageElement.style.setProperty('color', '#686868', 'important');
-        percentageElement.textContent = 'Default';
+        percentageElement.textContent = json.defaultRangeButton;
         btnReset.disabled = true;
     } else {
         percentageElement.style.setProperty('color', '#000', 'important');
@@ -206,14 +207,15 @@ export function changeTextAndColorRangeValue(percentAcrescentar, btnDiv) {
 //ALTERA O ESTILO DO BOTÃO PARA SELECIONADO
 export function changeStyleButtonSelected(btn) {
 
+    let json = getJson();
     let txt = btn.querySelector('small');
 
     if (!btn.classList.contains('btn-active')) {
         btn.classList.add("btn-active");
-        txt.textContent = 'Ligado';
+        txt.textContent = json.switchOn;
     } else {
         btn.classList.remove("btn-active");
-        txt.textContent = 'Desligado';
+        txt.textContent = json.switchOff;
     }
 
 }
@@ -226,6 +228,7 @@ export function changeStyleButtonSelectedAndDeselectOthers(btn, key) {
 
     // Seleciona todos os botões do mesmo grupo
     let buttons = shadowR.querySelectorAll('.' + group);
+    let json = getJson();
 
     let txt = btn.querySelector('small');
 
@@ -233,16 +236,16 @@ export function changeStyleButtonSelectedAndDeselectOthers(btn, key) {
     if (btn.classList.contains('btn-active')) {
         // Se o botão já estiver ativo, desativa ele
         btn.classList.remove("btn-active");
-        txt.textContent = 'Desligado';
+        txt.textContent = json.switchOff;
     } else {
         // Caso contrário, ativa o botão clicado e desativa os outros
         buttons.forEach(button => {
             button.classList.remove("btn-active"); // Desativa todos do grupo
             removeItemFromLocalStorage(key, button.id);
-            button.querySelector('small').textContent = 'Desligado';
+            button.querySelector('small').textContent = json.switchOff;
             // changeItemGroup(button.id);
         });
-        txt.textContent = 'Ligado';
+        txt.textContent = json.switchOn;
         btn.classList.add("btn-active"); // Ativa o botão clicado
     }
 }

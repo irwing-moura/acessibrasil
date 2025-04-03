@@ -1,4 +1,6 @@
-import widgetHtml from "../widget.html";
+import widgetHtmlPtBr from "../templates/widget-pt_BR.html";
+import widgetHtmlEnUS from "../templates/widget-en_US.html";
+import widgetHtmlEsEs from "../templates/widget-es_ES.html";
 import {
     createStyleGlobal,
     setOriginalFontSizeOnLoading,
@@ -9,16 +11,16 @@ import {
     toggleExpandWindow,
     createDynamicButtons
 } from "./components";
-import {getItemFromLocalStorageWithExpiry, needToLoadFuctions, setLocalStoregeButtonsId} from "../utils/storage";
+import {
+    getInclooweState,
+    getItemFromLocalStorageWithExpiry,
+    needToLoadFuctions,
+    setLocalStoregeButtonsId
+} from "../utils/storage";
 import {WIDGET_STATUS_KEY} from "./constants";
 import {loadFeatures} from "../features/load-features";
 import lottie from "lottie-web";
-import {
-    loadWidgetDarkMode,
-    loadWidgetHideInterface,
-    loadWidgetPosition,
-    loadWidgetShortcutKeyboard
-} from "../features/configuration";
+import { loadConfigurations } from "../features/configuration";
 import {initializeVlibras} from "../features/vlibras";
 
 let shadowR;
@@ -27,6 +29,8 @@ let buttons;
 let containers;
 let configsDefault;
 let queries;
+let widgetHtml;
+let json;
 
 export async function init() {
     let widgetStatus = getItemFromLocalStorageWithExpiry(WIDGET_STATUS_KEY);
@@ -39,7 +43,8 @@ export async function init() {
         //ACESSO PERMITIDO
         if(configsDefault) {
 
-            // Get buttons and containers data first
+            // Get contents
+            widgetHtml = await getStaticTextsTranslated();
             buttons = await getButtons();
             containers = await getContainers();
             queries = await getQueries();
@@ -49,10 +54,7 @@ export async function init() {
             triggerFixedButtons();
             createDynamicButtons();
             setOriginalFontSizeOnLoading();
-            loadWidgetPosition();
-            loadWidgetDarkMode();
-            loadWidgetHideInterface();
-            loadWidgetShortcutKeyboard();
+            loadConfigurations();
 
             if (needToLoadFuctions()) {
                 if (document.readyState === 'complete') {
@@ -69,6 +71,34 @@ export async function init() {
     }
 }
 
+async function getStaticTextsTranslated() {
+
+
+    let defaultLanguage = configsDefault.data.data[0].assinaturas.configuracoes.defaultLanguage;
+    let languageToFind = getInclooweState("language"); // Defina o idioma que deseja buscar
+
+    if(languageToFind === null || languageToFind === undefined) {
+        languageToFind = defaultLanguage;
+    }
+
+    await fetch('../assets/i18n/' + languageToFind + '.json')
+        .then(response => response.json())
+        .then(data => {
+            json = data;
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados:', error);
+        });
+
+    if (languageToFind === "pt_BR") {
+        return widgetHtmlPtBr; // Insere o HTML no shadowRoot
+    } else if (languageToFind === "en_US") {
+        return widgetHtmlEnUS; // Insere o HTML no shadowRoot
+    } else if (languageToFind === "es_ES") {
+        return widgetHtmlEsEs; // Insere o HTML no shadowRoot
+    }
+}
+
 function createWidget() {
 
     let host = document.createElement('widget-ui');
@@ -76,7 +106,8 @@ function createWidget() {
     let shadowRoot = host.attachShadow({mode: 'open'});
     // let html = require('./widget.html');
 
-    shadowRoot.innerHTML = widgetHtml; // Insere o HTML no shadowRoot
+    shadowRoot.innerHTML = widgetHtml;
+
     document.body.appendChild(host);
 
     shadowR = document.getElementById("shadow").shadowRoot;
@@ -146,4 +177,8 @@ export function getQueriesLoaded() {
 
 export function getAnimation() {
     return anim;
+}
+
+export function getJson() {
+    return json;
 }
