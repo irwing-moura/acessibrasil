@@ -1,8 +1,8 @@
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-// const hostBackend = 'https://api-incloowe.vercel.app/api/v1'
-const hostBackend = 'http://localhost:5000/api/v1'
+const hostBackend = 'https://api-incloowe.vercel.app/api/v1'
+// const hostBackend = 'http://localhost:5000/api/v1'
 
 export const getContainers = async () => {
     try {
@@ -58,5 +58,18 @@ export const auth = async () => {
     } catch (error) {
         console.error("Error authentication:", error);
         return false;
+    }
+};
+
+export const getTranslateImutable = async (language) => {
+    try {
+        const response = await axios.get(hostBackend + '/translate', {
+            params: {language}
+        });
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching containers:", error);
+        throw error; // Opcional: lançar o erro para tratar em outro lugar
     }
 };

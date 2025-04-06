@@ -5,7 +5,7 @@ import {
     createStyleGlobal,
     setOriginalFontSizeOnLoading,
 } from "../utils/support";
-import {auth, getButtons, getContainers, getQueries} from "../api/api";
+import {auth, getButtons, getContainers, getQueries, getTranslateImutable} from "../api/api";
 import {
     triggerFixedButtons,
     toggleExpandWindow,
@@ -81,14 +81,8 @@ async function getStaticTextsTranslated() {
         languageToFind = defaultLanguage;
     }
 
-    await fetch('../assets/i18n/' + languageToFind + '.json')
-        .then(response => response.json())
-        .then(data => {
-            json = data;
-        })
-        .catch(error => {
-            console.error('Erro ao carregar dados:', error);
-        });
+    json = await getTranslateImutable(languageToFind);
+    json = json[0].data;
 
     if (languageToFind === "pt_BR") {
         return widgetHtmlPtBr; // Insere o HTML no shadowRoot
